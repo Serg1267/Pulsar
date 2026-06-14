@@ -23,8 +23,8 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
 )
-from PySide6.QtCore import Qt, QTimer, QSettings
-from PySide6.QtGui import QAction, QPixmap, QKeySequence, QCursor
+from PySide6.QtCore import Qt, QTimer, QSettings, QPointF
+from PySide6.QtGui import QAction, QIcon, QPixmap, QKeySequence, QCursor, QPalette, QColor
 from EDA.app.items.directive_item import DirectiveItem
 
 from ui.settings_dialog import SettingsDialog
@@ -207,16 +207,16 @@ class SpiceEDAMainWindow(QMainWindow):
         self._view_netlist_action.triggered.connect(self._view_netlist_dialog)
         self._view_netlist_action.setEnabled(True)
         self._sch_menu.addAction(self._view_netlist_action)
+        # ─── Правка ───
 
-        # ─── Редактировать ───
-        self._edit_menu = menubar.addMenu("Редактировать")
+        self._edit_menu = menubar.addMenu("Правка")
 
-        self._cir_undo_action = QAction("Отменить", self)
+        self._cir_undo_action = QAction(QIcon(str(Path(__file__).parent / "resources" / "icons" / "gschem-undo.png")), "Отменить", self)
         self._cir_undo_action.setShortcut("Ctrl+Z")
         self._cir_undo_action.triggered.connect(self._edit_undo)
         self._edit_menu.addAction(self._cir_undo_action)
 
-        self._cir_redo_action = QAction("Повторить", self)
+        self._cir_redo_action = QAction(QIcon(str(Path(__file__).parent / "resources" / "icons" / "gschem-redo.png")), "Повторить", self)
         self._cir_redo_action.setShortcut("Ctrl+Shift+Z")
         self._cir_redo_action.triggered.connect(self._edit_redo)
         self._edit_menu.addAction(self._cir_redo_action)
@@ -345,16 +345,6 @@ class SpiceEDAMainWindow(QMainWindow):
 
         self._save_action.setIcon(QIcon(str(icons / "gschem-save.png")))
         tb.addAction(self._save_action)
-
-        tb.addSeparator()
-
-        self._cir_undo_action.setIcon(QIcon(str(icons / "gschem-undo.png")))
-        tb.addAction(self._cir_undo_action)
-
-        self._cir_redo_action.setIcon(QIcon(str(icons / "gschem-redo.png")))
-        tb.addAction(self._cir_redo_action)
-
-        tb.addSeparator()
 
         self._wire_mode_action = QAction(QIcon(str(icons / "insert-net.png")), "Режим проводов", self)
         self._wire_mode_action.setCheckable(True)
@@ -1996,6 +1986,57 @@ class SpiceEDAMainWindow(QMainWindow):
             page = self._tabs.widget(i)
             if hasattr(page, 'canvas'):
                 page.canvas.set_grid_dots(grid_dots)
+        self._apply_app_theme()
+
+    def _apply_app_theme(self):
+        from EDA.app.items.colors import set_light_theme
+        settings = QSettings("SpiceEDA", "SpiceEDA")
+        theme = settings.value("app/theme", "dark")
+        is_light = theme == "light"
+        set_light_theme(is_light)
+        app = QApplication.instance()
+        if theme == "light":
+            palette = QPalette()
+            palette.setColor(QPalette.ColorRole.Window, QColor("#f0f0f0"))
+            palette.setColor(QPalette.ColorRole.WindowText, QColor("#000000"))
+            palette.setColor(QPalette.ColorRole.Base, QColor("#ffffff"))
+            palette.setColor(QPalette.ColorRole.AlternateBase, QColor("#e0e0e0"))
+            palette.setColor(QPalette.ColorRole.ToolTipBase, QColor("#ffffff"))
+            palette.setColor(QPalette.ColorRole.ToolTipText, QColor("#000000"))
+            palette.setColor(QPalette.ColorRole.Text, QColor("#000000"))
+            palette.setColor(QPalette.ColorRole.Button, QColor("#e0e0e0"))
+            palette.setColor(QPalette.ColorRole.ButtonText, QColor("#000000"))
+            palette.setColor(QPalette.ColorRole.BrightText, QColor("#ff0000"))
+            palette.setColor(QPalette.ColorRole.Link, QColor("#0000ff"))
+            palette.setColor(QPalette.ColorRole.Highlight, QColor("#0078d4"))
+            palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#ffffff"))
+            app.setPalette(palette)
+        else:
+            palette = QPalette()
+            palette.setColor(QPalette.ColorRole.Window, QColor("#2d2d2d"))
+            palette.setColor(QPalette.ColorRole.WindowText, QColor("#d4d4d4"))
+            palette.setColor(QPalette.ColorRole.Base, QColor("#1e1e1e"))
+            palette.setColor(QPalette.ColorRole.AlternateBase, QColor("#3c3c3c"))
+            palette.setColor(QPalette.ColorRole.ToolTipBase, QColor("#2d2d2d"))
+            palette.setColor(QPalette.ColorRole.ToolTipText, QColor("#d4d4d4"))
+            palette.setColor(QPalette.ColorRole.Text, QColor("#d4d4d4"))
+            palette.setColor(QPalette.ColorRole.Button, QColor("#3c3c3c"))
+            palette.setColor(QPalette.ColorRole.ButtonText, QColor("#d4d4d4"))
+            palette.setColor(QPalette.ColorRole.BrightText, QColor("#ff0000"))
+            palette.setColor(QPalette.ColorRole.Link, QColor("#00a8ff"))
+            palette.setColor(QPalette.ColorRole.Highlight, QColor("#264f78"))
+            palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#ffffff"))
+            app.setPalette(palette)
+
+        # Обновить фон и перерисовать все холсты
+        bg = QColor("#ffffff") if is_light else QColor("#1e1e1e")
+        for i in range(self._tabs.count()):
+            page = self._tabs.widget(i)
+            if hasattr(page, 'canvas'):
+                page.canvas.set_background_color(bg)
+                page.canvas.reload_cursors()
+            if hasattr(page, 'canvas'):
+                page.canvas.viewport().update()
 
 
 def main():
@@ -2005,7 +2046,45 @@ def main():
     app.setOrganizationName("SpiceEDA")
     app.setStyle("Fusion")
 
+    # Применить тему из сохранённых настроек
     settings = QSettings("SpiceEDA", "SpiceEDA")
+    theme = settings.value("app/theme", "dark")
+    is_light = theme == "light"
+    from EDA.app.items.colors import set_light_theme
+    set_light_theme(is_light)
+    if is_light:
+        palette = QPalette()
+        palette.setColor(QPalette.ColorRole.Window, QColor("#f0f0f0"))
+        palette.setColor(QPalette.ColorRole.WindowText, QColor("#000000"))
+        palette.setColor(QPalette.ColorRole.Base, QColor("#ffffff"))
+        palette.setColor(QPalette.ColorRole.AlternateBase, QColor("#e0e0e0"))
+        palette.setColor(QPalette.ColorRole.ToolTipBase, QColor("#ffffff"))
+        palette.setColor(QPalette.ColorRole.ToolTipText, QColor("#000000"))
+        palette.setColor(QPalette.ColorRole.Text, QColor("#000000"))
+        palette.setColor(QPalette.ColorRole.Button, QColor("#e0e0e0"))
+        palette.setColor(QPalette.ColorRole.ButtonText, QColor("#000000"))
+        palette.setColor(QPalette.ColorRole.BrightText, QColor("#ff0000"))
+        palette.setColor(QPalette.ColorRole.Link, QColor("#0000ff"))
+        palette.setColor(QPalette.ColorRole.Highlight, QColor("#0078d4"))
+        palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#ffffff"))
+        app.setPalette(palette)
+    else:
+        palette = QPalette()
+        palette.setColor(QPalette.ColorRole.Window, QColor("#2d2d2d"))
+        palette.setColor(QPalette.ColorRole.WindowText, QColor("#d4d4d4"))
+        palette.setColor(QPalette.ColorRole.Base, QColor("#1e1e1e"))
+        palette.setColor(QPalette.ColorRole.AlternateBase, QColor("#3c3c3c"))
+        palette.setColor(QPalette.ColorRole.ToolTipBase, QColor("#2d2d2d"))
+        palette.setColor(QPalette.ColorRole.ToolTipText, QColor("#d4d4d4"))
+        palette.setColor(QPalette.ColorRole.Text, QColor("#d4d4d4"))
+        palette.setColor(QPalette.ColorRole.Button, QColor("#3c3c3c"))
+        palette.setColor(QPalette.ColorRole.ButtonText, QColor("#d4d4d4"))
+        palette.setColor(QPalette.ColorRole.BrightText, QColor("#ff0000"))
+        palette.setColor(QPalette.ColorRole.Link, QColor("#00a8ff"))
+        palette.setColor(QPalette.ColorRole.Highlight, QColor("#264f78"))
+        palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#ffffff"))
+        app.setPalette(palette)
+
     show_splash = settings.value("splash/show", "true").lower() == "true"
 
     if show_splash:
@@ -2024,6 +2103,7 @@ def main():
         nonlocal _main_window
         _main_window = SpiceEDAMainWindow()
         _main_window.show()
+        _main_window._apply_app_theme()
         if splash is not None:
             splash.close()
 

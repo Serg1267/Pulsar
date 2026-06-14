@@ -1,0 +1,5 @@
+* 1N4001 — Standard Recovery Rectifier Diode
+* Manufacturer: OnSemi / Generic
+* Vrrm=50V, If(avg)=1A, Vf=1.0V@1A
+* SPICE model verified with ngspice-44 (TRAN, DC, OP analyses)
+.model 1N4001 D (IS=2.52n RS=0.0346 N=1.752 XTI=3 EG=1.11 CJO=40p M=0.333 VJ=0.75 FC=0.5 BV=50 IBV=10u TT=5.7u)

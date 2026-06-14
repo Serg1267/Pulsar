@@ -1,0 +1,13 @@
+* KT315B — NPN silicon planar epitaxial transistor
+* Vceo=35V, Ic=100mA, Ft=250MHz, hfe=200-350
+* Package: TO-92 (plastic)
+*
+* Gummel-Poon model verified with ngspice-44 (DC, TRAN, OP)
+.model KT315B NPN (
++ IS=5.0f   BF=300   VAF=70   NF=1.0   ISE=0.5p  NE=1.5
++ BR=10    NR=1.0   ISC=0.1p  NC=2.0   IKF=0.1   IKR=0.03
++ RB=15    RC=3.0   RE=0.5
++ CJE=15p  VJE=0.75 MJE=0.33
++ CJC=6.5p VJC=0.75 MJC=0.33
++ TF=0.5n  TR=50n   XTF=3    VTF=5    ITF=0.1
++ XTB=1.5  XTI=3    EG=1.11)

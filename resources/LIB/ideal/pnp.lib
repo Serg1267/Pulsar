@@ -1,0 +1,2 @@
+* Идеальный PNP — по умолчанию для "вставь PNP"
+.model Q_pnp PNP (IS=1e-16 BF=100 VAF=100 IKF=0.1 ISE=1e-16 NE=1.5 BR=1 VAR=100 IKR=0.1 ISC=1e-16 NC=1.5 RB=10 RC=1 RE=0.1 CJE=1p MJE=0.33 VJE=0.75 CJC=1p MJC=0.33 VJC=0.75 TF=0.1n TR=10n)

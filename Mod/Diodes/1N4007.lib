@@ -1,0 +1,5 @@
+* 1N4007 — Standard Recovery Rectifier Diode
+* Manufacturer: OnSemi / Generic
+* Vrrm=1000V, If(avg)=1A, Vf=1.1V@1A
+* SPICE model verified with ngspice-44 (TRAN, DC, OP analyses)
+.model 1N4007 D (IS=5.26e-12 N=1.863 RS=0.568 BV=1000 IBV=1e-3 CJO=30p M=0.33 VJ=0.6 TT=6e-6)

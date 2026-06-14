@@ -1,0 +1,15 @@
+* Test KT315B — common-emitter amplifier
+.title KT315B test
+Vcc Vcc 0 DC 9
+Vin Vin 0 SIN(0 0.1 1k)
+Rb1 Vcc N1 47k
+Rb2 N1 0 10k
+Rc Vcc N2 2k
+Re N3 0 1k
+Q1 N2 N1 N3 KT315B
+*
+.include ../Mod/BJT/KT315B.lib
+*
+.tran 0.05m 10m 0 0.1m
+.plot tran v(N2) v(N1) v(Vin)
+.end

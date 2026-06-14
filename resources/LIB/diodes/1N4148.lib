@@ -1,0 +1,4 @@
+* 1N4148 — Fast Switching Diode
+* Manufacturer: Generic
+* Vrrm=100V, If=200mA
+.model 1N4148 D (IS=2.682n N=1.836 RS=0.5664 IKF=44.17m CJO=4p M=0.333 VJ=0.5 FC=0.5 BV=100 IBV=100n TT=20n)

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Лист с загнутым уголком -->
+  <path d="M5 4 H16 L19 7 V20 H5 Z" />
+  <!-- Линия сгиба -->
+  <path d="M16 4 V7 H19" />
+  <!-- Надпись New -->
+  <text x="12" y="14" font-family="sans-serif" font-size="5.5" font-weight="bold" fill="#333333" stroke="none" text-anchor="middle">New</text>
+</svg>

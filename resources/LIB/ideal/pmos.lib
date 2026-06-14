@@ -1,0 +1,2 @@
+* Идеальный P-MOSFET — по умолчанию для "вставь PMOS"
+.model pmos PMOS (VTO=-1.0 KP=1m L=1u W=10u LAMBDA=0.01 CBD=0 CBS=0 RG=1 RS=0 RD=0)

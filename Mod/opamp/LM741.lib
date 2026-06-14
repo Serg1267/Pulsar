@@ -1,0 +1,22 @@
+* LM741 Operational Amplifier Macro Model
+* connections: N+ N- V+ V- OUT
+.SUBCKT LM741 1 2 3 4 5
+R741_IN 1 2 2MEG
+*
+* Differential transconductance: I = 0.1 * (V+ - V-)
+* R741_GAIN at node 10 sets DC gain = 0.1 * 1MEG = 100k (100 dB)
+* C741_POLE sets dominant pole at ~5.3 Hz
+G741_DIFF 0 10 1 2 0.1
+R741_GAIN 10 0 1MEG
+C741_POLE 10 0 30P
+*
+* Supply clamping — hard clip at ~VCC+0.7V / VEE-0.7V
+D741_CLP 10 3 DCLAMP
+D741_CLN 4 10 DCLAMP
+.MODEL DCLAMP D(IS=1E-15)
+*
+* Unity-gain output buffer
+E741_OUT 5 0 10 0 1
+R741_OUT 5 0 75
+*
+.ENDS LM741

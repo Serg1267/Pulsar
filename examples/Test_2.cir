@@ -1,0 +1,10 @@
+*Test_2
+
+V1 1 0 sin 0 50 9
+C1 1 2 1k
+R1 2 0 1uF
+
+.tran 0.1 10m
+.print tran v(2)
+
+.end

@@ -1,0 +1,18 @@
+* Пилообразный генератор на одном транзисторе
+
+Vcc 1 0 DC 12
+R1 1 2 10k
+C1 2 3 100n
+R2 3 4 10k
+Q1 4 5 0 Q_npn
+D1 5 0 diode
+R3 2 0 1k
+
+.model Q_npn NPN (IS=1e-16 BF=100 VAF=100 IKF=0.1 ISE=1e-16 NE=1.5 BR=1 VAR=100 IKR=0.1 ISC=1e-16 NC=1.5 RB=10 RC=1 RE=0.1 CJE=1p MJE=0.33 VJE=0.75 CJC=1p MJC=0.33 VJC=0.75 TF=0.1n TR=10n)
+.model diode D (IS=1e-14 N=1 RS=0.001 CJO=0 TT=0 BV=1e6 IBV=1e-14)
+
+* Анализ
+.tran 0.1ms 1ms 0 100u
+.print tran v(4)
+
+.END
