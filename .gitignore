@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+build/
+dist/
+*.spec
+*.backup
+*.orig
+*~
+.qwen/
+sinus.*
+test_lm741.cir
+kicad_*
+no_filename.*
