@@ -36,9 +36,10 @@ from .canvas_wires import WireMixin
 from .canvas_placement import PlacementMixin
 from .canvas_selection import SelectionMixin
 from .canvas_export import ExportMixin
+from .canvas_serialization import SerializationMixin
 
 
-class SchematicCanvas(ExportMixin, SelectionMixin, PlacementMixin, WireMixin, QGraphicsView):
+class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, PlacementMixin, WireMixin, QGraphicsView):
     """Холст с системой координат Y-вверх, сеткой 100 mil и привязкой к ней."""
 
     # Сигнал: испускается при движении мыши с привязанными координатами (x, y в mil)
@@ -2024,16 +2025,6 @@ class SchematicCanvas(ExportMixin, SelectionMixin, PlacementMixin, WireMixin, QG
         x = round(scene_pos.x() / self.GRID_SPACING) * self.GRID_SPACING
         y = round(scene_pos.y() / self.GRID_SPACING) * self.GRID_SPACING
         return QPointF(x, y)
-
-    def save_sch(self, filepath: str):
-        """Сохранить схему в .sch (JSON)."""
-        from EDA.app.serializer import save_sch as _save
-        _save(self, filepath)
-
-    def load_sch(self, filepath: str):
-        """Загрузить схему из .sch (JSON), очистив текущую."""
-        from EDA.app.serializer import load_sch as _load
-        _load(self, filepath)
 
 # ======================================================================
 
