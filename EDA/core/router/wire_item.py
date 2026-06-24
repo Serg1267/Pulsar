@@ -5,7 +5,7 @@ from PySide6.QtCore import QRectF, QPointF, Qt
 from PySide6.QtGui import (QPainter, QColor, QPen, QBrush, QPainterPath,
                            QPainterPathStroker)
 
-_WIRE_COLOR = "#3377dd"
+_WIRE_COLOR = "#0033aa"
 _WIRE_SEL_COLOR = "#ffcc00"
 _WIRE_WIDTH = 1.5
 _HIT_MARGIN = 30.0

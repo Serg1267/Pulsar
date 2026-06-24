@@ -40,7 +40,7 @@ _GEDA_TO_TEDAX_FP: dict[str, str] = {
     "ACY500.FP": "acy(500)",
     "ACY300.FP": "acy(300)",
     "ACY400.FP": "acy(400)",
-    "ACY200.FP": "acy(200)",
+
     "RCY100.FP": "rcy(100)",
     "RCY200.FP": "rcy(200)",
     "TO92.FP": "TO92",
@@ -183,8 +183,10 @@ def export_tedax_netlist(canvas) -> str:
             continue
         dev = comp._data.attributes.get("device", "") or comp.value() or "unknown"
         val = comp.value() or ""
-        fp_raw = comp._data.attributes.get("footprint", "")
-        fp = _tedax_footprint_for(fp_raw, dev.upper())
+        fp = comp.footprint()
+        if not fp:
+            fp_raw = comp._data.attributes.get("footprint", "")
+            fp = _tedax_footprint_for(fp_raw, dev.upper())
         comp_meta.append((refdes, fp, dev, val))
 
     # 6. Write tEDAx

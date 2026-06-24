@@ -84,7 +84,8 @@ def _parse_raw_netlist(raw_netlist: str) -> dict:
             continue
         
         # Директивы анализа
-        if stripped.upper().startswith((".TRAN ", ".AC ", ".DC ", ".OP")):
+        if stripped.upper().startswith((".TRAN ", ".AC ", ".DC ", ".OP",
+                                       ".IC ", ".NODESET ", ".STEP ")):
             directives.append(line)
             continue
         

@@ -89,6 +89,8 @@ class _SchematicTabPage(QWidget):
 
 
 class _CirTabPage(QWidget):
+    modified = Signal()
+
     def __init__(self, filepath: str | None = None, parent=None):
         super().__init__(parent)
         self.filepath: str | None = filepath
@@ -109,7 +111,7 @@ class _CirTabPage(QWidget):
 
         self.editor = LineHighlightPlainTextEdit()
 
-        settings = QSettings("SpiceEDA", "SpiceEDA")
+        settings = QSettings("Pulsar", "Pulsar")
         saved_family = settings.value("editor/font_family", "")
         saved_size = settings.value("editor/font_size", 14, type=int)
         if saved_family:
@@ -188,6 +190,7 @@ class _CirTabPage(QWidget):
 
     def _mark_dirty(self):
         if not self._dirty:
+            self.modified.emit()
             self._dirty = True
 
     def is_dirty(self) -> bool:
@@ -324,9 +327,11 @@ class UnifiedTabWidget(QTabWidget):
 
     def _connect_canvas_signals(self, canvas: SchematicCanvas):
         from PySide6.QtCore import QSettings
-        settings = QSettings("SpiceEDA", "SpiceEDA")
+        settings = QSettings("Pulsar", "Pulsar")
         grid_dots = settings.value("grid/dots", "false").lower() == "true"
         canvas.set_grid_dots(grid_dots)
+        grid_enabled = settings.value("grid/enabled", "true").lower() == "true"
+        canvas.set_grid_enabled(grid_enabled)
 
         canvas.position_changed.connect(self.position_changed.emit)
         canvas.mode_changed.connect(self.mode_changed.emit)
@@ -387,6 +392,7 @@ class UnifiedTabWidget(QTabWidget):
         self._add_cir_tab(page)
 
     def _add_cir_tab(self, page: _CirTabPage):
+        page.modified.connect(self._mark_tab_dirty)
         self.addTab(page, page.tab_label())
         self.setCurrentWidget(page)
         if page.filepath:
@@ -410,26 +416,32 @@ class UnifiedTabWidget(QTabWidget):
                     )
                     if reply != QMessageBox.StandardButton.Yes:
                         return
-                try:
-                    cursor = p.editor.textCursor()
-                    position = cursor.position()
-                    content = Path(path).read_text()
-                    p.editor.setPlainText(content)
-                    new_cursor = p.editor.textCursor()
-                    new_cursor.setPosition(min(position, len(content)))
-                    p.editor.setTextCursor(new_cursor)
-                    p.set_dirty(False)
-                except Exception:
-                    pass
+            try:
+                cursor = p.editor.textCursor()
+                position = cursor.position()
+                content = Path(path).read_text()
+                if content == p.editor.toPlainText():
+                    break
+                p.editor.blockSignals(True)
+                p.editor.setPlainText(content)
+                p.editor.blockSignals(False)
+                new_cursor = p.editor.textCursor()
+                new_cursor.setPosition(min(position, len(content)))
+                p.editor.setTextCursor(new_cursor)
+                p.set_dirty(False)
+                self.setTabText(i, p.tab_label())
+            except Exception:
+                pass
                 break
 
     # ── открытие любого файла ──
 
     def open_tab(self, filepath: str):
         p = Path(filepath)
-        if p.suffix.lower() == '.sch':
+        suffix = p.suffix.lower()
+        if suffix == '.sch':
             self.open_sch_tab(filepath)
-        elif p.suffix.lower() in ('.cir', '.sp'):
+        elif suffix in ('.cir', '.sp'):
             self.open_cir_tab(filepath)
         else:
             try:
@@ -444,10 +456,16 @@ class UnifiedTabWidget(QTabWidget):
     # ── dirty ──
 
     def _mark_tab_dirty(self, *args):
-        p = self.currentWidget()
+        sender = self.sender()
+        if hasattr(sender, 'page_type') and hasattr(sender, 'set_dirty'):
+            p = sender
+        else:
+            p = self.currentWidget()
         if p is not None and not p.is_dirty():
             p.set_dirty(True)
-            self.setTabText(self.currentIndex(), p.tab_label())
+            idx = self.indexOf(p)
+            if idx >= 0:
+                self.setTabText(idx, p.tab_label())
 
     # ── сохранение ──
 

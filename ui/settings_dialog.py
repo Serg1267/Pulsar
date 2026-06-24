@@ -1,5 +1,5 @@
 """
-Диалог настроек программы SpiceEDA
+Диалог настроек программы Pulsar
 Открывается через Вид → Настройки программы…
 """
 
@@ -19,7 +19,7 @@ class SettingsDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Настройки программы")
         self.resize(500, 450)
-        self.settings = QSettings("SpiceEDA", "SpiceEDA")
+        self.settings = QSettings("Pulsar", "Pulsar")
 
         self._setup_ui()
         self._load_settings()
@@ -118,10 +118,14 @@ class SettingsDialog(QDialog):
         grid_group = QGroupBox("Сетка")
         grid_layout = QVBoxLayout(grid_group)
 
+        self.grid_enabled_check = QCheckBox("Показывать сетку")
+        self.grid_enabled_check.setChecked(True)
+
         self.grid_lines_radio = QRadioButton("Линии")
         self.grid_dots_radio = QRadioButton("Точки")
         self.grid_dots_radio.setChecked(False)
 
+        grid_layout.addWidget(self.grid_enabled_check)
         grid_layout.addWidget(self.grid_lines_radio)
         grid_layout.addWidget(self.grid_dots_radio)
 
@@ -153,6 +157,8 @@ class SettingsDialog(QDialog):
         self.splash_check.setChecked(saved_splash)
 
         # Схема
+        grid_enabled = self.settings.value("grid/enabled", "true").lower() == "true"
+        self.grid_enabled_check.setChecked(grid_enabled)
         grid_dots = self.settings.value("grid/dots", "false").lower() == "true"
         self.grid_dots_radio.setChecked(grid_dots)
         self.grid_lines_radio.setChecked(not grid_dots)
@@ -172,6 +178,7 @@ class SettingsDialog(QDialog):
         self.settings.setValue("splash/show", str(self.splash_check.isChecked()))
 
         # Схема
+        self.settings.setValue("grid/enabled", str(self.grid_enabled_check.isChecked()))
         self.settings.setValue("grid/dots", str(self.grid_dots_radio.isChecked()))
 
         # Тема

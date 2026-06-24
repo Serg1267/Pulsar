@@ -121,6 +121,7 @@ def serialize_canvas(canvas) -> dict:
             "refdes": item.refdes(),
             "value": item.value(),
             "model_line": item.model_line(),
+            "footprint": item.footprint(),
             "labels": [],
         }
         # Дочерние метки
@@ -136,6 +137,7 @@ def serialize_canvas(canvas) -> dict:
                 "rotation": child.rotation(),
                 "counter_flip_x": ct.m11() < 0,
                 "counter_flip_y": ct.m22() < 0,
+                "visible": child.isVisible(),
             })
         data["components"].append(comp)
 
@@ -228,9 +230,12 @@ def deserialize_into_canvas(canvas, data: dict):
     """Очищает сцену и загружает схему из data."""
     from EDA.app.canvas import SchematicCanvas
     scene = canvas._scene
-    scene.clear()
+    # Безопасная очистка — удаляем только те items, что в этой сцене
+    for item in list(scene.items()):
+        if item.scene() is scene:
+            scene.removeItem(item)
 
-    # Сброс ВСЕГО внутреннего состояния canvas (scene.clear() уничтожил все items,
+    # Сброс ВСЕГО внутреннего состояния canvas (clear уничтожил все items,
     # так что все Python-ссылки на них — висячие)
     canvas._wire_graph._graph.clear()
     canvas._comp_wire_links.clear()
@@ -311,6 +316,7 @@ def deserialize_into_canvas(canvas, data: dict):
             value=cd.get("value", ""),
         )
         comp.set_model_line(cd.get("model_line", ""))
+        comp.set_footprint(cd.get("footprint", ""))
         _auto_fill_model(comp)
         comp.setPos(cd["x"], cd["y"])
         comp.setRotation(cd.get("rotation", 0.0))
@@ -336,6 +342,7 @@ def deserialize_into_canvas(canvas, data: dict):
                     child.set_text(sl["text"])
                     child.setPos(sl["rel_x"], sl["rel_y"])
                     child.setRotation(sl.get("rotation", 0.0))
+                    child.setVisible(sl.get("visible", True))
                     cfx = sl.get("counter_flip_x", False)
                     cfy = sl.get("counter_flip_y", False)
                     if cfx or cfy:

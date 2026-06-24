@@ -36,7 +36,7 @@ def _fmt_current(i: float | None) -> str:
 class OpDialog(QDialog):
     def __init__(self, parent, rows: list[dict]):
         super().__init__(parent)
-        self.setWindowTitle("SpiceEDA — .OP рабочая точка")
+        self.setWindowTitle("Pulsar — .OP рабочая точка")
         self.resize(500, 450)
 
         self._rows = rows

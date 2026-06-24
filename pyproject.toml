@@ -3,8 +3,8 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "SpiceEDA"
-version = "0.3.0"
+name = "Pulsar"
+version = "0.9.0"
 description = "GUI-приложение для схемотехнического проектирования и SPICE-моделирования"
 readme = "README.md"
 requires-python = ">=3.10"

@@ -1,12 +1,12 @@
 """Цвета элементов схемы — переключаются между тёмной и светлой темой."""
 
 YELLOW = "#ffcc00"
-GREEN = "#00aa00"
+GREEN = "#00ee00"
 WHITE = "#ffffff"
 RED = "#ff0000"
 
-_BODY_LINE_WIDTH = 2.0
-_LEAD_LINE_WIDTH = 1.5
+_BODY_LINE_WIDTH = 1.0
+_LEAD_LINE_WIDTH = 1.0
 
 _is_light = False
 

@@ -102,7 +102,7 @@ class SymParser:
                                 p.pintype = val
                     elif not in_pin_block and content:
                         data.texts.append(SymText(x=x, y=y, content=content, visible=visibility != 0))
-                        attr_match = re.search(r'(\w+)\s*=\s*(.*)', content)
+                        attr_match = re.search(r'([\w-]+)\s*=\s*(.*)', content)
                         if attr_match:
                             key, val = attr_match.group(1).lower(), attr_match.group(2).strip('" ')
                             data.attributes[key] = val
@@ -149,7 +149,7 @@ class SymParser:
         return data
 
     def _parse_attribute(self, data: SymData, line: str):
-        match = re.search(r'(\w+)\s*=\s*"?([^"]*)"?', line)
+        match = re.search(r'([\w-]+)\s*=\s*"?([^"]*)"?', line)
         if match:
             key, val = match.group(1).lower(), match.group(2)
             data.attributes[key] = val

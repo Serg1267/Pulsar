@@ -423,7 +423,7 @@ class SpicePlotterWindow(QMainWindow):
         # Настройки отображения кривых
         self._tab_line_objects = {}   # храним ссылки на Line2D по вкладкам для перерисовки
 
-        self.setWindowTitle(f"SpiceEDA - Графики ({analysis_type.upper()})")
+        self.setWindowTitle(f"Pulsar - Графики ({analysis_type.upper()})")
         self.resize(1100, 750)
 
         self._setup_menu()

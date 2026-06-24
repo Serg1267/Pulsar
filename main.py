@@ -1,5 +1,7 @@
-"""SpiceEDA — Главное окно приложения.
+"""Pulsar — Главное окно приложения.
 """
+
+__version__ = "0.9.0"
 
 import sys
 import json
@@ -41,12 +43,12 @@ from plotter.spice_plotter import SpicePlotterWindow
 
 
 
-class SpiceEDAMainWindow(QMainWindow):
+class PulsarMainWindow(QMainWindow):
     """Главное окно приложения — редактор .sch и .cir файлов."""
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("SpiceEDA")
+        self.setWindowTitle("Pulsar")
         self.resize(1200, 800)
 
         self._sim_output_buffer: list[str] = []
@@ -140,6 +142,11 @@ class SpiceEDAMainWindow(QMainWindow):
         self._export_pdf_action.setEnabled(False)
         file_menu.addAction(self._export_pdf_action)
 
+        self._export_png_action = QAction("Сохранить схему в .png…", self)
+        self._export_png_action.triggered.connect(self._export_png)
+        self._export_png_action.setEnabled(False)
+        file_menu.addAction(self._export_png_action)
+
         self._sch_export_cir_action = QAction("Экспорт SPICE netlist…", self)
         self._sch_export_cir_action.triggered.connect(self._sch_export_cir)
         self._sch_export_cir_action.setEnabled(False)
@@ -157,56 +164,6 @@ class SpiceEDAMainWindow(QMainWindow):
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
-        # ─── Схема (hidden by default) ───
-        self._sch_menu = menubar.addMenu("Схема")
-        self._sch_menu.menuAction().setVisible(False)
-
-        self._sch_new_action = QAction("Новая схема", self)
-        self._sch_new_action.setShortcut("Ctrl+Shift+E")
-        self._sch_new_action.triggered.connect(self._sch_new_tab)
-        self._sch_menu.addAction(self._sch_new_action)
-
-        self._sch_add_component_action = QAction("Добавить компонент…", self)
-        self._sch_add_component_action.setShortcut("Ctrl+K")
-        self._sch_add_component_action.triggered.connect(self._sch_add_component)
-        self._sch_add_component_action.setEnabled(False)
-        self._sch_menu.addAction(self._sch_add_component_action)
-
-        self._sch_add_directive_action = QAction("Добавить директиву…", self)
-        self._sch_add_directive_action.setShortcut(".")
-        self._sch_add_directive_action.triggered.connect(self._sch_add_directive)
-        self._sch_add_directive_action.setEnabled(False)
-        self._sch_menu.addAction(self._sch_add_directive_action)
-
-        self._sch_add_node_label_action = QAction("Добавить метку узла…", self)
-        self._sch_add_node_label_action.setShortcut("L")
-        self._sch_add_node_label_action.triggered.connect(self._sch_add_node_label)
-        self._sch_add_node_label_action.setEnabled(False)
-        self._sch_menu.addAction(self._sch_add_node_label_action)
-
-        self._sch_add_text_action = QAction("Добавить текст…", self)
-        self._sch_add_text_action.setShortcut("T")
-        self._sch_add_text_action.triggered.connect(self._sch_add_text)
-        self._sch_add_text_action.setEnabled(False)
-        self._sch_menu.addAction(self._sch_add_text_action)
-
-        self._sch_add_rect_action = QAction("Добавить прямоугольник…", self)
-        self._sch_add_rect_action.triggered.connect(self._sch_add_rect)
-        self._sch_add_rect_action.setEnabled(False)
-        self._sch_menu.addAction(self._sch_add_rect_action)
-
-        self._sch_add_circle_action = QAction("Добавить окружность…", self)
-        self._sch_add_circle_action.triggered.connect(self._sch_add_circle)
-        self._sch_add_circle_action.setEnabled(False)
-        self._sch_menu.addAction(self._sch_add_circle_action)
-
-        self._sch_menu.addSeparator()
-
-        self._view_netlist_action = QAction("Просмотр SPICE netlist…", self)
-        self._view_netlist_action.setShortcut("Ctrl+Shift+V")
-        self._view_netlist_action.triggered.connect(self._view_netlist_dialog)
-        self._view_netlist_action.setEnabled(True)
-        self._sch_menu.addAction(self._view_netlist_action)
         # ─── Правка ───
 
         self._edit_menu = menubar.addMenu("Правка")
@@ -309,6 +266,57 @@ class SpiceEDAMainWindow(QMainWindow):
         self._analysis_op_action.triggered.connect(self._toggle_op)
         self._analysis_menu.addAction(self._analysis_op_action)
 
+        # ─── Схема (hidden by default) ───
+        self._sch_menu = menubar.addMenu("Схема")
+        self._sch_menu.menuAction().setVisible(False)
+
+        self._sch_new_action = QAction("Новая схема", self)
+        self._sch_new_action.setShortcut("Ctrl+Shift+E")
+        self._sch_new_action.triggered.connect(self._sch_new_tab)
+        self._sch_menu.addAction(self._sch_new_action)
+
+        self._sch_add_component_action = QAction("Добавить компонент…", self)
+        self._sch_add_component_action.setShortcut("Ctrl+K")
+        self._sch_add_component_action.triggered.connect(self._sch_add_component)
+        self._sch_add_component_action.setEnabled(False)
+        self._sch_menu.addAction(self._sch_add_component_action)
+
+        self._sch_add_directive_action = QAction("Добавить директиву…", self)
+        self._sch_add_directive_action.setShortcut(".")
+        self._sch_add_directive_action.triggered.connect(self._sch_add_directive)
+        self._sch_add_directive_action.setEnabled(False)
+        self._sch_menu.addAction(self._sch_add_directive_action)
+
+        self._sch_add_node_label_action = QAction("Добавить метку узла…", self)
+        self._sch_add_node_label_action.setShortcut("L")
+        self._sch_add_node_label_action.triggered.connect(self._sch_add_node_label)
+        self._sch_add_node_label_action.setEnabled(False)
+        self._sch_menu.addAction(self._sch_add_node_label_action)
+
+        self._sch_add_text_action = QAction("Добавить текст…", self)
+        self._sch_add_text_action.setShortcut("T")
+        self._sch_add_text_action.triggered.connect(self._sch_add_text)
+        self._sch_add_text_action.setEnabled(False)
+        self._sch_menu.addAction(self._sch_add_text_action)
+
+        self._sch_add_rect_action = QAction("Добавить прямоугольник…", self)
+        self._sch_add_rect_action.triggered.connect(self._sch_add_rect)
+        self._sch_add_rect_action.setEnabled(False)
+        self._sch_menu.addAction(self._sch_add_rect_action)
+
+        self._sch_add_circle_action = QAction("Добавить окружность…", self)
+        self._sch_add_circle_action.triggered.connect(self._sch_add_circle)
+        self._sch_add_circle_action.setEnabled(False)
+        self._sch_menu.addAction(self._sch_add_circle_action)
+
+        self._sch_menu.addSeparator()
+
+        self._view_netlist_action = QAction("Просмотр SPICE netlist…", self)
+        self._view_netlist_action.setShortcut("Ctrl+Shift+V")
+        self._view_netlist_action.triggered.connect(self._view_netlist_dialog)
+        self._view_netlist_action.setEnabled(True)
+        self._sch_menu.addAction(self._view_netlist_action)
+
         # ─── Справка (самый правый пункт) ───
         help_menu = menubar.addMenu("Справка")
         about_action = QAction("О программе", self)
@@ -316,10 +324,10 @@ class SpiceEDAMainWindow(QMainWindow):
         help_menu.addAction(about_action)
 
     def _show_about(self):
-        QMessageBox.about(self, "О программе SpiceEDA",
-            "SpiceEDA — редактор принципиальных схем и SPICE-симулятор.\n\n"
+        QMessageBox.about(self, "О программе Pulsar",
+            "Pulsar — редактор принципиальных схем и SPICE-симулятор.\n\n"
             "Основан на PySide6, matplotlib и ngspice.\n"
-            "Версия 1.0")
+            "Версия 0.9.0")
 
     def _create_toolbar(self):
         from PySide6.QtWidgets import QToolBar
@@ -564,6 +572,7 @@ class SpiceEDAMainWindow(QMainWindow):
         self._save_action.setEnabled(dirty)
         self._save_as_action.setEnabled(any_open)
         self._export_pdf_action.setEnabled(self._tabs.has_sch_tabs())
+        self._export_png_action.setEnabled(self._tabs.has_sch_tabs())
 
     # ── делегаты для меню Редактировать ──
 
@@ -663,6 +672,15 @@ class SpiceEDAMainWindow(QMainWindow):
         self._update_jump_actions()
 
         is_sch_now = self._tabs.current_page_type() == 'sch'
+        self._sch_add_component_action.setEnabled(is_sch_now)
+        self._sch_add_directive_action.setEnabled(is_sch_now)
+        self._sch_add_node_label_action.setEnabled(is_sch_now)
+        self._sch_add_text_action.setEnabled(is_sch_now)
+        self._sch_add_rect_action.setEnabled(is_sch_now)
+        self._sch_add_circle_action.setEnabled(is_sch_now)
+        self._sch_export_cir_action.setEnabled(is_sch_now)
+        self._sch_export_tedax_action.setEnabled(is_sch_now)
+
         self._comp_panel_action.setVisible(self._tabs.has_sch_tabs())
         if is_sch_now and self._comp_panel_action.isChecked():
             self._ensure_comp_dock()
@@ -672,14 +690,14 @@ class SpiceEDAMainWindow(QMainWindow):
 
     def _on_tabs_count_changed(self, count: int):
         has_sch = self._tabs.has_sch_tabs()
+        is_sch_now = self._tabs.current_page_type() == 'sch'
         self._comp_panel_action.setVisible(has_sch)
-        if has_sch:
+        if has_sch and is_sch_now and self._comp_panel_action.isChecked():
             self._ensure_comp_dock()
-            if not self._comp_panel_action.isChecked():
-                self._comp_panel_action.setChecked(True)
             self._comp_dock.show()
         else:
-            self._comp_panel_action.setChecked(False)
+            if not has_sch:
+                self._comp_panel_action.setChecked(False)
             if self._comp_dock:
                 self._comp_dock.hide()
         has_sch = self._tabs.current_page_type() == 'sch'
@@ -930,6 +948,102 @@ class SpiceEDAMainWindow(QMainWindow):
             self._show_notification(f"PDF сохранён (тёмный, сетка): {path}")
         else:
             self._show_notification("Ошибка сохранения PDF")
+
+    def _export_png(self):
+        canvas = self._tabs.current_canvas()
+        if canvas is None:
+            return
+        from PySide6.QtWidgets import QFileDialog, QMessageBox
+        from PySide6.QtGui import QPainter, QImage, QColor, QPen
+        from PySide6.QtCore import QRectF
+        from EDA.app.items.colors import set_light_theme, is_light_theme
+        import math
+
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Сохранение PNG")
+        msg.setText("Выберите режим изображения:")
+        btn_color = msg.addButton("Цветной", QMessageBox.ButtonRole.AcceptRole)
+        btn_bw = msg.addButton("Чёрно-белый", QMessageBox.ButtonRole.AcceptRole)
+        msg.exec()
+        color_mode = msg.clickedButton() == btn_color
+
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Сохранить схему в .png", "", "PNG (*.png);;Все файлы (*)")
+        if not path:
+            return
+        if not path.lower().endswith(".png"):
+            path += ".png"
+
+        scene = canvas._scene
+        rect = scene.itemsBoundingRect()
+        if rect.isEmpty():
+            self._show_notification("Схема пуста")
+            return
+        margin = 400.0
+        rect.adjust(-margin, -margin, margin, margin)
+
+        SCREEN_DPI = 96
+        min_scale = 300.0 / 1000.0
+        scale = max(canvas._zoom, min_scale)
+        w = max(1, int(rect.width() * scale))
+        h = max(1, int(rect.height() * scale))
+
+        was_light = is_light_theme()
+        try:
+            if not color_mode:
+                set_light_theme(True)
+
+            bg = QColor("#1E1E1E") if color_mode else QColor("#FFFFFF")
+            img = QImage(w, h, QImage.Format_ARGB32_Premultiplied)
+            img.setDotsPerMeterX(int(SCREEN_DPI / 0.0254 + 0.5))
+            img.setDotsPerMeterY(int(SCREEN_DPI / 0.0254 + 0.5))
+            img.fill(bg.rgb())
+
+            ip = QPainter(img)
+            ip.setRenderHint(QPainter.Antialiasing)
+
+            if color_mode:
+                from PySide6.QtCore import QSettings
+                _gs = QSettings("Pulsar", "Pulsar")
+                _grid_ok = _gs.value("grid/enabled", "true").lower() == "true"
+                if _grid_ok:
+                    grid_step = 100.0
+                    ip.setPen(QPen(QColor("#2a2a2a"), 0.0))
+                    gx = math.floor(rect.left() / grid_step) * grid_step
+                    while gx <= rect.right():
+                        ix = (gx - rect.left()) / rect.width() * w
+                        ip.drawLine(int(ix), 0, int(ix), h)
+                        gx += grid_step
+                    gy = math.floor(rect.top() / grid_step) * grid_step
+                    while gy <= rect.bottom():
+                        iy = (gy - rect.top()) / rect.height() * h
+                        ip.drawLine(0, int(iy), w, int(iy))
+                        gy += grid_step
+
+            scene.render(ip, QRectF(0, 0, w, h), rect)
+            ip.end()
+
+            flipped = img.mirrored(False, True)
+            if not color_mode:
+                gray = flipped.convertToFormat(QImage.Format_Grayscale8)
+                ptr = gray.bits()
+                n = gray.sizeInBytes()
+                for i in range(n):
+                    ptr[i] = 0 if ptr[i] < 196 else 255
+                flipped = gray
+            ok = flipped.save(path, "PNG")
+        finally:
+            if not color_mode:
+                set_light_theme(was_light)
+
+        # Полное обновление сцены и вьюпорта
+        canvas._scene.update()
+        canvas.viewport().update()
+
+        if ok:
+            self._show_notification(f"PNG сохранён: {path}")
+        else:
+            self._show_notification("Ошибка сохранения PNG")
 
     # ─── Просмотр netlist ───
 
@@ -1241,6 +1355,23 @@ class SpiceEDAMainWindow(QMainWindow):
         lines = text.split('\n')
 
         self._output_directives = self._detect_output_directives(text)
+
+        # ── .ic ... + uic → .ic ... + UIC в .tran ──
+        uic_needed = False
+        for i, line in enumerate(lines):
+            s = line.strip()
+            m_ic = re.match(r'(?i)\.IC\b\s+(.*?)\+\s*UIC\s*$', s)
+            if m_ic:
+                lines[i] = '.ic ' + m_ic.group(1).strip()
+                uic_needed = True
+            elif re.match(r'(?i)\.IC\b.*\bUIC\b', s):
+                lines[i] = re.sub(r'\bUIC\b', '', s, flags=re.IGNORECASE).strip()
+                uic_needed = True
+        if uic_needed:
+            for i, line in enumerate(lines):
+                s = line.strip()
+                if re.match(r'(?i)\.TRAN\b', s) and 'UIC' not in s.upper():
+                    lines[i] = s + ' UIC'
 
         # Определить тип анализа
         analysis_type = ""
@@ -1974,23 +2105,30 @@ class SpiceEDAMainWindow(QMainWindow):
     # ─── Настройки ───
 
     def _open_settings(self):
+        from EDA.app.items.colors import is_light_theme as _current_theme
+        old_light = _current_theme()
         dialog = SettingsDialog(self)
         dialog.exec()
-        settings = QSettings("SpiceEDA", "SpiceEDA")
+        settings = QSettings("Pulsar", "Pulsar")
         family = settings.value("editor/font_family", "Monospace")
         size = settings.value("editor/font_size", 14, type=int)
         self._tabs.apply_font(family, size)
         # Применить стиль сетки ко всем холстам
         grid_dots = settings.value("grid/dots", "false").lower() == "true"
+        grid_enabled = settings.value("grid/enabled", "true").lower() == "true"
         for i in range(self._tabs.count()):
             page = self._tabs.widget(i)
             if hasattr(page, 'canvas'):
                 page.canvas.set_grid_dots(grid_dots)
-        self._apply_app_theme()
+                page.canvas.set_grid_enabled(grid_enabled)
+        # Переприменить тему только если она изменилась
+        new_light = settings.value("app/theme", "dark") == "light"
+        if new_light != old_light:
+            self._apply_app_theme()
 
     def _apply_app_theme(self):
         from EDA.app.items.colors import set_light_theme
-        settings = QSettings("SpiceEDA", "SpiceEDA")
+        settings = QSettings("Pulsar", "Pulsar")
         theme = settings.value("app/theme", "dark")
         is_light = theme == "light"
         set_light_theme(is_light)
@@ -2041,13 +2179,13 @@ class SpiceEDAMainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setApplicationName("SpiceEDA")
+    app.setApplicationName("Pulsar")
     app.setApplicationVersion("0.3.0")
-    app.setOrganizationName("SpiceEDA")
+    app.setOrganizationName("Pulsar")
     app.setStyle("Fusion")
 
     # Применить тему из сохранённых настроек
-    settings = QSettings("SpiceEDA", "SpiceEDA")
+    settings = QSettings("Pulsar", "Pulsar")
     theme = settings.value("app/theme", "dark")
     is_light = theme == "light"
     from EDA.app.items.colors import set_light_theme
@@ -2101,9 +2239,9 @@ def main():
 
     def _show_main():
         nonlocal _main_window
-        _main_window = SpiceEDAMainWindow()
-        _main_window.show()
+        _main_window = PulsarMainWindow()
         _main_window._apply_app_theme()
+        _main_window.show()
         if splash is not None:
             splash.close()
 

@@ -1,0 +1,61 @@
+* TL331 Single Differential Comparator Macro Model
+* Pins: 1=IN- 2=GND 3=IN+ 4=OUT 5=VCC
+*
+* Parameters from datasheet:
+*   VIO (input offset voltage): 2 mV typ
+*   IIB (input bias current): -25 nA typ
+*   AVD (open-loop gain): 200 V/mV = 200,000 V/V
+*   VOL (output saturation): 150 mV @ IOL = 4 mA
+*   ICC (supply current): 0.4 mA typ
+*   Response time: ~1.3 us
+*   Output: open collector NPN
+*
+* Architecture:
+*   1. Differential input with offset
+*   2. Gain stage with bandwidth limiting (f3dB ~ 120 kHz)
+*   3. Output switch (open collector)
+*
+.SUBCKT TL331 1 2 3 4 5
+
+* === Input Stage ===
+* Input resistance for bias currents
+RINP 3 2 40MEG
+RINN 1 2 40MEG
+
+* Differential error signal with offset voltage
+EERR 10 2 VOL='(V(3,2) - V(1,2) - 0.002)'
+RERR 10 2 1G
+
+* === Gain Stage with Bandwidth Limiting ===
+* Gain = 200,000 V/V
+* Dominant pole at ~120 kHz (tau ~ 1.3 us)
+* Using integrator for bandwidth control
+EGAIN 20 2 VOL='V(10,2) * 200k'
+RG 20 21 10k
+CG 21 2 130p IC=0
+
+* === Output Stage: Open Collector ===
+* Comparator function: V(21) > 0 => IN+ > IN- => output LOW
+* V(21) <= 0 => IN+ < IN- => output HIGH via external pullup
+
+* Voltage-controlled switch with proper threshold
+* Switch ON when V(21) > 0
+SOUT 4 2 21 2 SWITCH_OUT
+.MODEL SWITCH_OUT SW(VT=0 VH=0.01 RON=37.5 ROFF=10MEG)
+
+* Protection diodes
+DCLH 4 5 DID
+DCLL 2 4 DID
+
+* NPN model for input loading
+RB 21 31 1k
+QNPN 31 2 2 NPN_OUT
+.MODEL NPN_OUT NPN (IS=1E-15 BF=100 NF=1 VAF=50
++   RB=50 RC=10 CJE=500f CJC=200f TF=1n TR=50n)
+
+.MODEL DID D (IS=1e-14 N=1)
+
+* === Supply Current ===
+ICC_SRC 5 2 DC 0.4m
+
+.ENDS TL331

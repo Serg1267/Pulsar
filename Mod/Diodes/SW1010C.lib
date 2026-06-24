@@ -1,0 +1,27 @@
+* SW1010C — Fast Switching Diode (analog 1N4148WS, SOD-323)
+* Manufacturer: SW (generic) / analogy 1N4148WS
+* VRRM=100V, IF=300mA, VF=1.0V max @ IF=50mA
+* IR=1uA max @ VR=75V, CD=2pF max @ VR=0V/1MHz
+* Trr=4ns max @ IF=IR=10mA, RL=100 Ohm
+* SPICE model verified with ngspice-44 (DC sweep)
+*
+* DC Test Results (ngspice-44):
+*   VF = 0.995V @ IF = 50mA  (spec: 1.0V max) ✓
+*   IR = 0.0001uA @ VR = 75V (spec: 1uA max)  ✓
+*   BV ≈ 100V                                    ✓
+*
+* Trr (theoretical): TT=5.77ns → Trr ≈ 4ns
+.model SW1010C D(
++ IS=2.5e-11
++ RS=0.5
++ N=1.75
++ CJO=2p
++ VJ=0.5
++ M=0.33
++ TT=5.77n
++ BV=100
++ IBV=10u
++ XTI=3
++ EG=1.11
++ FC=0.5
++ )

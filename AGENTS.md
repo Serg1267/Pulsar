@@ -1,4 +1,4 @@
-# SpiceEDA — AGENTS.md
+# Pulsar — AGENTS.md
 
 ## Быстрый старт
 ```bash
@@ -12,7 +12,7 @@ pip install -r requirements.txt           # зависимости: PySide6, mat
 Нет сборки, нет линтера, нет typecheck, нет CI. Системная зависимость: `ngspice` (установка: `apt install ngspice`).
 
 ## Точки входа и структура
-- `main.py` — единственная точка входа. Создаёт `QApplication` + `SpiceEDAMainWindow`.
+- `main.py` — единственная точка входа. Создаёт `QApplication` + `PulsarMainWindow`.
 - Единый `UnifiedTabWidget` (QTabWidget) для обеих типов вкладок: `.sch` и `.cir/.sp`.
 - Вкладки не закрывают друг друга — каждый файл открывается новой вкладкой справа.
 - Переключение между вкладками — кликом по названию (показывает имя файла).
@@ -33,13 +33,12 @@ pip install -r requirements.txt           # зависимости: PySide6, mat
 | `core/` | `component_lib.py` — загрузка .lib файлов из `resources/LIB/`. |
 | `examples/` | Примеры `.cir` файлов (RC-фильтр, делитель напряжения и др.). |
 | `resources/` | Иконки, изображения, LIB/ (модели компонентов), themes/ (цветовые схемы редактора). |
-| `kicad/` | Зарезервировано — пока пусто. |
 
 ## Архитектура UI
 
 ### Система меню (контекстно-зависимая)
 Все меню создаются в `_create_menu_bar()`. Некоторые скрыты по умолчанию:
-- **Файл** — всегда видно. Новый .sch (Ctrl+N), Новый .cir (Ctrl+Shift+N), Новая схема (Ctrl+Shift+E), Открыть (Ctrl+O), Сохранить (Ctrl+S), Сохранить как (Ctrl+Shift+S), Сохранить схему в .pdf, Выход (Ctrl+Q).
+- **Файл** — всегда видно. Новый .sch (Ctrl+N), Новый .cir (Ctrl+Shift+N), Новая схема (Ctrl+Shift+E), Открыть (Ctrl+O), Сохранить (Ctrl+S), Сохранить как (Ctrl+Shift+S), Сохранить схему в .pdf, Сохранить схему в .png, Выход (Ctrl+Q).
 - **Вид** — всегда видно. Подменю цветовой схемы (когда открыт .cir), номера строк (когда .cir), терминал (Ctrl+T, когда .cir), настройки (Ctrl+,).
 - **Схема** — видно только при открытых .sch. Новая схема, Добавить компонент (Ctrl+K), Добавить директиву (.), Добавить метку узла (L), Добавить текст (T), Экспорт gEDA netlist, Экспорт SPICE netlist, Просмотр SPICE netlist (Ctrl+Shift+V).
 - **Правка** — видно только при открытых .cir. Выделить всё, Отменить/Повторить, Вырезать/Копировать/Вставить — делегирует текущему редактору.
@@ -240,7 +239,7 @@ python3 -m pytest -x --tb=short           # остановиться на пер
 
 ## Соглашения
 - Все комментарии на **русском** (договорённость проекта). Идентификаторы кода на английском.
-- Настройки хранятся в `QSettings("SpiceEDA", "SpiceEDA")`.
+- Настройки хранятся в `QSettings("Pulsar", "Pulsar")`.
 - Стиль приложения: `Fusion`.
 - Шрифт редактора по умолчанию: `Monospace`, размер 14.
 - Запуск: экран-заставка (2с) из `resources/images/splash.png`, затем главное окно.
@@ -248,11 +247,12 @@ python3 -m pytest -x --tb=short           # остановиться на пер
 ## Удалено / Устарело
 
 Удалено из кодовой базы. Не пытайтесь использовать или чинить:
+- **PCB-редактор** (`EDA/pcb/`) — удалён 23.06.2026. tEDAx-экспорт оставлен (`EDA/tedax/netlist_exporter.py`).
 - **Lepton EDA bridge** (`schematic/`, `lepton_bridge.py`, `sch_to_spice.py`) — удалён 16.05.2026. Заменён встроенным редактором схем (EDA/).
 - **Проектная система** (`core/project.py`, `ui/project_tree.py`, `ui/new_project_dialog.py` и др.) — удалена 17.05.2026. Теперь чисто файловая модель.
 - **AI-ассистент Addy** (`core/ai_client.py`, `core/ngspice_docs.py`, `ui/engineer_panel.py`) — удалён 20.05.2026. Генерировал некорректные SPICE-нетлисты.
 - **`schematic_editor_new/`** — заменён на `EDA/` 16.05.2026.
-- **`SpiceEDAEditorWindow`** — отдельное окно редактора, заменено на `QStackedWidget` в главном окне.
+- **`PulsarEditorWindow`** — отдельное окно редактора, заменено на `QStackedWidget` в главном окне.
 - **Тулбар** — был удалён 19.05.2026, восстановлен 29.05.2026. Иконки 24×24 из KiCad v9 (`/usr/share/kicad/resources/images.tar.gz`, dark-варианты).
 - **`schematic/`** пакет в `pyproject.toml` — изменён на `EDA*`.
 - **Зависимость `requests`** — удалена вместе с Addy 20.05.2026.
@@ -415,6 +415,11 @@ python3 -m pytest -x --tb=short           # остановиться на пер
 - Шрифты: 96 DPI на QImage = тот же физический размер, что на экране (80pt = 80pt).
 - Если контент не влезает на A4 — вписывается с сохранением пропорций.
 
+#### PNG (main.py:_export_png)
+- **Файл → Сохранить схему в .png…** — перед сохранением диалог выбора **Цветной** / **Чёрно-белый**.
+- **Цветной**: тёмный фон `#1E1E1E`, сетка НЕ рисуется, сохраняется как есть (Y-flip через `mirrored`).
+- **Чёрно-белый**: временное переключение в светлую тему (`set_light_theme(True)`), белый фон `#FFFFFF`, конвертация в `Format_Grayscale8`, затем threshold 250 → все пикселы светлее 250 становятся белыми (фон), все остальные — чёрными. Гарантирует, что любые цветные элементы (текст, прямоугольники, junction, выводы) становятся чёрными на белом.
+
 #### Библиотека компонентов — категория Connector
 - Новый каталог `EDA/core/library/sym/Connector/`:
   - **`db9.sym`** — 9-пиновый разъём DB9 (`device=DB9`, `refdes=CONN?`).
@@ -544,11 +549,11 @@ python3 -m pytest -x --tb=short           # остановиться на пер
 
 ```bash
 pip install --break-system-packages --user pyinstaller
-pyinstaller SpiceEDA.spec        # → dist/SpiceEDA (один ELF, 90 MB)
-./dist/SpiceEDA                  # запуск без Python
+pyinstaller Pulsar.spec        # → dist/Pulsar (один ELF, 90 MB)
+./dist/Pulsar                  # запуск без Python
 ```
 
-- `SpiceEDA.spec` — готовый spec-файл (лежит в корне проекта)
+- `Pulsar.spec` — готовый spec-файл (лежит в корне проекта)
 - `--add-data`: `resources/`, `Mod/`, `EDA/core/library/sym/`
 - `console=False` — без консольного окна
 - Сборка занимает ~3 мин, `dist/` в `.gitignore`
@@ -679,23 +684,6 @@ pyinstaller SpiceEDA.spec        # → dist/SpiceEDA (один ELF, 90 MB)
 - Формат: `tEDAx v1`, секции `footprint/device/value` + `conn <сеть> <refdes> <вывод>`.
 - **Конвертация gEDA→pcb-rnd футпринтов**: `_tedax_footprint_for()` маппит `ACY500.fp` → `acy(500)`, `TO92.FP` → `to92`, `DIP8.FP` → `dip(8)` и т.д. Параметрические генераторы pcb-rnd: `acy(spacing)`, `rcy(spacing)`, `dip(n)`, `connector(nx,ny,spacing)`, `to92`, `to220`, `led5`.
 - **Меню**: Схема → Экспорт tEDAx (pcb-rnd)…, сохраняет `.tdx`.
-### Рабочий процесс в pcb-rnd
-1. **File → Import → Import tEDAx schematics** — импорт `.tdx`
-2. **Connects → Subcircuit placement → Disperse all** — разбросать на плату
-3. Выделить всё рамкой → **Connects → Subcircuit placement → Auto-place selected subcircuits** — авторазмещение
-4. `c` `r` — показать rat lines (связи)
-5. **Connects → Optimize routes → Auto-route all** — автотрассировка
-6. **File → Export → STL** — 3D-модель
-- Если пины не совпали: **Connects → Netlist → Swap pins…**
-- TO92: пады 1,2,3. Порядок пинов в SpiceEDA: 1=C, 2=B, 3=E.
-
-## Локализация sch-rnd / pcb-rnd
-Конфиги меню лежат в `~/.sch-rnd/menu-default.lht` и `~/.pcb-rnd/menu-default.lht` — копии системных с заменой `ha:ИмяПункта` на русский. Клавиатурные/мышиные биндинги: `~/.sch-rnd/schrc` (старый синтаксис `bind`) или секция `li:mouse` в `menu-default.lht` (lihata). Shift+ЛКМ → pan: в `li:left` → `press-shift = { Pan(1) }`, `release-shift = { Pan(0) }`.
-
-**Переведено полностью:** sch-rnd (все меню + контекстные).
-**pcb-rnd:** все меню + контекстные + layer/group — переведены; заголовки `Mode` и `Connects` оставлены английскими (pcb-rnd использует для них внутренние строки, `ha:` ключ игнорируется).
-**Не переведено (лучше английский):** имена инструментов (via, line, arc…), технические термины (Rats nest, Keepouts, scripts), тултипы (tip=).
-
 - **Файлы**:
   - `EDA/app/canvas.py`: `export_tedax_netlist()`, `_tedax_footprint_for()`, `_TEDAX_DEFAULT_FP`, `_GEDA_TO_TEDAX_FP`
   - `ui/unified_tabs.py`: `export_tedax()` passthrough
@@ -739,7 +727,7 @@ pyinstaller SpiceEDA.spec        # → dist/SpiceEDA (один ELF, 90 MB)
 - В `SchematicCanvas.drawBackground()`: режим точек (флаг `_grid_dots`)
 - Цвет точек: `#555555` (отличается от линии `#2a2a2a` для контраста)
 - Вкладка «Схема» в диалоге настроек: радиокнопки «Линии» / «Точки»
-- Настройка сохраняется в `QSettings("SpiceEDA", "SpiceEDA")` / `grid/dots`
+- Настройка сохраняется в `QSettings("Pulsar", "Pulsar")` / `grid/dots`
 - Применяется ко всем холстам при создании и при закрытии диалога
 
 #### Исправление бага: прыжок окружности/прямоугольника после перетаскивания
@@ -778,3 +766,46 @@ pyinstaller SpiceEDA.spec        # → dist/SpiceEDA (один ELF, 90 MB)
 #### Выделение компонентов
 - `shape()` возвращает заполненные области (прямоугольники, круги, полигоны) — не нужно целиться в тонкие линии.
 - При повороте компонента надписи контр-вращаются, оставаясь читаемыми.
+
+### Важные изменения (21.06.2026)
+
+#### Поправлен `.png` экспорт
+- `main.py:_export_png()` — перед сохранением диалог **Цветной** / **Чёрно-белый**.
+- **Чёрно-белый**: переключение в светлую тему (`set_light_theme(True)`), белый фон, `convertToFormat(Grayscale8)`, затем threshold 250 → все пиксели светлее 250 становятся белыми (фон), остальные — чёрными. Сетка не рисуется.
+- `AGENTS.md`: секция про PNG экспорт.
+
+#### Устранён `Ambiguous shortcut overload: T`
+- Шорткат `T` используется только для `_sch_add_text_action` (добавление текста на схему).
+- Ранее конфликтовал с трассировкой PCB, которая удалена из проекта.
+
+### Важные изменения (22.06.2026)
+
+#### Цвета и отрисовка
+- **Провода** (`EDA/core/router/wire_item.py`): `_WIRE_COLOR = "#0033aa"` (темно-синий, было `#3377dd`)
+- **Компоненты** (`EDA/app/items/colors.py`): `GREEN = "#00ee00"` (светло-зелёный, было `#00aa00` → `#00cc00`)
+- **Толщина линий** (`colors.py`): `_BODY_LINE_WIDTH = 1.0`, `_LEAD_LINE_WIDTH = 1.0` (было 2.0 и 1.5)
+- **Выводы компонентов** (`lead_color()`): на тёмной теме `#ffffff` (чисто белый, не менялось)
+- **Цвета сетки** (`canvas.py`): линии `#111111` → `#333333`, точки `#2a2a2a` → `#555555`, начало координат `#555555` → `#777777`
+- **Фон холста** (`canvas.py`): `_bg_color = QColor("#0a0a0a")` — восстановлен тёмный фон
+
+#### Отключение сетки
+- **`canvas.py`**: новое поле `_grid_enabled`, метод `set_grid_enabled(enabled)`. В `drawBackground()` сетка рисуется только если `_grid_enabled`
+- **`settings_dialog.py`**: чекбокс «Показывать сетку» в группе «Сетка» (над Линии/Точки), сохраняется как `grid/enabled`
+- **`unified_tabs.py`**: `grid/enabled` применяется при создании каждой вкладки
+- **`main.py`**: `grid/enabled` применяется ко всем холстам после закрытия настроек
+- **PNG экспорт** (`main.py:_export_png`): сетка в цветном режиме рисуется только если `grid/enabled == true`
+
+#### Исправление фона при закрытии настроек
+- **`main.py:2325-2328`**: `_apply_app_theme()` вызывается **до** `show()` — окно появляется уже с правильным фоном
+- **`main.py:2198`**: `_open_settings` больше не вызывает `_apply_app_theme()` если тема не менялась
+- **`main.py:2272`**: `QSettings("SpiceEDA", "SpiceEDA")` → `QSettings("Pulsar", "Pulsar")` — единый ключ QSettings по всему проекту
+
+### Важные изменения (23.06.2026)
+
+#### Удалён PCB-редактор
+- Весь пакет `EDA/pcb/` удалён из проекта (13 файлов: board, footprint, pcb_view, ratsnest, track, serializers, диалоги и т.д.).
+- Каталог `resources/footprint_pcb-rnd/` (~100 файлов корпусов) удалён.
+- Из `ui/unified_tabs.py` удалены: класс `_PcbTabPage`, все методы управления PCB-вкладками (`new_pcb_tab`, `open_pcb_tab`, `current_pcb_view`, `import_pcb_from_schematic`, `_connect_pcb_signals`, `_mark_pcb_tab_dirty`), сигнал `pcb_track_mode_changed`, фильтр `.pcb` в `open_tab`/`save_tab_as`.
+- Из `main.py` удалены: меню «Плата», тулбар-кнопка «Трассировка (T)», методы `_new_pcb_file`, `_pcb_import_from_schematic`, `_pcb_export_tedax`, `_import_pcb_rnd_footprints`, `_toggle_pcb_track_mode`, `_on_pcb_track_mode_changed`.
+- tEDAx-экспорт (`EDA/tedax/netlist_exporter.py`) и пункт меню «Схема → Экспорт tEDAx (pcb-rnd)…» оставлены.
+- Все 53 теста проходят.

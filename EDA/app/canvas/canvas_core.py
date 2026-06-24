@@ -82,16 +82,13 @@ class SchematicCanvas(QGraphicsView):
         self.setDragMode(self.DragMode.NoDrag)
 
         # --- Цвета фона ---
-        if is_light_theme():
-            self._bg_color = QColor("#ffffff")
-            self._grid_color = QColor("#cccccc")
-            self._grid_dots_color = QColor("#aaaaaa")
-        else:
-            self._bg_color = QColor("#1e1e1e")
-            self._grid_color = QColor("#2a2a2a")
-            self._grid_dots_color = QColor("#555555")
-        self._origin_color = QColor("#555555")
+        # Фон всегда темный, независимо от темы
+        self._bg_color = QColor("#0a0a0a")
+        self._grid_color = QColor("#333333")
+        self._grid_dots_color = QColor("#555555")
+        self._origin_color = QColor("#777777")
         self._grid_dots = False  # False = линии, True = точки
+        self._grid_enabled = True
         self.setBackgroundBrush(QBrush(self._bg_color))
 
         # --- Состояние зума ---
@@ -241,51 +238,52 @@ class SchematicCanvas(QGraphicsView):
         self._grid_dots = dots
         self.viewport().update()
 
+    def set_grid_enabled(self, enabled: bool):
+        self._grid_enabled = enabled
+        self.viewport().update()
+
     def set_background_color(self, color: QColor):
         self._bg_color = color
-        if color.lightness() > 128:
-            self._grid_color = QColor("#cccccc")
-            self._grid_dots_color = QColor("#aaaaaa")
-        else:
-            self._grid_color = QColor("#2a2a2a")
-            self._grid_dots_color = QColor("#555555")
+        self._grid_color = QColor("#333333")
+        self._grid_dots_color = QColor("#555555")
         self.setBackgroundBrush(QBrush(self._bg_color))
         self.viewport().update()
 
     def drawBackground(self, painter: QPainter, rect: QRectF):
         painter.fillRect(rect, self._bg_color)
 
-        pixel_per_mil = self._zoom
-        spacing = self.GRID_SPACING
-        if pixel_per_mil * spacing < 5.0:
-            n = int(5.0 / (pixel_per_mil * spacing)) + 1
-            spacing *= n
+        if self._grid_enabled:
+            pixel_per_mil = self._zoom
+            spacing = self.GRID_SPACING
+            if pixel_per_mil * spacing < 5.0:
+                n = int(5.0 / (pixel_per_mil * spacing)) + 1
+                spacing *= n
 
-        left   = math.floor(rect.left()   / self.GRID_SPACING) * self.GRID_SPACING
-        right  = math.ceil(rect.right()   / self.GRID_SPACING) * self.GRID_SPACING
-        top    = math.floor(rect.top()    / self.GRID_SPACING) * self.GRID_SPACING
-        bottom = math.ceil(rect.bottom()  / self.GRID_SPACING) * self.GRID_SPACING
+            left   = math.floor(rect.left()   / self.GRID_SPACING) * self.GRID_SPACING
+            right  = math.ceil(rect.right()   / self.GRID_SPACING) * self.GRID_SPACING
+            top    = math.floor(rect.top()    / self.GRID_SPACING) * self.GRID_SPACING
+            bottom = math.ceil(rect.bottom()  / self.GRID_SPACING) * self.GRID_SPACING
 
-        if self._grid_dots:
-            painter.setPen(QPen(self._grid_dots_color, 0.0))
-            x = left
-            while x <= right:
+            if self._grid_dots:
+                painter.setPen(QPen(self._grid_dots_color, 0.0))
+                x = left
+                while x <= right:
+                    y = top
+                    while y <= bottom:
+                        painter.drawPoint(QPointF(x, y))
+                        y += spacing
+                    x += spacing
+            else:
+                painter.setPen(QPen(self._grid_color, 0.0))
+                x = left
+                while x <= right:
+                    painter.drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()))
+                    x += spacing
+
                 y = top
                 while y <= bottom:
-                    painter.drawPoint(QPointF(x, y))
+                    painter.drawLine(QPointF(rect.left(), y), QPointF(rect.right(), y))
                     y += spacing
-                x += spacing
-        else:
-            painter.setPen(QPen(self._grid_color, 0.0))
-            x = left
-            while x <= right:
-                painter.drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()))
-                x += spacing
-
-            y = top
-            while y <= bottom:
-                painter.drawLine(QPointF(rect.left(), y), QPointF(rect.right(), y))
-                y += spacing
 
         marker = 200.0
         painter.setPen(QPen(self._origin_color, 0.0))
@@ -814,6 +812,8 @@ class SchematicCanvas(QGraphicsView):
                 continue
             if hasattr(item, 'rotate'):
                 item.rotate(angle_delta)
+            elif isinstance(item, (TextItem, DirectiveItem, RectangleItem, CircleItem)):
+                item.setRotation(item.rotation() + angle_delta)
             if isinstance(item, ComponentGraphicsItem):
                 self._align_pins_to_grid(item)
                 for label in item._label_items:
@@ -836,8 +836,9 @@ class SchematicCanvas(QGraphicsView):
                     lt = label.transform()
                     lt.scale(-1, 1)
                     label.setTransform(lt)
-            elif isinstance(item, LabelItem):
-                if item.parentItem() in selected_parents:
+            elif isinstance(item, (LabelItem, TextItem, DirectiveItem,
+                                   RectangleItem, CircleItem, NetLabelItem)):
+                if isinstance(item, LabelItem) and item.parentItem() in selected_parents:
                     continue  # родитель уже отразил и контр-отразил
                 t = item.transform()
                 t.scale(-1, 1)
@@ -859,8 +860,9 @@ class SchematicCanvas(QGraphicsView):
                     lt = label.transform()
                     lt.scale(1, -1)
                     label.setTransform(lt)
-            elif isinstance(item, LabelItem):
-                if item.parentItem() in selected_parents:
+            elif isinstance(item, (LabelItem, TextItem, DirectiveItem,
+                                   RectangleItem, CircleItem, NetLabelItem)):
+                if isinstance(item, LabelItem) and item.parentItem() in selected_parents:
                     continue
                 t = item.transform()
                 t.scale(1, -1)
@@ -950,6 +952,8 @@ class SchematicCanvas(QGraphicsView):
         self._save_snapshot()
         deleted_endpoints: list[QPointF] = []
         for item in list(self._selected_items):
+            if item.scene() is not self._scene:
+                continue
             if isinstance(item, JunctionItem):
                 # Удаление junction напрямую — срастить половины проводов
                 rejoined = self._undo_junction_split(item)
@@ -3625,11 +3629,18 @@ class SchematicCanvas(QGraphicsView):
             device = comp._data.attributes.get("device", "").upper()
             pins = comp._data.pins
 
-            line = self._spice_device_line(refdes, device, value, pins, pin_nets)
+            line = self._spice_device_line(refdes, device, value, pins, pin_nets,
+                                              comp._data.attributes)
             if line:
                 comp_lines.append(line)
             else:
-                comp_lines.append(f"* {refdes}: device={device} не поддерживается")
+                unconn = [str(p.pinnumber) for i, p in enumerate(pins)
+                          if i not in pin_nets]
+                if unconn:
+                    comp_lines.append(
+                        f"* {refdes}: device={device} — пины {','.join(unconn)} не подключены")
+                else:
+                    comp_lines.append(f"* {refdes}: device={device} не поддерживается")
 
         # Шаг 6: MODEL / DIRECTIVE — не-электрические аннотации, вставляются без привязки к проводам
         for cid, comp in all_comps.items():
@@ -3669,6 +3680,13 @@ class SchematicCanvas(QGraphicsView):
                 model_lines.append(ml)
         model_lines.sort()
 
+        # Автоматическая .MODEL swmod для VC-переключателей
+        if getattr(SchematicCanvas, '_swmod_needed', False):
+            SchematicCanvas._swmod_needed = False
+            swmod_line = ".MODEL swmod SW(VT=0.5 VH=0.1 RON=1 ROFF=10MEG)"
+            if swmod_line not in model_lines:
+                model_lines.append(swmod_line)
+
         comp_lines.sort()
         dir_lines.sort(key=lambda t: (1 if t.lstrip().lower().startswith(('.print', '.plot', '.probe')) else 0, t))
         lines.extend(comp_lines)
@@ -3679,7 +3697,8 @@ class SchematicCanvas(QGraphicsView):
 
     @staticmethod
     def _spice_device_line(refdes: str, device: str, value: str,
-                           pins, pin_nets: dict[int, str]) -> str | None:
+                           pins, pin_nets: dict[int, str],
+                           attributes: dict | None = None) -> str | None:
         """Сформировать одну строку SPICE для компонента."""
 
         def pinnumber_index(target: str) -> int | None:
@@ -3825,16 +3844,44 @@ class SchematicCanvas(QGraphicsView):
             return f"X{refdes} {' '.join(nets)} {model}"
 
         # Сложные IC → X (subcircuit call)
-        if device in ("OPAMP", "DUAL_OPAMP", "QUAD_OPAMP", "LM555",
+        if device in ("OPAMP", "DUAL_OPAMP", "QUAD_OPAMP",
+                      "COMPARATOR", "DUAL_COMPARATOR",
+                      "LM555",
                       "LM741", "LM358", "LM324", "LM311", "LM393",
-                      "LM317", "LM337", "LM339", "LM319", "LM2902",
+                      "LM339", "LM319", "LM2902",
                       "LT1782", "LTC1799", "LTC2400", "LT1761SD",
                       "LT1374CS8", "LT1376", "LP2954IT", "LM2941T",
                       "LM2576T", "LM2822M", "L200"):
-            net_list = [pin_nets.get(i, "NC") for i in range(len(pins))]
+            def _pin_sort_key(i):
+                pn = pins[i].pinnumber
+                if pn and pn.isdigit():
+                    return int(pn)
+                return i
+            sorted_indices = sorted(range(len(pins)), key=_pin_sort_key)
+            net_list = [pin_nets.get(i, "NC") for i in sorted_indices]
             if not any(n != "NC" for n in net_list):
                 return None
-            return f"X{refdes} {' '.join(net_list)} {device.lower()}"
+            model = value if value else device.lower()
+            return f"X{refdes} {' '.join(net_list)} {model}"
+
+        # SPICE voltage-controlled switch: S<refdes> N+ N- NC+ NC- <model>
+        if device == "SPICE-VC-SWITCH":
+            i_nplus = pinnumber_index("1")
+            i_nminus = pinnumber_index("2")
+            i_ncplus = pinnumber_index("3")
+            i_ncminus = pinnumber_index("4")
+            if None in (i_nplus, i_nminus, i_ncplus, i_ncminus):
+                return None
+            nplus = net(i_nplus)
+            nminus = net(i_nminus)
+            ncplus = net(i_ncplus)
+            ncminus = net(i_ncminus)
+            if None in (nplus, nminus, ncplus, ncminus):
+                return None
+            attrs = attributes or {}
+            model = attrs.get("model-name", value) or "swmod"
+            SchematicCanvas._swmod_needed = True
+            return f"{refdes} {nplus} {nminus} {ncplus} {ncminus} {model}"
 
         return None
 

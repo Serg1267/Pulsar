@@ -24,6 +24,7 @@ class ComponentGraphicsItem(QGraphicsItem):
         self._refdes = refdes
         self._value = value
         self._model_line: str = ""
+        self._footprint: str = ""
         self._label_items: list[LabelItem] = []
         self._create_labels()
         self._sync_value_label()
@@ -65,6 +66,12 @@ class ComponentGraphicsItem(QGraphicsItem):
 
     def set_model_line(self, text: str):
         self._model_line = text
+
+    def footprint(self) -> str:
+        return self._footprint
+
+    def set_footprint(self, name: str):
+        self._footprint = name
 
     def _sync_value_label(self):
         """Создаёт или обновляет метку value, если её нет в .sym."""

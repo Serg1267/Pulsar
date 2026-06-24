@@ -1,4 +1,4 @@
-# SpiceEDA - Зависимости
+# Pulsar - Зависимости
 PySide6>=6.5.0
 matplotlib>=3.7.0
 numpy>=1.24.0
