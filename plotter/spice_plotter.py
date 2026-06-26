@@ -115,7 +115,27 @@ class MultiCursor:
                 hl.set_ydata([y_val])
                 hl.set_visible(True)
                 txt.set_text(f'x={x_nearest:.4f}\ny={y_val:.6f}')
-                txt.set_position((x_nearest, y_val))
+
+                xlim = ax.get_xlim()
+                ylim = ax.get_ylim()
+                x_range = xlim[1] - xlim[0]
+                y_range = ylim[1] - ylim[0]
+                tx = x_nearest + x_range * 0.03
+                ty = y_val + y_range * 0.03
+
+                if tx > xlim[1] - x_range * 0.02:
+                    tx = x_nearest - x_range * 0.18
+                    txt.set_ha('right')
+                else:
+                    txt.set_ha('left')
+
+                if ty > ylim[1] - y_range * 0.15:
+                    ty = y_val - y_range * 0.12
+                    txt.set_va('top')
+                else:
+                    txt.set_va('bottom')
+
+                txt.set_position((tx, ty))
                 txt.set_visible(True)
             else:
                 hl.set_visible(False)
@@ -264,8 +284,8 @@ class CursorTracker:
             self.info_text.set_ha('left')
 
         # Если текст вылезает за верхний край — показать ниже курсора
-        if ty > ylim[1] - y_range * 0.02:
-            ty = y - y_range * 0.08
+        if ty > ylim[1] - y_range * 0.15:
+            ty = y - y_range * 0.12
             self.info_text.set_va('top')
         else:
             self.info_text.set_va('bottom')
