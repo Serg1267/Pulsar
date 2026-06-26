@@ -24,9 +24,10 @@ from PySide6.QtWidgets import (
     QInputDialog,
     QLabel,
     QPushButton,
+    QSizePolicy,
 )
 from PySide6.QtCore import Qt, QTimer, QSettings, QPointF
-from PySide6.QtGui import QAction, QIcon, QPixmap, QKeySequence, QCursor, QPalette, QColor
+from PySide6.QtGui import QAction, QIcon, QPixmap, QKeySequence, QCursor, QPalette, QColor, QPainter
 from EDA.app.items.directive_item import DirectiveItem
 
 from ui.settings_dialog import SettingsDialog
@@ -341,6 +342,21 @@ class PulsarMainWindow(QMainWindow):
         tb.setMovable(False)
         self.addToolBar(tb)
 
+        class DotSep(QWidget):
+            def __init__(self, parent=None):
+                super().__init__(parent)
+                self.setFixedWidth(10)
+                self.setFixedHeight(24)
+            def paintEvent(self, ev):
+                p = QPainter(self)
+                p.setPen(QColor("#4488ff"))
+                for y in range(3, 24, 6):
+                    p.drawPoint(5, y)
+                p.end()
+
+        def _dot_sep():
+            tb.addWidget(DotSep())
+
         new_action = QAction(QIcon(str(icons / "gschem-new.png")), "Новый файл", self)
         new_action.setShortcut("Ctrl+N")
         new_action.triggered.connect(self._new_file_dialog)
@@ -354,24 +370,80 @@ class PulsarMainWindow(QMainWindow):
         self._save_action.setIcon(QIcon(str(icons / "gschem-save.png")))
         tb.addAction(self._save_action)
 
-        self._wire_mode_action = QAction(QIcon(str(icons / "insert-net.png")), "Режим проводов", self)
+        self._wire_mode_action = QAction(QIcon(str(icons / "icons8-ball-point-pen-50.ico")), "Нарисовать провод", self)
         self._wire_mode_action.setCheckable(True)
+        self._wire_mode_action.setEnabled(False)
         self._wire_mode_action.triggered.connect(self._toggle_wire_mode)
-        tb.addAction(self._wire_mode_action)
 
-        tb.addSeparator()
+        _dot_sep()
 
         self._rect_action = QAction(QIcon(str(icons / "insert-box.png")), "Прямоугольник", self)
         self._rect_action.setCheckable(True)
+        self._rect_action.setEnabled(False)
         self._rect_action.triggered.connect(self._toggle_rect_mode)
         tb.addAction(self._rect_action)
 
         self._circle_action = QAction(QIcon(str(icons / "insert-circle.png")), "Окружность", self)
         self._circle_action.setCheckable(True)
+        self._circle_action.setEnabled(False)
         self._circle_action.triggered.connect(self._toggle_circle_mode)
         tb.addAction(self._circle_action)
 
-        tb.addSeparator()
+        _dot_sep()
+
+        # ── Быстрое размещение компонентов ──
+        self._comp_actions = []
+
+        def _make_comp_action(sym_id, icon_name, tooltip):
+            ico = QIcon()
+            ico.addPixmap(QPixmap(str(icons / f"{icon_name}.png")), QIcon.Mode.Normal)
+            ico.addPixmap(QPixmap(str(icons / f"{icon_name}_dim.png")), QIcon.Mode.Disabled)
+            act = QAction(ico, tooltip, self)
+            act.setEnabled(False)
+            act.triggered.connect(lambda checked, sid=sym_id: self._start_comp_placement(sid))
+            tb.addAction(act)
+            self._comp_actions.append(act)
+
+        ico_r = QIcon(str(icons / "icon-resistor.ico"))
+        act_r = QAction(ico_r, "Резистор (R)", self)
+        act_r.setEnabled(False)
+        act_r.triggered.connect(lambda: self._start_comp_placement("resistor-2"))
+        tb.addAction(act_r)
+        self._comp_actions.append(act_r)
+        ico_c = QIcon(str(icons / "icon-capacitor.ico"))
+        act_c = QAction(ico_c, "Конденсатор (C)", self)
+        act_c.setEnabled(False)
+        act_c.triggered.connect(lambda: self._start_comp_placement("capacitor-1"))
+        tb.addAction(act_c)
+        self._comp_actions.append(act_c)
+        # Транзистор из .ico
+        ico_t = QIcon(str(icons / "icon-transistor.ico"))
+        act_t = QAction(ico_t, "Транзистор (Q)", self)
+        act_t.setEnabled(False)
+        act_t.triggered.connect(lambda: self._start_comp_placement("npn-1"))
+        tb.addAction(act_t)
+        self._comp_actions.append(act_t)
+        ico_d = QIcon(str(icons / "icon-diode.ico"))
+        act_d = QAction(ico_d, "Диод (D)", self)
+        act_d.setEnabled(False)
+        act_d.triggered.connect(lambda: self._start_comp_placement("diode-1"))
+        tb.addAction(act_d)
+        self._comp_actions.append(act_d)
+        ico_g = QIcon(str(icons / "icon-ground.ico"))
+        act_g = QAction(ico_g, "Земля (G)", self)
+        act_g.setEnabled(False)
+        act_g.triggered.connect(lambda: self._start_comp_placement("gnd-1"))
+        tb.addAction(act_g)
+        self._comp_actions.append(act_g)
+
+        ico_el = QIcon(str(icons / "icons8-electronics-50.ico"))
+        act_el = QAction(ico_el, "Компоненты…", self)
+        act_el.setEnabled(False)
+        act_el.triggered.connect(self._sch_add_component)
+        tb.addAction(act_el)
+        self._comp_actions.append(act_el)
+
+        _dot_sep()
 
         def _icon_with_dim(name):
             """QIcon: Normal=red, Disabled=dim"""
@@ -380,31 +452,52 @@ class PulsarMainWindow(QMainWindow):
             ico.addPixmap(QPixmap(str(icons / f"{name}_dim.png")), QIcon.Mode.Disabled)
             return ico
 
-        self._jump_action = QAction(_icon_with_dim("step-into"), "Повернуть влево…", self)
+        self._jump_action = QAction(QIcon(str(icons / "icon-rotate-l.ico")), "Повернуть влево…", self)
         self._jump_action.setToolTip("Повернуть выделенный компонент влево на 90°")
         self._jump_action.setEnabled(False)
         self._jump_action.triggered.connect(self._rotate_selected_left)
         tb.addAction(self._jump_action)
 
-        self._jump_mirror_action = QAction(_icon_with_dim("step-into-mirror"), "Повернуть вправо…", self)
+        self._jump_mirror_action = QAction(QIcon(str(icons / "icon-rotate-r.ico")), "Повернуть вправо…", self)
         self._jump_mirror_action.setToolTip("Повернуть выделенный компонент вправо на 90°")
         self._jump_mirror_action.setEnabled(False)
         self._jump_mirror_action.triggered.connect(self._rotate_selected_right)
         tb.addAction(self._jump_mirror_action)
 
-        self._flip_v_action = QAction(_icon_with_dim("flip-v"), "Отразить по вертикали…", self)
-        self._flip_v_action.setToolTip("Отразить выделенный компонент по вертикали (Y)")
-        self._flip_v_action.setEnabled(False)
-        self._flip_v_action.triggered.connect(self._flip_selected_v)
-        tb.addAction(self._flip_v_action)
-
-        self._flip_h_action = QAction(_icon_with_dim("flip-h"), "Отразить по горизонтали…", self)
+        self._flip_h_action = QAction(QIcon(str(icons / "icon-flip-h.ico")), "Отразить по горизонтали…", self)
         self._flip_h_action.setToolTip("Отразить выделенный компонент по горизонтали (X)")
         self._flip_h_action.setEnabled(False)
         self._flip_h_action.triggered.connect(self._flip_selected_h)
         tb.addAction(self._flip_h_action)
 
-        tb.addSeparator()
+        self._flip_v_action = QAction(QIcon(str(icons / "icon-flip-v.ico")), "Отразить по вертикали…", self)
+        self._flip_v_action.setToolTip("Отразить выделенный компонент по вертикали (Y)")
+        self._flip_v_action.setEnabled(False)
+        self._flip_v_action.triggered.connect(self._flip_selected_v)
+        tb.addAction(self._flip_v_action)
+
+        _dot_sep()
+        tb.addAction(self._wire_mode_action)
+
+        self._toolbar_text_action = QAction(QIcon(str(icons / "icons8-type-50.ico")), "Добавить текст", self)
+        self._toolbar_text_action.setEnabled(False)
+        self._toolbar_text_action.triggered.connect(self._sch_add_text)
+        tb.addAction(self._toolbar_text_action)
+
+        self._toolbar_node_label_action = QAction(QIcon(str(icons / "icons8-добавить-метку-50.ico")), "Добавить метку узла", self)
+        self._toolbar_node_label_action.setEnabled(False)
+        self._toolbar_node_label_action.triggered.connect(self._sch_add_node_label)
+        tb.addAction(self._toolbar_node_label_action)
+
+        self._toolbar_code_file_action = QAction(QIcon(str(icons / "icons8-code-file-50.ico")), ".SPICE директива", self)
+        self._toolbar_code_file_action.setEnabled(False)
+        self._toolbar_code_file_action.triggered.connect(self._sch_add_directive)
+        tb.addAction(self._toolbar_code_file_action)
+
+        self._toolbar_netlist_action = QAction(QIcon(str(icons / "icons8-режим-одной-страницы-50.ico")), "Просмотр SPICE netlist", self)
+        self._toolbar_netlist_action.setEnabled(False)
+        self._toolbar_netlist_action.triggered.connect(self._view_netlist_dialog)
+        tb.addAction(self._toolbar_netlist_action)
 
     def _update_jump_actions(self):
         canvas = self._tabs.current_canvas()
@@ -480,6 +573,27 @@ class PulsarMainWindow(QMainWindow):
             canvas.setFocus()
         else:
             canvas._cancel_circle_placement()
+
+    def _start_comp_placement(self, sym_id: str):
+        canvas = self._tabs.current_canvas()
+        if canvas is None:
+            return
+        canvas._cancel_placement()
+        canvas._cancel_node_label_placement()
+        canvas._cancel_text_placement()
+        canvas._cancel_rect_placement()
+        canvas._cancel_circle_placement()
+        if canvas._wire_draw_mode:
+            canvas._wire_draw_mode = False
+            canvas._router.reset()
+            canvas._clear_routing_preview()
+            canvas._last_segment_item = None
+        if canvas._wire_mode:
+            canvas._wire_mode = False
+        canvas.mode_changed.emit("")
+        canvas.drag_placement_started.emit(sym_id)
+        canvas.setCursor(canvas._hand_cursor)
+        canvas.setFocus()
 
     def _create_status_bar(self):
         self.statusBar().showMessage("Готово")
@@ -650,6 +764,11 @@ class PulsarMainWindow(QMainWindow):
         page_type = self._tabs.current_page_type()
         is_cir = page_type == 'cir'
         is_sch = page_type == 'sch'
+        self._wire_mode_action.setEnabled(is_sch)
+        self._toolbar_text_action.setEnabled(is_sch)
+        self._toolbar_node_label_action.setEnabled(is_sch)
+        self._toolbar_code_file_action.setEnabled(is_sch)
+        self._toolbar_netlist_action.setEnabled(is_sch)
         self._cir_cut_action.setEnabled(is_cir or is_sch)
         self._cir_copy_action.setEnabled(is_cir or is_sch)
         self._cir_paste_action.setEnabled(is_cir or is_sch)
@@ -676,10 +795,14 @@ class PulsarMainWindow(QMainWindow):
         self._sch_add_directive_action.setEnabled(is_sch_now)
         self._sch_add_node_label_action.setEnabled(is_sch_now)
         self._sch_add_text_action.setEnabled(is_sch_now)
+        self._rect_action.setEnabled(is_sch_now)
+        self._circle_action.setEnabled(is_sch_now)
         self._sch_add_rect_action.setEnabled(is_sch_now)
         self._sch_add_circle_action.setEnabled(is_sch_now)
         self._sch_export_cir_action.setEnabled(is_sch_now)
         self._sch_export_tedax_action.setEnabled(is_sch_now)
+        for act in self._comp_actions:
+            act.setEnabled(is_sch_now)
 
         self._comp_panel_action.setVisible(self._tabs.has_sch_tabs())
         if is_sch_now and self._comp_panel_action.isChecked():
@@ -705,10 +828,19 @@ class PulsarMainWindow(QMainWindow):
         self._sch_add_directive_action.setEnabled(has_sch)
         self._sch_add_node_label_action.setEnabled(has_sch)
         self._sch_add_text_action.setEnabled(has_sch)
+        self._toolbar_text_action.setEnabled(has_sch)
+        self._toolbar_node_label_action.setEnabled(has_sch)
+        self._toolbar_code_file_action.setEnabled(has_sch)
+        self._toolbar_netlist_action.setEnabled(has_sch)
+        self._rect_action.setEnabled(has_sch)
+        self._circle_action.setEnabled(has_sch)
         self._sch_add_rect_action.setEnabled(has_sch)
         self._sch_add_circle_action.setEnabled(has_sch)
         self._sch_export_cir_action.setEnabled(has_sch)
         self._sch_export_tedax_action.setEnabled(has_sch)
+        self._wire_mode_action.setEnabled(has_sch)
+        for act in self._comp_actions:
+            act.setEnabled(has_sch)
         self._update_menus_for_mode()
         self._update_save_actions(count > 0)
         self._update_jump_actions()

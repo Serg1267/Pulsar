@@ -809,3 +809,32 @@ pyinstaller Pulsar.spec        # → dist/Pulsar (один ELF, 90 MB)
 - Из `main.py` удалены: меню «Плата», тулбар-кнопка «Трассировка (T)», методы `_new_pcb_file`, `_pcb_import_from_schematic`, `_pcb_export_tedax`, `_import_pcb_rnd_footprints`, `_toggle_pcb_track_mode`, `_on_pcb_track_mode_changed`.
 - tEDAx-экспорт (`EDA/tedax/netlist_exporter.py`) и пункт меню «Схема → Экспорт tEDAx (pcb-rnd)…» оставлены.
 - Все 53 теста проходят.
+
+### Важные изменения (25.06.2026)
+
+#### Иконки тулбара из .ico
+- Все иконки компонентных кнопок (`icon-resistor.ico`, `icon-capacitor.ico`, `icon-transistor.ico`, `icon-diode.ico`, `icon-ground.ico`) — файлы `.ico` из `/home/serg/Рабочий стол/icons_sym/`.
+- Кнопки создаются напрямую через `QIcon(str(icons / "icon-xxx.ico"))` без `_dim`-файлов (Qt использует `setEnabled(False)` для серого отображения).
+- `_make_comp_action()` остался только для PNG-иконок с `_dim`-суффиксом (не используется для .ico).
+- Иконки поворота/отражения: `icon-rotate-l.ico`, `icon-rotate-r.ico`, `icon-flip-h.ico`, `icon-flip-v.ico` — тоже `.ico`.
+
+#### Разделители тулбара
+- В `main.py:_create_toolbar()` добавлен класс `DotSep(QWidget)` — рисует вертикальный ряд синих точек (`#4488ff`) через `QPainter`.
+- Все `tb.addSeparator()` заменены на `_dot_sep()` — вызов `tb.addWidget(DotSep())`.
+- `QPainter` добавлен в глобальный импорт `PySide6.QtGui`.
+
+#### Состав тулбара (слева направо)
+1. Новый / Открыть / Сохранить
+2. Провода / Прямоугольник / Окружность
+3. Резистор / Конденсатор / Транзистор / Диод / Земля / Компоненты…
+4. Поворот влево / Поворот вправо / Отразить H / Отразить V
+5. Текст / Метка узла / .SPICE директива / Просмотр SPICE netlist
+
+### Важные изменения (25.06.2026, вечер)
+
+#### Новые кнопки тулбара
+- **Компоненты…** (`icons8-electronics-50.ico`) — в секции компонентов после земли, вызывает `_sch_add_component` (диалог выбора компонента).
+- **Метка узла** (`icons8-добавить-метку-50.ico`) — между текстом и .SPICE директивой, вызывает `_sch_add_node_label`.
+- **Просмотр SPICE netlist** (`icons8-режим-одной-страницы-50.ico`) — после .SPICE директивы, вызывает `_view_netlist_dialog`.
+- **.SPICE директива** заменена с `icon-spice.png` на `icons8-code-file-50.ico`.
+- Все новые кнопки выключаются/включаются при переключении вкладок (только для `.sch`).

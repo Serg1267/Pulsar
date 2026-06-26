@@ -61,13 +61,53 @@ class WireMixin:
         rect = QRectF(scene_pos.x() - tolerance, scene_pos.y() - tolerance,
                        tolerance * 2, tolerance * 2)
         for item in self._scene.items(rect,
-                                       Qt.ItemSelectionMode.IntersectsItemShape,
-                                       Qt.SortOrder.DescendingOrder):
+                                        Qt.ItemSelectionMode.IntersectsItemShape,
+                                        Qt.SortOrder.DescendingOrder):
             if isinstance(item, ComponentGraphicsItem):
                 pin_pos = item.hit_test_pin(scene_pos, tolerance)
                 if pin_pos is not None:
                     return item, pin_pos
         return None
+
+    def _snap_to_nearest_wire_or_pin(self, scene_pos: QPointF,
+                                     tolerance: float = 60.0) -> tuple[QPointF, bool]:
+        """Привязать позицию к ближайшему проводу или пину.
+        Возвращает (привязанная_позиция, is_on_wire_or_pin)."""
+        from PySide6.QtCore import QPointF
+        g = self.GRID_SPACING
+        best = None
+        best_dist = tolerance
+        for item in self._scene.items():
+            if not isinstance(item, WireItem):
+                continue
+            pts = item.points()
+            for i in range(len(pts) - 1):
+                a, b = pts[i], pts[i + 1]
+                if abs(a.x() - b.x()) < 0.1:
+                    if abs(scene_pos.x() - a.x()) <= best_dist:
+                        y = scene_pos.y()
+                        if min(a.y(), b.y()) - tolerance <= y <= max(a.y(), b.y()) + tolerance:
+                            d = abs(scene_pos.x() - a.x())
+                            if d < best_dist:
+                                best_dist = d
+                                best = QPointF(a.x(), y)
+                else:
+                    if abs(scene_pos.y() - a.y()) <= best_dist:
+                        x = scene_pos.x()
+                        if min(a.x(), b.x()) - tolerance <= x <= max(a.x(), b.x()) + tolerance:
+                            d = abs(scene_pos.y() - a.y())
+                            if d < best_dist:
+                                best_dist = d
+                                best = QPointF(x, a.y())
+        if best is not None:
+            return best, True
+        pin_hit = self._find_pin_at(scene_pos, tolerance)
+        if pin_hit is not None:
+            _, pin_pos = pin_hit
+            return pin_pos, True
+        x = round(scene_pos.x() / g) * g
+        y = round(scene_pos.y() / g) * g
+        return QPointF(x, y), False
 
     def _find_wire_endpoint_at(self, scene_pos: QPointF,
                                 tolerance: float = 30.0) -> tuple[WireItem, int] | None:
@@ -322,6 +362,37 @@ class WireMixin:
             self._scene.removeItem(self._routing_preview)
             self._routing_preview = None
         self._clear_wire_hover()
+
+    def _fix_segment(self, sx: float, sy: float):
+        """Зафиксировать текущий сегмент.
+        
+        Если есть _last_segment_item — дополняем его новыми точками,
+        иначе создаём новый WireItem. Так multi-segment провод остаётся
+        одним объектом и перетаскивается как единое целое.
+        """
+        self._save_snapshot()
+        segment = self._router.finish(sx, sy)
+        if len(segment) >= 2:
+            qpts = [QPointF(x, y) for x, y in segment]
+            if self._last_segment_item is not None:
+                self._last_segment_item.set_show_end_pin(False)
+                self._wire_graph.remove_wire(self._last_segment_item)
+                self._last_segment_item.append_points(qpts[1:])
+                self._wire_graph.add_wire(self._last_segment_item)
+                self._update_connections_for_wire(self._last_segment_item)
+                self._last_segment_item.set_show_end_pin(True)
+            else:
+                wire = WireItem(qpts, placed=True,
+                                show_start_pin=True, show_end_pin=True)
+                self._scene.addItem(wire)
+                self._wire_graph.add_wire(wire)
+                self._update_connections_for_wire(wire)
+                self._last_segment_item = wire
+            self._router.start(segment[-1][0], segment[-1][1])
+            self.modified.emit()
+        else:
+            self._router.start(sx, sy)
+        self._clear_routing_preview()
 
     # ------------------------------------------------------------------
     # Crosshair (перекрестие) для режима проводов

@@ -28,8 +28,8 @@ class ExportMixin:
         import re as _re
         from pathlib import Path as _Path
         _lib_dirs = [
-            _Path(__file__).resolve().parent.parent.parent / "resources" / "LIB",
-            _Path(__file__).resolve().parent.parent.parent / "Mod",
+            _Path(__file__).resolve().parent.parent.parent.parent / "resources" / "LIB",
+            _Path(__file__).resolve().parent.parent.parent.parent / "Mod",
         ]
         for _ld in _lib_dirs:
             if not _ld.exists():
@@ -218,7 +218,7 @@ class ExportMixin:
         # Автоматическая .MODEL swmod для VC-переключателей
         if getattr(self.__class__, '_swmod_needed', False):
             self.__class__._swmod_needed = False
-            swmod_line = ".MODEL swmod SW(VT=0.5 VH=0.1 RON=1 ROFF=10MEG)"
+            swmod_line = ".MODEL swmod SW(VT=0.5 VH=0.1 RON=1 ROFF=1G)"
             if swmod_line not in model_lines:
                 model_lines.append(swmod_line)
 

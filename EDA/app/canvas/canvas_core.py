@@ -135,7 +135,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
     # ------------------------------------------------------------------
     def _load_cursors(self):
         from pathlib import Path
-        icons = Path(__file__).parent.parent.parent / "resources" / "icons"
+        icons = Path(__file__).resolve().parent.parent.parent.parent / "resources" / "icons"
         light = is_light_theme()
         suffix = "" if not light else "_black"
         pw = icons / f"pencil_cursor{suffix}.png"
@@ -1554,8 +1554,8 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                     from pathlib import Path as _Path
                     import re as _re
                     _lib_dirs = [
-                        _Path(__file__).resolve().parent.parent.parent / "resources" / "LIB",
-                        _Path(__file__).resolve().parent.parent.parent / "Mod",
+                        _Path(__file__).resolve().parent.parent.parent.parent / "resources" / "LIB",
+                        _Path(__file__).resolve().parent.parent.parent.parent / "Mod",
                     ]
                     for _ld in _lib_dirs:
                         if not _ld.exists():
