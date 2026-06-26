@@ -499,6 +499,17 @@ class PulsarMainWindow(QMainWindow):
         self._toolbar_netlist_action.triggered.connect(self._view_netlist_dialog)
         tb.addAction(self._toolbar_netlist_action)
 
+        _dot_sep()
+        self._toolbar_run_action = QAction(QIcon(str(icons / "icons8-shutdown-50.ico")), "Пуск", self)
+        self._toolbar_run_action.setEnabled(False)
+        self._toolbar_run_action.triggered.connect(self._sch_run_simulation)
+        tb.addAction(self._toolbar_run_action)
+
+        self._toolbar_stop_action = QAction(QIcon(str(icons / "icons8-stop-64.ico")), "Стоп", self)
+        self._toolbar_stop_action.setEnabled(False)
+        self._toolbar_stop_action.triggered.connect(self._stop_simulation)
+        tb.addAction(self._toolbar_stop_action)
+
     def _update_jump_actions(self):
         canvas = self._tabs.current_canvas()
         has_sel = bool(canvas and canvas._selected_items)
@@ -769,6 +780,7 @@ class PulsarMainWindow(QMainWindow):
         self._toolbar_node_label_action.setEnabled(is_sch)
         self._toolbar_code_file_action.setEnabled(is_sch)
         self._toolbar_netlist_action.setEnabled(is_sch)
+        self._toolbar_run_action.setEnabled(is_cir or is_sch)
         self._cir_cut_action.setEnabled(is_cir or is_sch)
         self._cir_copy_action.setEnabled(is_cir or is_sch)
         self._cir_paste_action.setEnabled(is_cir or is_sch)
@@ -832,13 +844,13 @@ class PulsarMainWindow(QMainWindow):
         self._toolbar_node_label_action.setEnabled(has_sch)
         self._toolbar_code_file_action.setEnabled(has_sch)
         self._toolbar_netlist_action.setEnabled(has_sch)
+        self._toolbar_run_action.setEnabled(count > 0)
         self._rect_action.setEnabled(has_sch)
         self._circle_action.setEnabled(has_sch)
         self._sch_add_rect_action.setEnabled(has_sch)
         self._sch_add_circle_action.setEnabled(has_sch)
         self._sch_export_cir_action.setEnabled(has_sch)
         self._sch_export_tedax_action.setEnabled(has_sch)
-        self._wire_mode_action.setEnabled(has_sch)
         for act in self._comp_actions:
             act.setEnabled(has_sch)
         self._update_menus_for_mode()
@@ -1230,8 +1242,10 @@ class PulsarMainWindow(QMainWindow):
         self._sim_output_queue.append(text)
 
     def _process_output_queue(self):
-        while self._sim_output_queue:
+        processed = 0
+        while self._sim_output_queue and processed < 500:
             item = self._sim_output_queue.pop(0)
+            processed += 1
             if isinstance(item, tuple) and item[0] == "FINISHED":
                 success = item[1]
                 self._sim_progress_value = 100
@@ -1239,6 +1253,7 @@ class PulsarMainWindow(QMainWindow):
                 QTimer.singleShot(800, self._sim_progress.hide)
                 self._sim_run_action.setEnabled(True)
                 self._sim_stop_action.setEnabled(False)
+                self._toolbar_stop_action.setEnabled(False)
                 # Очистить temp-файл симуляции
                 sim_temp = getattr(self, '_sim_current_temp', None)
                 if sim_temp:
@@ -1246,6 +1261,8 @@ class PulsarMainWindow(QMainWindow):
                     self._sim_current_temp = None
                 if success and self._simulator.simulation_data:
                     QTimer.singleShot(500, self._show_simulation_results)
+                # После FINISHED всё равно больше нечего обрабатывать
+                break
             else:
                 self._sim_output_buffer.append(item)
                 term = self._tabs.current_terminal()
@@ -1643,6 +1660,7 @@ class PulsarMainWindow(QMainWindow):
         self._sim_progress.show()
         self._sim_run_action.setEnabled(False)
         self._sim_stop_action.setEnabled(True)
+        self._toolbar_stop_action.setEnabled(True)
         QTimer.singleShot(50, self._update_sim_progress)
 
         self._sim_current_temp = sim_path  # для очистки после симуляции
@@ -1717,6 +1735,7 @@ class PulsarMainWindow(QMainWindow):
         self._sim_progress.show()
         self._sim_run_action.setEnabled(False)
         self._sim_stop_action.setEnabled(True)
+        self._toolbar_stop_action.setEnabled(True)
         QTimer.singleShot(50, self._update_sim_progress)
 
         self._sim_current_temp = sim_path
@@ -1733,6 +1752,7 @@ class PulsarMainWindow(QMainWindow):
         self._sim_progress.hide()
         self._sim_run_action.setEnabled(True)
         self._sim_stop_action.setEnabled(False)
+        self._toolbar_stop_action.setEnabled(False)
         sim_temp = getattr(self, '_sim_current_temp', None)
         if sim_temp:
             self._cleanup_temp_file(sim_temp)

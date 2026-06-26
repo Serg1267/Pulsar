@@ -623,20 +623,16 @@ class SpicePlotterWindow(QMainWindow):
         current_vars = []
         in_data_section = False
         seen_indices = set()
-        skip_time = False  # время добавляем только из первой таблицы с данным набором переменных
+        skip_time = False
+        header_re = re.compile(r'Index\s+Time\s+(.*)', re.IGNORECASE)
 
-        lines = self.terminal_text.split('\n')
-
-        for i, line in enumerate(lines):
-            # Найти заголовок с переменными (регистронезависимый)
-            header_match = re.match(r'index\s+time\s+(.*)', line, re.IGNORECASE)
+        for line in self.terminal_text.split('\n'):
+            # Найти заголовок с переменными
+            header_match = header_re.match(line)
             if header_match:
                 var_part = header_match.group(1)
-                # Извлечь имена переменных В ПОРЯДКЕ следования в заголовке
-                # Ловим: v(3), i(V1), vsense#branch, v1#branch и т.д.
                 new_vars = re.findall(r'[a-zA-Z][a-zA-Z0-9_]*(?:\([^)]*\)|#[a-zA-Z]+)', var_part)
 
-                # Если это первый заголовок — инициализировать
                 if not current_vars:
                     current_vars = new_vars
                     for var in current_vars:
@@ -644,13 +640,11 @@ class SpicePlotterWindow(QMainWindow):
                     in_data_section = True
                     skip_time = False
                 elif new_vars:
-                    # Второй и последующие заголовки
                     seen_indices.clear()
-                    # Сравнить переменные: если набор изменился — это новый .PRINT (время уже есть)
                     if set(v.upper() for v in new_vars) != set(v.upper() for v in current_vars):
                         skip_time = True
                     else:
-                        skip_time = False  # тот же .PRINT, разбитый NGspice на части — время продолжаем
+                        skip_time = False
                     current_vars[:] = new_vars
                     for var in current_vars:
                         if var not in voltage_data:
@@ -662,41 +656,44 @@ class SpicePlotterWindow(QMainWindow):
                 continue
 
             # Пропускать разделительные линии
-            if re.match(r'^\s*-+\s*$', line):
+            if not line or line.startswith('---') or line.startswith('==='):
                 continue
 
-            # Парсить строки данных — захватываем все колонки значений
-            data_match = re.match(r'^\s*(\d+)\s+([0-9eE+\-.]+)\s+(.*)', line)
-            if data_match:
-                idx = int(data_match.group(1))
+            # Парсить строки данных через split (быстрее regex)
+            if not line[0].isdigit() and not line[0].isspace():
+                continue
+            parts = line.split()
+            if len(parts) < 3:
+                continue
 
-                # Пропустить дубликаты (одинаковый индекс в рамках одной таблицы)
-                if idx in seen_indices:
-                    continue
+            try:
+                idx = int(parts[0])
+            except ValueError:
+                continue
 
-                seen_indices.add(idx)
+            if idx in seen_indices:
+                continue
+            seen_indices.add(idx)
 
-                try:
-                    time_val = float(data_match.group(2))
-                except ValueError:
-                    continue
+            try:
+                time_val = float(parts[1])
+            except ValueError:
+                continue
 
-                # Разобрать все оставшиеся значения
-                rest = data_match.group(3).strip()
-                values = re.findall(r'[0-9eE+\-.]+', rest)
+            values = parts[2:]
 
-                if not skip_time:
-                    time_data.append(time_val)
+            if not skip_time:
+                time_data.append(time_val)
 
-                if current_vars:
-                    for vi, val_str in enumerate(values):
-                        if vi < len(current_vars):
-                            var_name = current_vars[vi]
-                            if var_name in voltage_data:
-                                try:
-                                    voltage_data[var_name].append(float(val_str))
-                                except ValueError:
-                                    pass
+            if current_vars:
+                for vi, val_str in enumerate(values):
+                    if vi < len(current_vars):
+                        var_name = current_vars[vi]
+                        if var_name in voltage_data:
+                            try:
+                                voltage_data[var_name].append(float(val_str))
+                            except ValueError:
+                                pass
 
         return time_data, voltage_data
 
