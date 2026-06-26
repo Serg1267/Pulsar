@@ -27,7 +27,7 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 from PySide6.QtCore import Qt, QTimer, QSettings, QPointF
-from PySide6.QtGui import QAction, QIcon, QPixmap, QKeySequence, QCursor, QPalette, QColor, QPainter
+from PySide6.QtGui import QAction, QIcon, QPixmap, QKeySequence, QCursor, QPalette, QColor, QPainter, QTextCursor
 from EDA.app.items.directive_item import DirectiveItem
 
 from ui.settings_dialog import SettingsDialog
@@ -56,11 +56,8 @@ class PulsarMainWindow(QMainWindow):
 
         # Simulation engine
         self._simulator = NGspiceSimulator()
-        self._sim_output_queue: list = []
-        self._sim_output_timer = QTimer(self)
-        self._sim_output_timer.timeout.connect(self._process_output_queue)
-        self._sim_output_timer.start(50)
         self._sim_progress_value = 0
+        self._sim_finished_data: tuple | None = None
         self._plot_window = None
 
         # .OP analysis (должно быть до _on_tab_changed)
@@ -1239,40 +1236,57 @@ class PulsarMainWindow(QMainWindow):
     # ─── Симуляция ───
 
     def _log_to_terminal_safe(self, text: str):
-        self._sim_output_queue.append(text)
+        self._sim_output_buffer.append(text)
 
-    def _process_output_queue(self):
-        processed = 0
-        while self._sim_output_queue and processed < 500:
-            item = self._sim_output_queue.pop(0)
-            processed += 1
-            if isinstance(item, tuple) and item[0] == "FINISHED":
-                success = item[1]
-                self._sim_progress_value = 100
-                self._sim_progress.setValue(100)
-                QTimer.singleShot(800, self._sim_progress.hide)
-                self._sim_run_action.setEnabled(True)
-                self._sim_stop_action.setEnabled(False)
-                self._toolbar_stop_action.setEnabled(False)
-                # Очистить temp-файл симуляции
-                sim_temp = getattr(self, '_sim_current_temp', None)
-                if sim_temp:
-                    self._cleanup_temp_file(sim_temp)
-                    self._sim_current_temp = None
-                if success and self._simulator.simulation_data:
-                    QTimer.singleShot(500, self._show_simulation_results)
-                # После FINISHED всё равно больше нечего обрабатывать
-                break
-            else:
-                self._sim_output_buffer.append(item)
-                term = self._tabs.current_terminal()
-                if term is not None:
-                    term.append(item)
+    TERMINAL_MAX_LINES = 2000
+    MAX_BUFFER_LINES = 300000
+
+    def _handle_sim_finished(self, lines: list[str], success: bool):
+        """Обработать завершение симуляции (вызывается из главного потока)."""
+        self._sim_output_buffer.extend(lines)
+        if len(self._sim_output_buffer) > self.MAX_BUFFER_LINES:
+            self._sim_output_buffer = self._sim_output_buffer[-self.MAX_BUFFER_LINES:]
+
+        self._sim_progress_value = 100
+        self._sim_progress.setValue(100)
+        QTimer.singleShot(800, self._sim_progress.hide)
+        self._sim_run_action.setEnabled(True)
+        self._sim_stop_action.setEnabled(False)
+        self._toolbar_stop_action.setEnabled(False)
+
+        sim_temp = getattr(self, '_sim_current_temp', None)
+        if sim_temp:
+            self._cleanup_temp_file(sim_temp)
+            self._sim_current_temp = None
+
+        self._flush_terminal_buffer()
+        if success and self._simulator.simulation_data:
+            self._show_simulation_results()
+
+    def _flush_terminal_buffer(self):
+        """Сбросить последние N строк буфера в терминал одной операцией."""
+        if not self._sim_output_buffer:
+            return
+        term = self._tabs.current_terminal()
+        if term is None:
+            return
+        lines = self._sim_output_buffer
+        total = len(lines)
+        if total > self.TERMINAL_MAX_LINES:
+            display = lines[-self.TERMINAL_MAX_LINES:]
+            note = f"\n[... {total - self.TERMINAL_MAX_LINES} строк скрыто. Всего строк: {total}]\n"
+        else:
+            display = lines
+            note = ""
+        text = note + '\n'.join(display) + '\n'
+        cursor = term.textCursor()
+        cursor.movePosition(QTextCursor.End)
+        cursor.insertText(text)
+        term.setTextCursor(cursor)
+        term.ensureCursorVisible()
 
     def _terminal_text(self) -> str:
-        text = self._tabs.terminal_text()
-        if text:
-            return text
+        """Вернуть полный буфер вывода (не truncated terminal)."""
         return "\n".join(self._sim_output_buffer)
 
     def _detect_output_directives(self, text: str) -> dict:
@@ -1610,7 +1624,6 @@ class PulsarMainWindow(QMainWindow):
             self._log_to_terminal_safe("[WARN] Симуляция уже запущена")
             return
 
-        self._sim_output_queue.clear()
         self._sim_output_buffer.clear()
 
         path = Path(cir_path)
@@ -1668,7 +1681,7 @@ class PulsarMainWindow(QMainWindow):
         self._simulator.run_simulation(
             sim_path,
             output_callback=self._log_to_terminal_safe,
-            finished_callback=lambda success: self._sim_output_queue.append(("FINISHED", success)),
+            finished_callback=lambda success, lines: setattr(self, '_sim_finished_data', (lines, success)),
         )
 
     def _run_simulation(self):
@@ -1676,8 +1689,6 @@ class PulsarMainWindow(QMainWindow):
             self._log_to_terminal_safe("[WARN] Симуляция уже запущена")
             return
 
-        # Очистить очередь предыдущего запуска (чтобы старые данные не попали в терминал)
-        self._sim_output_queue.clear()
         self._sim_output_buffer.clear()
 
         filepath = self._tabs.current_filepath()
@@ -1743,7 +1754,7 @@ class PulsarMainWindow(QMainWindow):
         self._simulator.run_simulation(
             sim_path,
             output_callback=self._log_to_terminal_safe,
-            finished_callback=lambda success: self._sim_output_queue.append(("FINISHED", success)),
+            finished_callback=lambda success, lines: setattr(self, '_sim_finished_data', (lines, success)),
         )
 
     def _stop_simulation(self):
@@ -1762,10 +1773,19 @@ class PulsarMainWindow(QMainWindow):
     def _update_sim_progress(self):
         if not self._sim_progress.isVisible():
             return
+
+        if self._sim_finished_data is not None:
+            lines, success = self._sim_finished_data
+            self._sim_finished_data = None
+            self._handle_sim_finished(lines, success)
+            return
+
         if self._sim_progress_value < 95:
             self._sim_progress_value += 1
             self._sim_progress.setValue(self._sim_progress_value)
-            QTimer.singleShot(50, self._update_sim_progress)
+
+        # Продолжаем тикать пока не скроется прогресс-бар
+        QTimer.singleShot(50, self._update_sim_progress)
 
     def _show_simulation_results(self):
         directives = getattr(self, '_output_directives', {})
@@ -1812,8 +1832,15 @@ class PulsarMainWindow(QMainWindow):
             self._log_to_terminal_safe("[INFO] Нет данных для построения графиков")
 
     def _show_print_table(self, terminal_text: str):
-        """Показать .PRINT результаты в отдельном окне."""
-        self._show_result_dialog("Результаты .PRINT", terminal_text)
+        """Показать .PRINT результаты (только последние 2000 строк)."""
+        lines = terminal_text.split('\n')
+        if len(lines) > self.TERMINAL_MAX_LINES:
+            truncated = '\n'.join(lines[-self.TERMINAL_MAX_LINES:])
+            note = f"\n[... {len(lines) - self.TERMINAL_MAX_LINES} строк скрыто. Всего строк: {len(lines)}]\n"
+            text = note + truncated
+        else:
+            text = terminal_text
+        self._show_result_dialog("Результаты .PRINT", text)
 
     def _show_op_table(self, terminal_text: str):
         """Показать .OP результаты в отдельном окне."""

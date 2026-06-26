@@ -20,8 +20,6 @@ class ExportMixin:
     @staticmethod
     def _auto_fill_model(comp: 'ComponentGraphicsItem'):
         """Заполнить model_line из .lib/.mod файлов по value компонента."""
-        if comp.model_line():
-            return
         _value = comp.value().strip()
         if not _value:
             return
@@ -54,7 +52,10 @@ class ExportMixin:
                     if _m.group(1).upper() == _value.upper():
                         _start = _m.start()
                         _ends = _re.search(r'^\s*\.ends\s+', _c[_start:], _re.MULTILINE | _re.IGNORECASE)
-                        comp.set_model_line(_c[_start:_start + _ends.end() - 1] if _ends else f".SUBCKT {_value} {_m.group(2)}")
+                        if _ends:
+                            comp.set_model_line(_c[_start:])
+                        else:
+                            comp.set_model_line(f".SUBCKT {_value} {_m.group(2)}")
                         return
 
     # ------------------------------------------------------------------
@@ -206,10 +207,8 @@ class ExportMixin:
         for item in self._scene.items():
             if not isinstance(item, ComponentGraphicsItem):
                 continue
+            self._auto_fill_model(item)
             ml = item.model_line()
-            if not ml:
-                self._auto_fill_model(item)
-                ml = item.model_line()
             if ml and ml not in seen:
                 seen.add(ml)
                 model_lines.append(ml)

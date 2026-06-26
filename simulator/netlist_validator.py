@@ -108,9 +108,10 @@ def validate_netlist(file_path: Path) -> ValidationResult:
             "Отсутствует директива .END — NGspice не завершит обработку",
         ))
 
-    # --- 2. Проверка GND (узел 0) ---
+    # --- 2. Проверка GND (узел 0, пропуская .SUBCKT блоки) ---
     has_ground = False
     ground_lines: List[int] = []
+    inside_subckt = 0
 
     component_re = re.compile(
         r'^\s*([RCLVDIQMBJXF]\S*)\s+(\S+)\s+(\S+)', re.IGNORECASE
@@ -118,8 +119,16 @@ def validate_netlist(file_path: Path) -> ValidationResult:
 
     for i, line in enumerate(lines):
         stripped = line.strip()
-        # Пропускать комментарии и пустые
-        if not stripped or stripped.startswith("*") or stripped.startswith("."):
+        if not stripped or stripped.startswith("*"):
+            continue
+        upper = stripped.upper()
+        if upper.startswith(".SUBCKT"):
+            inside_subckt += 1
+            continue
+        if upper.startswith(".ENDS"):
+            inside_subckt = max(0, inside_subckt - 1)
+            continue
+        if inside_subckt > 0 or stripped.startswith("."):
             continue
 
         match = component_re.match(stripped)
@@ -143,13 +152,25 @@ def validate_netlist(file_path: Path) -> ValidationResult:
             suggestion="Подключите один из узлов к узлу '0' (GND)",
         ))
 
-    # --- 3. Проверка компонентов ---
+    # --- 3. Проверка компонентов (пропускаем .SUBCKT/.ENDS блоки) ---
     components: List[tuple] = []  # (refdes, line_number)
     refdes_set = set()
+    inside_subckt = 0
 
     for i, line in enumerate(lines):
         stripped = line.strip()
-        if not stripped or stripped.startswith("*") or stripped.startswith("."):
+        if not stripped or stripped.startswith("*"):
+            continue
+
+        if stripped.upper().startswith(".SUBCKT"):
+            inside_subckt += 1
+            continue
+        if stripped.upper().startswith(".ENDS"):
+            inside_subckt = max(0, inside_subckt - 1)
+            continue
+        if inside_subckt > 0:
+            continue
+        if stripped.startswith("."):
             continue
 
         match = component_re.match(stripped)

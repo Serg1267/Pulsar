@@ -3,11 +3,16 @@
 Запуск симуляций, обработка результатов и автоматическое отображение графиков
 """
 
+import os
 import re
+import signal
 import subprocess
 import threading
 from pathlib import Path
 from typing import Optional, Callable, Dict, Any, List
+
+MAX_OUTPUT_LINES = 5000000       # абсолютный лимит — прервать симуляцию
+MAX_OUTPUT_KEEP = 500000         # сколько строк хранить в памяти для отображения
 
 
 class NGspiceSimulator:
@@ -69,29 +74,36 @@ class NGspiceSimulator:
         self,
         circuit_file: Path,
         output_callback: Callable[[str], None],
-        finished_callback: Callable[[bool], None],
+        finished_callback: Callable[[bool, list[str]], None],
     ):
-        """Поток для запуска симуляции"""
-        try:
-            output_callback(f"\n[INFO] Запуск NGspice для файла: {circuit_file.name}")
-            output_callback(f"[INFO] Путь: {circuit_file}")
-            output_callback("=" * 60)
+        """Поток для запуска симуляции — собирает всё в локальный list, передаёт батчем."""
+        all_lines: list[str] = []
+        def log(msg: str):
+            all_lines.append(msg)
 
-            # Проверить тип анализа
+        def finish(success: bool):
+            """Единая точка выхода с триммингом буфера."""
+            if len(all_lines) > MAX_OUTPUT_KEEP:
+                trimmed = all_lines[-MAX_OUTPUT_KEEP:]
+            else:
+                trimmed = all_lines
+            finished_callback(success, trimmed)
+
+        try:
+            log(f"\n[INFO] Запуск NGspice для файла: {circuit_file.name}")
+            log(f"[INFO] Путь: {circuit_file}")
+            log("=" * 60)
+
             with open(circuit_file, 'r') as f:
                 netlist_content = f.read()
 
             analysis_type = self._detect_analysis_type(netlist_content)
-            output_callback(f"[INFO] Обнаружен тип анализа: {analysis_type.upper()}")
+            log(f"[INFO] Обнаружен тип анализа: {analysis_type.upper()}")
 
-            # Сохранить тип анализа
-            self._simulation_data = {
-                'type': analysis_type,
-            }
+            self._simulation_data = {'type': analysis_type}
 
-            output_callback("[INFO] Запуск симуляции...")
+            log("[INFO] Запуск симуляции...")
 
-            # Запустить NGspice в batch режиме
             self._process = subprocess.Popen(
                 ["ngspice", "-b", str(circuit_file)],
                 stdout=subprocess.PIPE,
@@ -103,38 +115,59 @@ class NGspiceSimulator:
 
             self._running = True
 
-            # Читать вывод
+            line_count = 0
             if self._process.stdout:
-                for line in self._process.stdout:
-                    if self._stop_requested:
-                        self._process.terminate()
-                        output_callback("\n[STOP] Симуляция остановлена пользователем")
-                        self._running = False
-                        finished_callback(False)
-                        return
+                try:
+                    for line in self._process.stdout:
+                        if self._stop_requested:
+                            log("\n[STOP] Симуляция остановлена пользователем")
+                            self._running = False
+                            finish(False)
+                            return
 
-                    if line.strip():
-                        output_callback(line.rstrip())
+                        line_count += 1
+                        if line_count > MAX_OUTPUT_LINES:
+                            log(f"\n[WARN] Превышен лимит вывода ({MAX_OUTPUT_LINES} строк). Симуляция прервана.")
+                            try:
+                                if hasattr(signal, 'SIGKILL'):
+                                    os.kill(self._process.pid, signal.SIGKILL)
+                                else:
+                                    self._process.kill()
+                                if self._process.stdout:
+                                    self._process.stdout.close()
+                            except Exception:
+                                pass
+                            self._running = False
+                            finish(False)
+                            return
+
+                        if line.strip():
+                            log(line.rstrip())
+                except ValueError:
+                    log("\n[STOP] Вывод прерван")
+                    self._running = False
+                    finish(False)
+                    return
 
             return_code = self._process.wait()
 
             if return_code == 0:
-                output_callback("\n" + "=" * 60)
-                output_callback("[SUCCESS] Симуляция завершена успешно")
-                finished_callback(True)
+                log("\n" + "=" * 60)
+                log("[SUCCESS] Симуляция завершена успешно")
             else:
-                output_callback("\n" + "=" * 60)
-                output_callback(f"[ERROR] Симуляция завершилась с кодом: {return_code}")
-                finished_callback(False)
+                log("\n" + "=" * 60)
+                log(f"[ERROR] Симуляция завершилась с кодом: {return_code}")
+
+            finish(return_code == 0)
 
         except FileNotFoundError:
-            output_callback("[ERROR] NGspice не найден. Установите ngspice.")
-            finished_callback(False)
+            log("[ERROR] NGspice не найден. Установите ngspice.")
+            finish(False)
         except Exception as e:
-            output_callback(f"\n[ERROR] Ошибка симуляции: {e}")
+            log(f"\n[ERROR] Ошибка симуляции: {e}")
             import traceback
-            output_callback(f"[ERROR] {traceback.format_exc()}")
-            finished_callback(False)
+            log(f"[ERROR] {traceback.format_exc()}")
+            finish(False)
         finally:
             self._running = False
 
@@ -155,10 +188,22 @@ class NGspiceSimulator:
         return 'unknown'
 
     def stop_simulation(self):
-        """Остановить симуляцию"""
+        """Остановить симуляцию (SIGKILL + закрыть stdout)"""
         if not self._running:
             return
 
         self._stop_requested = True
         if self._process and self._process.poll() is None:
-            self._process.terminate()
+            try:
+                # SIGKILL гарантированно убивает процесс (в отличие от SIGTERM)
+                if hasattr(signal, 'SIGKILL'):
+                    os.kill(self._process.pid, signal.SIGKILL)
+                else:
+                    self._process.kill()
+            except ProcessLookupError:
+                pass  # процесс уже завершился
+            try:
+                if self._process.stdout:
+                    self._process.stdout.close()
+            except Exception:
+                pass

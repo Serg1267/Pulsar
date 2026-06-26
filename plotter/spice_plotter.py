@@ -26,6 +26,17 @@ SCOPE_TICK = "#cccccc"
 SCOPE_TEXT = "#cccccc"
 SCOPE_COLORS = ["#00ff41", "#00d4ff", "#ff006e", "#ffbe0b", "#8338ec", "#3a86ff"]
 
+MAX_PLOT_POINTS = 10000
+
+
+def _downsample(x, y):
+    """Проредить массив до MAX_PLOT_POINTS равномерно."""
+    n = len(x)
+    if n <= MAX_PLOT_POINTS:
+        return x, y
+    step = n // MAX_PLOT_POINTS
+    return x[::step], y[::step]
+
 
 def _get_ylabel_for_vars(var_names: list) -> str:
     """Определить подпись оси Y по именам переменных"""
@@ -727,9 +738,10 @@ class SpicePlotterWindow(QMainWindow):
         for idx, (var_name, values) in enumerate(var_items):
             ax = fig.add_subplot(n_vars, 1, idx + 1)
             color = SCOPE_COLORS[idx % len(SCOPE_COLORS)]
+            xs = np.array(time_data) * 1e3
+            xd, yd = _downsample(xs, values)
             ax.plot(
-                np.array(time_data) * 1e3,
-                values,
+                xd, yd,
                 linewidth=0.5,
                 label=var_name,
                 color=color,
@@ -1062,9 +1074,9 @@ class SpicePlotterWindow(QMainWindow):
         for idx, (var_name, values) in enumerate(voltage_data.items()):
             if values:
                 color = SCOPE_COLORS[idx % len(SCOPE_COLORS)]
+                xd, yd = _downsample(sweep_data, values)
                 ax.plot(
-                    sweep_data,
-                    values,
+                    xd, yd,
                     linewidth=0.5,
                     label=var_name,
                     color=color,
@@ -1127,9 +1139,9 @@ class SpicePlotterWindow(QMainWindow):
                 color = SCOPE_COLORS[idx % len(SCOPE_COLORS)]
                 # Децибелы: 20 * log10(|V|)
                 db_values = [20 * np.log10(max(abs(v), 1e-15)) for v in values]
+                fd, dbd = _downsample(frequency_data, db_values)
                 ax_mag.semilogx(
-                    frequency_data,
-                    db_values,
+                    fd, dbd,
                     linewidth=0.5,
                     label=f'{var_name} (dB)',
                     color=color
@@ -1159,9 +1171,9 @@ class SpicePlotterWindow(QMainWindow):
         for idx, (var_name, values) in enumerate(phase_data.items()):
             if values:
                 color = SCOPE_COLORS[(idx + 2) % len(SCOPE_COLORS)]
+                fd2, pd2 = _downsample(frequency_data, values)
                 ax_phase.semilogx(
-                    frequency_data,
-                    values,
+                    fd2, pd2,
                     linewidth=0.5,
                     label=f'{var_name} (phase)',
                     color=color

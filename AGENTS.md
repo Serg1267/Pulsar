@@ -172,8 +172,9 @@ pip install -r requirements.txt           # зависимости: PySide6, mat
    - Нет дубликатов refdes
    - Предупреждение если нет `.PRINT`
 5. Если валидно: запустить `NGspiceSimulator.run_simulation()` в фоновом потоке.
-6. Callback вывода → `_sim_output_queue` → таймер 50ms сбрасывает в терминал.
-7. По завершении: авто-открытие `SpicePlotterWindow` если есть данные для графиков.
+6. Вывод ngspice собирается в локальном `list[str]` в потоке — каждый вызов `output_callback` отключён.
+7. При завершении: `finished_callback(lines, success)` (из фонового потока) сохраняет батч в `_sim_finished_data`.
+8. `_update_sim_progress` (каждый 50ms) проверяет `_sim_finished_data`, вызывает `_handle_sim_finished(lines, success)` — буфер расширяется, терминал сбрасывается одной операцией `insertText()`, открывается плоттер.
 
 ### Проверки валидатора
 - **Ошибки** (блокирующие): пустой файл, нет `.END`, нет GND (узел 0), нет компонентов, нет директивы анализа, дубликаты refdes.
@@ -829,6 +830,17 @@ pyinstaller Pulsar.spec        # → dist/Pulsar (один ELF, 90 MB)
 3. Резистор / Конденсатор / Транзистор / Диод / Земля / Компоненты…
 4. Поворот влево / Поворот вправо / Отразить H / Отразить V
 5. Текст / Метка узла / .SPICE директива / Просмотр SPICE netlist
+
+### Важные изменения (26.06.2026)
+
+#### Симуляция — batch-вывод (без очередей и таймера)
+- **Проблема**: `QTimer` + `deque` + `_process_output_queue()` каждые 50ms — даже с `deque.popleft()` (O(1)) GUI тормозил из-за постоянных переключений контекста между таймером и потоком.
+- **Решение**: фоновый поток (NGspiceSimulator) собирает ВСЁ в локальный `all_lines: list[str]`. Никаких `output_callback` вызовов.
+- **Передача батча**: `finished_callback(success, all_lines)` устанавливает `self._sim_finished_data = (lines, success)` — одно присваивание из фонового потока.
+- **Подхват батча**: `_update_sim_progress` (тот же таймер 50ms) проверяет `_sim_finished_data`, вызывает `_handle_sim_finished(lines, success)`, которая расширяет `_sim_output_buffer`, сбрасывает терминал и открывает результаты.
+- **Удалено**: `from collections import deque`, `_sim_output_queue`, `_sim_output_timer`, `_process_output_queue`, `MAX_QUEUE_PER_TICK`.
+- **Изменено**: `_log_to_terminal_safe()` → прямой `_sim_output_buffer.append()` (без очереди). Пре-симуляционные сообщения (валидация и т.д.) накапливаются в буфере, сбрасываются только при FINISHED.
+- Все 53 теста проходят.
 
 ### Важные изменения (25.06.2026, вечер)
 
