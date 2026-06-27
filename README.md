@@ -55,6 +55,4 @@ python3 main.py
 | `resources/` | Иконки, темы |
 | `examples/` | Примеры .cir файлов |
 
-## Лицензия
 
-MIT
