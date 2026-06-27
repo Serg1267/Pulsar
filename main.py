@@ -598,9 +598,7 @@ class PulsarMainWindow(QMainWindow):
         """Сбросить показ узлов при изменении схемы."""
         if self._net_numbers_action.isChecked():
             self._net_numbers_action.setChecked(False)
-            canvas = self._tabs.current_canvas()
-            if canvas is not None:
-                canvas.set_net_numbers_visible(False)
+            self._toggle_net_numbers()
 
     def _start_comp_placement(self, sym_id: str):
         canvas = self._tabs.current_canvas()
