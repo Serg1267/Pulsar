@@ -1,0 +1,9 @@
+* BS250 P-channel MOSFET model
+* Vds_max = -45V, Id_max = -230mA, Vgs(th) = -0.8--4V
+
+.MODEL BS250 PMOS (
++ VTO=-2.0   KP=0.08     GAMMA=0.6    PHI=0.75
++ LAMBDA=0.02 RD=2.0     RS=2.0       IS=1e-14
++ CBD=2e-12  CBS=2e-12   CGSO=2e-10  CGOO=2e-11
++ CGDO=2e-10 PB=0.8      MJ=0.5      TOX=5e-8
++ LD=0.0     WD=0.0      RDS=1e8     )

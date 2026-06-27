@@ -1,0 +1,32 @@
+* ME4856 — N-Channel Power MOSFET (Microgate, SOP-8)
+* VDS=30V, ID=17A, RDS(on)=6mOhm@VGS=10V
+* Package: SOP-8
+* Created: 2026-06-27
+*
+* Примечание: модель LEVEL 1 VDMOS не может одновременно
+* точно воспроизвести RDS(on) и GFS из-за отсутствия
+* моделирования velocity saturation. RDS(on) оптимизирован
+* под spec @VGS=10V; GFS в симуляции ~41S (spec: 14S).
+*
+.MODEL ME4856 VDMOS NCHAN (
++ VTO=1.8
++ KP=50
++ LAMBDA=0.01
++ RD=2.0m
++ RS=1.5m
++ RG=1.0
++ CGS=2590p
++ CGDMAX=550p
++ CGDMIN=110p
++ A=0.3
++ CJO=240p
++ VJ=0.8
++ M=0.5
++ IS=1e-10
++ RB=50m
++ BV=30
++ IBV=250u
++ NBV=4
++ TT=25n
++ RTHJC=34
+)
