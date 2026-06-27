@@ -112,6 +112,10 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
         # --- Служебные поля для выделения / перетаскивания (инициализация в SelectionMixin.__init__) ---
         # --- Вставка из буфера обмена (инициализация в SelectionMixin.__init__) ---
 
+        # --- Показ номеров узлов ---
+        self._show_net_numbers = False
+        self._net_labels: list[tuple[int, QPointF]] = []
+
         # --- Undo/Redo стек (snapshot-based) ---
         self._undo_stack: list[dict] = []
         self._redo_stack: list[dict] = []
@@ -211,6 +215,130 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
         painter.setPen(QPen(self._origin_color, 0.0))
         painter.drawLine(QPointF(-marker, 0.0), QPointF(marker, 0.0))
         painter.drawLine(QPointF(0.0, -marker), QPointF(0.0, marker))
+
+    def drawForeground(self, painter: QPainter, rect: QRectF):
+        if not self._show_net_numbers or not self._net_labels:
+            return
+        painter.save()
+        painter.setTransform(QTransform())
+        font = QFont("Monospace", 28)
+        font.setBold(True)
+        painter.setFont(font)
+        pen = QPen(QColor("#00ff88"))
+        painter.setPen(pen)
+        brush = QColor(0, 0, 0, 160)
+        for num, pt in self._net_labels:
+            vp = self.mapFromScene(pt)
+            s = str(num)
+            fm = QFontMetrics(font)
+            tw = fm.horizontalAdvance(s)
+            th = fm.height()
+            r = QRectF(vp.x() - tw / 2 - 6, vp.y() - th / 2 - 3, tw + 12, th + 6)
+            painter.fillRect(r, brush)
+            painter.setPen(pen)
+            painter.drawText(r, int(Qt.AlignmentFlag.AlignCenter), s)
+        painter.restore()
+
+    def set_net_numbers_visible(self, visible: bool):
+        self._show_net_numbers = visible
+        if visible:
+            self._update_net_labels()
+        else:
+            self._net_labels.clear()
+        self.viewport().update()
+
+    def _update_net_labels(self):
+        """Сгруппировать провода BFS, назначить номера 0,1,2..., вычислить центр группы."""
+        from EDA.core.router.wire_item import WireItem
+        from EDA.app.items.component_item import ComponentGraphicsItem
+        from EDA.app.items.node_label_item import NetLabelItem
+
+        processed: set[WireItem] = set()
+        net_groups: list[set[WireItem]] = []
+        for item in self._scene.items():
+            if not isinstance(item, WireItem):
+                continue
+            if item in processed:
+                continue
+            connected = self._wire_graph.get_connected(item)
+            processed.update(connected)
+            net_groups.append(connected)
+
+        all_comps: dict[int, ComponentGraphicsItem] = {}
+        power_ids: set[int] = set()
+        for item in self._scene.items():
+            if isinstance(item, ComponentGraphicsItem):
+                cid = id(item)
+                all_comps[cid] = item
+                if "net" in item._data.attributes:
+                    power_ids.add(cid)
+                elif item._data.attributes.get("device", "").upper() == "GND":
+                    power_ids.add(cid)
+
+        self._net_labels.clear()
+        net_counter = 0
+        for group in net_groups:
+            name = None
+            for (cid, _pin_idx), (w, _wi, _px, _py) in self._comp_wire_links.items():
+                if cid not in power_ids:
+                    continue
+                if w not in group:
+                    continue
+                comp = all_comps.get(cid)
+                if comp is None:
+                    continue
+                dev = comp._data.attributes.get("device", "").upper()
+                net_attr = comp._data.attributes.get("net", "")
+                if net_attr:
+                    label = net_attr.split(":")[0] if ":" in net_attr else net_attr
+                    if label.upper() == "GND":
+                        name = "0"
+                    else:
+                        name = label
+                elif dev == "GND":
+                    name = "0"
+                break
+            if name is None:
+                for item in self._scene.items():
+                    if not isinstance(item, NetLabelItem):
+                        continue
+                    anchor = item.pos()
+                    for w in group:
+                        pts = w.points()
+                        for i in range(len(pts) - 1):
+                            a, b = pts[i], pts[i + 1]
+                            if abs(a.x() - b.x()) < 0.1:
+                                if abs(anchor.x() - a.x()) <= 30:
+                                    if min(a.y(), b.y()) - 30 <= anchor.y() <= max(a.y(), b.y()) + 30:
+                                        name = item.text()
+                                        break
+                            else:
+                                if abs(anchor.y() - a.y()) <= 30:
+                                    if min(a.x(), b.x()) - 30 <= anchor.x() <= max(a.x(), b.x()) + 30:
+                                        name = item.text()
+                                        break
+                    if name is not None:
+                        break
+            if name is None:
+                net_counter += 1
+                name = str(net_counter)
+            elif name == "0":
+                name = "0"
+
+            # Вычислить центр группы проводов
+            pts_sum = QPointF(0, 0)
+            count = 0
+            for w in group:
+                for p in w.points():
+                    pts_sum += p
+                    count += 1
+            center = pts_sum / count if count else QPointF(0, 0)
+
+            try:
+                num = int(name)
+            except ValueError:
+                num = net_counter
+            self._net_labels.append((num, center))
 
     # ------------------------------------------------------------------
     # Zoom колесом мыши

@@ -496,6 +496,12 @@ class PulsarMainWindow(QMainWindow):
         self._toolbar_netlist_action.triggered.connect(self._view_netlist_dialog)
         tb.addAction(self._toolbar_netlist_action)
 
+        self._net_numbers_action = QAction(QIcon(str(icons / "icons8-address-50.ico")), "Узлы", self)
+        self._net_numbers_action.setCheckable(True)
+        self._net_numbers_action.setEnabled(False)
+        self._net_numbers_action.triggered.connect(self._toggle_net_numbers)
+        tb.addAction(self._net_numbers_action)
+
         _dot_sep()
         self._toolbar_run_action = QAction(QIcon(str(icons / "icons8-shutdown-50.ico")), "Пуск", self)
         self._toolbar_run_action.setEnabled(False)
@@ -581,6 +587,20 @@ class PulsarMainWindow(QMainWindow):
             canvas.setFocus()
         else:
             canvas._cancel_circle_placement()
+
+    def _toggle_net_numbers(self):
+        canvas = self._tabs.current_canvas()
+        if canvas is None:
+            return
+        canvas.set_net_numbers_visible(self._net_numbers_action.isChecked())
+
+    def _on_net_numbers_modified(self):
+        """Сбросить показ узлов при изменении схемы."""
+        if self._net_numbers_action.isChecked():
+            self._net_numbers_action.setChecked(False)
+            canvas = self._tabs.current_canvas()
+            if canvas is not None:
+                canvas.set_net_numbers_visible(False)
 
     def _start_comp_placement(self, sym_id: str):
         canvas = self._tabs.current_canvas()
@@ -758,6 +778,7 @@ class PulsarMainWindow(QMainWindow):
             try:
                 self._op_connected_canvas.modified.disconnect(self._reset_op)
                 self._op_connected_canvas.modified.disconnect(self._on_dirty_changed)
+                self._op_connected_canvas.modified.disconnect(self._on_net_numbers_modified)
                 self._op_connected_canvas.selection_changed.disconnect(self._update_jump_actions)
             except Exception:
                 pass
@@ -777,6 +798,7 @@ class PulsarMainWindow(QMainWindow):
         self._toolbar_node_label_action.setEnabled(is_sch)
         self._toolbar_code_file_action.setEnabled(is_sch)
         self._toolbar_netlist_action.setEnabled(is_sch)
+        self._net_numbers_action.setEnabled(is_sch)
         self._toolbar_run_action.setEnabled(is_cir or is_sch)
         self._cir_cut_action.setEnabled(is_cir or is_sch)
         self._cir_copy_action.setEnabled(is_cir or is_sch)
@@ -789,12 +811,17 @@ class PulsarMainWindow(QMainWindow):
                 canvas.modified.connect(self._reset_op)
                 self._op_connected_canvas = canvas
                 canvas.modified.connect(self._on_dirty_changed)
+                canvas.modified.connect(self._on_net_numbers_modified)
                 canvas.selection_changed.connect(self._update_jump_actions)
         elif is_cir:
             editor = self._tabs.current_editor()
             if editor is not None:
                 editor.textChanged.connect(self._on_dirty_changed)
                 self._dirty_connected_editor = editor
+
+        # Сбросить показ узлов при переключении вкладки
+        if not is_sch and self._net_numbers_action.isChecked():
+            self._net_numbers_action.setChecked(False)
 
         self._update_save_actions(self._tabs.count() > 0)
         self._update_jump_actions()
