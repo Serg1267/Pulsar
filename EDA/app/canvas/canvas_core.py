@@ -112,9 +112,12 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
         # --- Служебные поля для выделения / перетаскивания (инициализация в SelectionMixin.__init__) ---
         # --- Вставка из буфера обмена (инициализация в SelectionMixin.__init__) ---
 
-        # --- Показ номеров узлов ---
+        # --- Показ и перетаскивание номеров узлов ---
         self._show_net_numbers = False
-        self._net_labels: list[tuple[int, QPointF]] = []
+        self._net_number_items: list[QGraphicsSimpleTextItem] = []
+        self._net_label_positions: dict[int, QPointF] = {}
+        self._drag_net_label_idx: int | None = None
+        self._drag_net_label_offset: QPointF = QPointF(0, 0)
 
         # --- Undo/Redo стек (snapshot-based) ---
         self._undo_stack: list[dict] = []
@@ -216,42 +219,35 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
         painter.drawLine(QPointF(-marker, 0.0), QPointF(marker, 0.0))
         painter.drawLine(QPointF(0.0, -marker), QPointF(0.0, marker))
 
-    def drawForeground(self, painter: QPainter, rect: QRectF):
-        if not self._show_net_numbers or not self._net_labels:
-            return
-        painter.save()
-        painter.setTransform(QTransform())
-        font = QFont("Monospace", 28)
-        font.setBold(True)
-        painter.setFont(font)
-        pen = QPen(QColor("#00ff88"))
-        painter.setPen(pen)
-        brush = QColor(0, 0, 0, 160)
-        for num, pt in self._net_labels:
-            vp = self.mapFromScene(pt)
-            s = str(num)
-            fm = QFontMetrics(font)
-            tw = fm.horizontalAdvance(s)
-            th = fm.height()
-            r = QRectF(vp.x() - tw / 2 - 6, vp.y() - th / 2 - 3, tw + 12, th + 6)
-            painter.fillRect(r, brush)
-            painter.setPen(pen)
-            painter.drawText(r, int(Qt.AlignmentFlag.AlignCenter), s)
-        painter.restore()
+    def _save_net_label_positions(self):
+        for item in self._net_number_items:
+            try:
+                num = int(item.text())
+                self._net_label_positions[num] = item.pos()
+            except ValueError:
+                pass
 
     def set_net_numbers_visible(self, visible: bool):
         self._show_net_numbers = visible
         if visible:
             self._update_net_labels()
         else:
-            self._net_labels.clear()
+            self._clear_net_number_items()
         self.viewport().update()
 
+    def _clear_net_number_items(self):
+        self._save_net_label_positions()
+        for item in self._net_number_items:
+            self._scene.removeItem(item)
+        self._net_number_items.clear()
+
     def _update_net_labels(self):
-        """Сгруппировать провода BFS, назначить номера 0,1,2..., вычислить центр группы."""
+        """Сгруппировать провода BFS, назначить номера 1,2,3..., создать перетаскиваемые элементы."""
         from EDA.core.router.wire_item import WireItem
         from EDA.app.items.component_item import ComponentGraphicsItem
         from EDA.app.items.node_label_item import NetLabelItem
+
+        self._clear_net_number_items()
 
         processed: set[WireItem] = set()
         net_groups: list[set[WireItem]] = []
@@ -275,10 +271,10 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                 elif item._data.attributes.get("device", "").upper() == "GND":
                     power_ids.add(cid)
 
-        self._net_labels.clear()
         net_counter = 0
         for group in net_groups:
             name = None
+            is_gnd = False
             for (cid, _pin_idx), (w, _wi, _px, _py) in self._comp_wire_links.items():
                 if cid not in power_ids:
                     continue
@@ -292,12 +288,13 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                 if net_attr:
                     label = net_attr.split(":")[0] if ":" in net_attr else net_attr
                     if label.upper() == "GND":
-                        name = "0"
-                    else:
-                        name = label
+                        is_gnd = True
+                    name = label
                 elif dev == "GND":
+                    is_gnd = True
                     name = "0"
                 break
+
             if name is None:
                 for item in self._scene.items():
                     if not isinstance(item, NetLabelItem):
@@ -319,26 +316,47 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                                         break
                     if name is not None:
                         break
+
             if name is None:
                 net_counter += 1
                 name = str(net_counter)
             elif name == "0":
-                name = "0"
+                is_gnd = True
 
-            # Вычислить центр группы проводов
-            pts_sum = QPointF(0, 0)
-            count = 0
-            for w in group:
-                for p in w.points():
-                    pts_sum += p
-                    count += 1
-            center = pts_sum / count if count else QPointF(0, 0)
+            # Пропустить GND
+            if is_gnd:
+                continue
 
             try:
                 num = int(name)
             except ValueError:
                 num = net_counter
-            self._net_labels.append((num, center))
+
+            # Использовать сохранённую позицию или вычислить центр группы
+            if num in self._net_label_positions:
+                pos = self._net_label_positions[num]
+            else:
+                pts_sum = QPointF(0, 0)
+                count = 0
+                for w in group:
+                    for p in w.points():
+                        pts_sum += p
+                        count += 1
+                pos = pts_sum / count if count else QPointF(0, 0)
+                self._net_label_positions[num] = pos
+
+            item = QGraphicsSimpleTextItem(str(num))
+            font = QFont("Monospace", 16)
+            font.setBold(True)
+            item.setFont(font)
+            item.setBrush(QColor("#00ff88"))
+            item.setPos(pos)
+            item.setZValue(100)
+            item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, True)
+            item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, True)
+            item.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIgnoresTransformations, True)
+            self._scene.addItem(item)
+            self._net_number_items.append(item)
 
     # ------------------------------------------------------------------
     # Zoom колесом мыши
@@ -1394,6 +1412,9 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
 
         event.accept()
 
+    def _on_net_label_moved(self):
+        self._save_net_label_positions()
+
     def mouseReleaseEvent(self, event: QMouseEvent):
         if event.button() == Qt.MouseButton.RightButton and self._panning:
             self._panning = False
@@ -1631,6 +1652,8 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                 event.accept()
                 return
 
+        if self._show_net_numbers:
+            self._save_net_label_positions()
         super().mouseReleaseEvent(event)
 
     # ------------------------------------------------------------------
