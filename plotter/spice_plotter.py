@@ -455,7 +455,13 @@ class SpicePlotterWindow(QMainWindow):
         self._tab_line_objects = {}   # храним ссылки на Line2D по вкладкам для перерисовки
 
         self.setWindowTitle(f"Pulsar - Графики ({analysis_type.upper()})")
-        self.resize(1100, 750)
+        from PySide6.QtGui import QGuiApplication
+        screen = QGuiApplication.primaryScreen()
+        if screen:
+            rect = screen.availableGeometry()
+            self.resize(rect.width() // 2, rect.height() // 2)
+        else:
+            self.resize(1000, 600)
 
         self._setup_menu()
         self._setup_ui()
@@ -769,9 +775,10 @@ class SpicePlotterWindow(QMainWindow):
             _apply_scope_style(fig, ax)
             if idx < n_vars - 1:
                 ax.set_xlabel('')
+                ax.tick_params(labelbottom=False)
             ax.legend(fontsize=9, loc='upper right')
 
-        fig.subplots_adjust(left=0.12, right=0.98, top=0.95, bottom=0.12, hspace=0.05)
+        fig.subplots_adjust(left=0.12, right=0.98, top=0.95, bottom=0.12, hspace=0.02)
 
         # Создать canvas и MultiCursor на всех subplot
         canvas = FigureCanvas(fig)

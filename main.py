@@ -1259,31 +1259,17 @@ class PulsarMainWindow(QMainWindow):
             self._cleanup_temp_file(sim_temp)
             self._sim_current_temp = None
 
-        self._flush_terminal_buffer()
-        if success and self._simulator.simulation_data:
+        if not success:
+            self._show_error_log()
+        elif self._simulator.simulation_data:
             self._show_simulation_results()
 
-    def _flush_terminal_buffer(self):
-        """Сбросить последние N строк буфера в терминал одной операцией."""
-        if not self._sim_output_buffer:
-            return
-        term = self._tabs.current_terminal()
-        if term is None:
-            return
-        lines = self._sim_output_buffer
-        total = len(lines)
-        if total > self.TERMINAL_MAX_LINES:
-            display = lines[-self.TERMINAL_MAX_LINES:]
-            note = f"\n[... {total - self.TERMINAL_MAX_LINES} строк скрыто. Всего строк: {total}]\n"
-        else:
-            display = lines
-            note = ""
-        text = note + '\n'.join(display) + '\n'
-        cursor = term.textCursor()
-        cursor.movePosition(QTextCursor.End)
-        cursor.insertText(text)
-        term.setTextCursor(cursor)
-        term.ensureCursorVisible()
+    def _show_error_log(self):
+        """Открыть вкладку error.log с полным логом ошибок симуляции."""
+        text = self._terminal_text()
+        if not text:
+            text = "[ERROR] Симуляция завершилась с ошибкой, но вывод отсутствует."
+        self._tabs.open_error_log_tab(text)
 
     def _terminal_text(self) -> str:
         """Вернуть полный буфер вывода (не truncated terminal)."""
@@ -1392,7 +1378,7 @@ class PulsarMainWindow(QMainWindow):
             tb = traceback.format_exc()
             self._log_to_terminal_safe(f"[ОШИБКА] {e}")
             self._log_to_terminal_safe(tb)
-            QMessageBox.critical(self, "Ошибка", f"{e}\n\nПодробности в терминале.")
+            self._show_error_log()
 
     def _sch_run_simulation_impl(self):
         if self._simulator.is_running:
@@ -1414,8 +1400,6 @@ class PulsarMainWindow(QMainWindow):
                 QMessageBox.warning(self, "Ошибка",
                                     "Не удалось создать .cir файл из схемы.")
                 return
-            self._tabs.show_terminal()
-            self._tabs.clear_terminal()
             self._run_simulation_from_file(cir_path)
             return
 
@@ -1643,22 +1627,12 @@ class PulsarMainWindow(QMainWindow):
 
         if not result.is_valid:
             self._log_to_terminal_safe(f"❌ Симуляция отменена: {result.error_count} ошибок")
-            QMessageBox.warning(
-                self, "Ошибки в netlist",
-                f"Найдено {result.error_count} ошибок:\n\n" + "\n".join(
-                    f"• {e.message}" for e in result.errors if e.severity == "error"
-                ),
-            )
+            self._show_error_log()
             self._cleanup_temp_file(sim_path)
             return
 
         if result.warning_count > 0:
             self._log_to_terminal_safe(f"⚠️ Предупреждений: {result.warning_count}")
-
-        # Очистить терминал, если он открыт
-        page = self._tabs.current_page()
-        if page:
-            page.clear_terminal()
 
         from PySide6.QtWidgets import QProgressBar
         if not hasattr(self, '_sim_progress'):
@@ -1726,20 +1700,12 @@ class PulsarMainWindow(QMainWindow):
 
         if not result.is_valid:
             self._log_to_terminal_safe(f"❌ Симуляция отменена: {result.error_count} ошибок")
-            QMessageBox.warning(
-                self, "Ошибки в netlist",
-                f"Найдено {result.error_count} ошибок:\n\n" + "\n".join(
-                    f"• {e.message}" for e in result.errors if e.severity == "error"
-                ),
-            )
+            self._show_error_log()
             self._cleanup_temp_file(sim_path)
             return
 
         if result.warning_count > 0:
             self._log_to_terminal_safe(f"⚠️ Предупреждений: {result.warning_count}")
-
-        if page:
-            page.clear_terminal()
 
         self._sim_progress_value = 0
         self._sim_progress.setValue(0)

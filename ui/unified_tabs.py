@@ -715,6 +715,18 @@ class UnifiedTabWidget(QTabWidget):
         if p is not None and hasattr(p, '_term_container'):
             p._term_container.hide()
 
+    def open_error_log_tab(self, text: str):
+        """Открыть read-only вкладку с логом ошибок симуляции."""
+        page = _CirTabPage(parent=self)
+        page.editor.setPlainText(text)
+        page.editor.setReadOnly(True)
+        page._dirty = False
+        page.filepath = None
+        page._term_container.setVisible(False)
+        self.addTab(page, "error.log")
+        self.setCurrentWidget(page)
+        self.tabs_count_changed.emit(self.count())
+
     # ── cir-специфичные ──
 
     def apply_theme(self, scheme_name: str):
