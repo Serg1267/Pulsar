@@ -1,0 +1,11 @@
+RC delay — contact closes at 1ms
+C1 2 0 0.22u
+R1 2 3 39k
+R2 0 out 1k
+S1 1 out 2 0 swmod
+V1 0 3 DC 5
+V2 1 0 DC 5
+.MODEL swmod SW(VT=0.5 VH=0.1 RON=1 ROFF=1G)
+.tran 1u 2m 0 0.1u uic
+.plot tran v(out) v(2)
+.end
