@@ -1,5 +1,7 @@
 # Pulsar
 
+![Pulsar v0.9.0](screenshots/Pulsar%20v0.9.0.png)
+
 SPICE-редактор схем и симулятор на Python + PySide6 + ngspice.
 
 ## Возможности
