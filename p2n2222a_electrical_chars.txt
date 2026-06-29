@@ -1,0 +1,129 @@
+                                                                 P2N2222A
+
+ ELECTRICAL CHARACTERISTICS (TA = 25°C unless otherwise noted)
+                                     Characteristic                              Symbol     Min    Max     Unit
+ OFF CHARACTERISTICS
+ Collector −Emitter Breakdown Voltage                                            V(BR)CEO                  Vdc
+            (IC = 10 mAdc, IB = 0)                                                          40      −
+ Collector −Base Breakdown Voltage                                               V(BR)CBO   75             Vdc
+            (IC = 10 mAdc, IE = 0)                                                                  −
+ Emitter−Base Breakdown Voltage                                                  V(BR)EBO                  Vdc
+          (IE = 10 mAdc, IC = 0)                                                            6.0     −
+ Collector Cutoff Current                                                          ICEX                   nAdc
+           (VCE = 60 Vdc, VEB(off) = 3.0 Vdc)                                                −     10
+ Collector Cutoff Current                                                         ICBO                    mAdc
+           (VCB = 60 Vdc, IE = 0)                                                            −     0.01
+           (VCB = 60 Vdc, IE = 0, TA = 150°C)                                                −      10
+ Emitter Cutoff Current                                                            IEBO            10     nAdc
+           (VEB = 3.0 Vdc, IC = 0)                                                           −
+ Collector Cutoff Current                                                         ICEO                    nAdc
+           (VCE = 10 V)                                                                      −     10
+ Base Cutoff Current                                                               IBEX                   nAdc
+          (VCE = 60 Vdc, VEB(off) = 3.0 Vdc)                                                 −     20
+ ON CHARACTERISTICS
+ DC Current Gain                                                                   hFE                      −
+          (IC = 0.1 mAdc, VCE = 10 Vdc)                                                     35      −
+          (IC = 1.0 mAdc, VCE = 10 Vdc)                                                     50      −
+          (IC = 10 mAdc, VCE = 10 Vdc)                                                      75      −
+          (IC = 10 mAdc, VCE = 10 Vdc, TA = −55°C)                                          35      −
+          (IC = 150 mAdc, VCE = 10 Vdc) (Note 1)                                            100    300
+          (IC = 150 mAdc, VCE = 1.0 Vdc) (Note 1)                                           50      −
+          (IC = 500 mAdc, VCE = 10 Vdc) (Note 1)                                            40      −
+ Collector −Emitter Saturation Voltage (Note 1)                                  VCE(sat)                  Vdc
+            (IC = 150 mAdc, IB = 15 mAdc)                                                    −     0.3
+            (IC = 500 mAdc, IB = 50 mAdc)                                                    −     1.0
+ Base −Emitter Saturation Voltage (Note 1)                                       VBE(sat)                  Vdc
+         (IC = 150 mAdc, IB = 15 mAdc)                                                      0.6    1.2
+         (IC = 500 mAdc, IB = 50 mAdc)                                                       −     2.0
+ SMALL−SIGNAL CHARACTERISTICS
+ Current −Gain − Bandwidth Product (Note 2)                                         fT                     MHz
+           (IC = 20 mAdc, VCE = 20 Vdc, f = 100 MHz)C                                       300     −
+ Output Capacitance                                                               Cobo                      pF
+          (VCB = 10 Vdc, IE = 0, f = 1.0 MHz)                                                −     8.0
+ Input Capacitance                                                                 Cibo                     pF
+          (VEB = 0.5 Vdc, IC = 0, f = 1.0 MHz)                                               −     25
+ Input Impedance                                                                   hie                      kW
+           (IC = 1.0 mAdc, VCE = 10 Vdc, f = 1.0 kHz)                                        2.0    8.0
+           (IC = 10 mAdc, VCE = 10 Vdc, f = 1.0 kHz)                                        0.25   1.25
+ Voltage Feedback Ratio                                                            hre                    X 10− 4
+           (IC = 1.0 mAdc, VCE = 10 Vdc, f = 1.0 kHz)                                        −     8.0
+           (IC = 10 mAdc, VCE = 10 Vdc, f = 1.0 kHz)                                         −     4.0
+ Small−Signal Current Gain                                                         hfe                      −
+          (IC = 1.0 mAdc, VCE = 10 Vdc, f = 1.0 kHz)                                        50     300
+          (IC = 10 mAdc, VCE = 10 Vdc, f = 1.0 kHz)                                         75     375
+ Output Admittance                                                                 hoe                    mMhos
+          (IC = 1.0 mAdc, VCE = 10 Vdc, f = 1.0 kHz)                                        5.0    35
+          (IC = 10 mAdc, VCE = 10 Vdc, f = 1.0 kHz)                                         25     200
+ Collector Base Time Constant                                                     rb′Cc                     ps
+           (IE = 20 mAdc, VCB = 20 Vdc, f = 31.8 MHz)                                        −     150
+ Noise Figure                                                                      NF                       dB
+          (IC = 100 mAdc, VCE = 10 Vdc, RS = 1.0 kW, f = 1.0 kHz)                            −     4.0
+1. Pulse Test: Pulse Width v 300 ms, Duty Cycle v 2.0%.
+2. fT is defined as the frequency at which |hfe| extrapolates to unity.
+
+
+                                                             http://onsemi.com
+                                                                          2
+                                                                                             P2N2222A
+
+        ELECTRICAL CHARACTERISTICS (TA = 25°C unless otherwise noted) (Continued)
+                                                        Characteristic                                                   Symbol               Min           Max               Unit
+        SWITCHING CHARACTERISTICS
+          Delay Time                           (VCC = 30 Vdc, VBE(off) = −2.0 Vdc,                                         td                  −             10                ns
+          Rise Time                            IC = 150 mAdc, IB1 = 15 mAdc) (Figure 1)                                    tr                  −             25                ns
+          Storage Time                         (VCC = 30 Vdc, IC = 150 mAdc,                                               ts                  −            225                ns
+          Fall Time                            IB1 = IB2 = 15 mAdc) (Figure 2)                                                tf               −             60                ns
+
+
+
+
+                                                            SWITCHING TIME EQUIVALENT TEST CIRCUITS
+
+                                                                            +30 V                                                                                +30 V
+                                            1.0 to 100 ms,                                                               1.0 to 100 ms,                           200
+                                                                            200                           +16 V
+                          +16 V             DUTY CYCLE ≈ 2.0%                                                            DUTY CYCLE ≈ 2.0%
+
+                           0                                                                                 0
+                                                         1 kW                                                    -14 V                   1k                                CS* < 10 pF
+                         -2 V                                                       CS* < 10 pF
+                                   < 2 ns                                                                                  < 20 ns
+                                                                                                                                         1N914
+
+                                                                                      Scope rise time < 4 ns                                        -4 V
+                                                                                      *Total shunt capacitance of test jig,
+                                                                                      connectors, and oscilloscope.
+                                        Figure 1. Turn−On Time                                                           Figure 2. Turn−Off Time
+
+
+
+
+                       1000
+                        700
+                        500                                                    TJ = 125°C
+hFE, DC CURRENT GAIN
+
+
+
+
+                        300
+                        200
+                                                                                      25°C
+                        100
+                         70
+                                                                                      -55°C
+                         50
+                         30                                                                        VCE = 1.0 V
+                         20                                                                        VCE = 10 V
+
+                         10
+                           0.1    0.2    0.3      0.5 0.7   1.0       2.0     3.0         5.0 7.0 10      20 30               50   70   100         200     300      500 700 1.0 k
+                                                                                     IC, COLLECTOR CURRENT (mA)
+                                                                               Figure 3. DC Current Gain
+
+
+
+
+                                                                                      http://onsemi.com
+                                                                                                    3
+
