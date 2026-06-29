@@ -1,0 +1,7 @@
+Package: pulsar
+Version: 0.9.0
+Architecture: amd64
+Maintainer: Serg <serg@example.com>
+Description: EDA Schematic Editor with SPICE simulation
+ Pulsar is a schematic editor for electronic circuits
+ with built-in ngspice SPICE simulation support.

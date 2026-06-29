@@ -264,6 +264,10 @@ class PulsarMainWindow(QMainWindow):
         self._analysis_op_action.triggered.connect(self._toggle_op)
         self._analysis_menu.addAction(self._analysis_op_action)
 
+        self._analysis_four_action = QAction("Коэффициент гармоник", self)
+        self._analysis_four_action.triggered.connect(self._show_fourier_from_menu)
+        self._analysis_menu.addAction(self._analysis_four_action)
+
         # ─── Схема (hidden by default) ───
         self._sch_menu = menubar.addMenu("Схема")
         self._sch_menu.menuAction().setVisible(False)
@@ -1303,7 +1307,7 @@ class PulsarMainWindow(QMainWindow):
     def _detect_output_directives(self, text: str) -> dict:
         """Определить, какие директивы вывода есть в тексте ДО авто-фикса."""
         import re
-        result = {'has_print': False, 'has_plot': False, 'has_op': False}
+        result = {'has_print': False, 'has_plot': False, 'has_op': False, 'has_four': False}
         for line in text.split('\n'):
             s = line.strip().upper()
             if not s or s.startswith('*') or s.startswith(';'):
@@ -1314,6 +1318,8 @@ class PulsarMainWindow(QMainWindow):
                 result['has_plot'] = True
             elif s.startswith('.OP') and not s.startswith('.OPTION'):
                 result['has_op'] = True
+            elif re.match(r'\.FOUR\b', s):
+                result['has_four'] = True
         return result
 
     def _fix_print_directive(self):
@@ -1643,6 +1649,14 @@ class PulsarMainWindow(QMainWindow):
         fixed_text = self._apply_sim_fixes(text)
         sim_path = Path(self._write_temp_sim_file(fixed_text))
 
+        # Отладка: показать первые/последние строки temp-файла
+        sim_lines = fixed_text.split('\n')
+        four_lines = [l for l in sim_lines if '.FOUR' in l.upper()]
+        self._log_to_terminal_safe(f"[DEBUG] TEMP file: {sim_path}, lines={len(sim_lines)}, .FOUR found={len(four_lines)}")
+        if four_lines:
+            for fl in four_lines:
+                self._log_to_terminal_safe(f"[DEBUG]   .FOUR line: {fl.strip()}")
+
         # Валидация (по temp-файлу, без модификации оригинала)
         result = validate_netlist(sim_path)
         report_lines = result.formatted_report()
@@ -1708,6 +1722,14 @@ class PulsarMainWindow(QMainWindow):
         text = page.editor.toPlainText()
         fixed_text = self._apply_sim_fixes(text)
         sim_path = Path(self._write_temp_sim_file(fixed_text))
+
+        # Отладка: показать первые/последние строки temp-файла
+        sim_lines = fixed_text.split('\n')
+        four_lines = [l for l in sim_lines if '.FOUR' in l.upper()]
+        self._log_to_terminal_safe(f"[DEBUG] TEMP file: {sim_path}, lines={len(sim_lines)}, .FOUR found={len(four_lines)}")
+        if four_lines:
+            for fl in four_lines:
+                self._log_to_terminal_safe(f"[DEBUG]   .FOUR line: {fl.strip()}")
 
         from PySide6.QtWidgets import QProgressBar
         if not hasattr(self, '_sim_progress'):
@@ -1782,7 +1804,12 @@ class PulsarMainWindow(QMainWindow):
         directives = getattr(self, '_output_directives', {})
         terminal_text = self._terminal_text()
 
-        if directives.get('has_print'):
+        self._log_to_terminal_safe(f"[DEBUG] _show_simulation_results: directives={directives}, len={len(terminal_text)}")
+
+        if directives.get('has_four'):
+            self._log_to_terminal_safe("[DEBUG] Calling _show_fourier_results...")
+            self._show_fourier_results(terminal_text)
+        elif directives.get('has_print'):
             self._show_print_table(terminal_text)
         elif directives.get('has_plot'):
             self._plot_simulation_results(terminal_text)
@@ -1832,6 +1859,75 @@ class PulsarMainWindow(QMainWindow):
         else:
             text = terminal_text
         self._show_result_dialog("Результаты .PRINT", text)
+
+    def _show_fourier_results(self, terminal_text: str):
+        """Извлечь и показать .FOUR результаты."""
+        import re
+        has_four = re.search(r'fourier\s+analysis', terminal_text, re.IGNORECASE)
+        self._log_to_terminal_safe(f"[DEBUG] _show_fourier_results: len={len(terminal_text)}, has_Fourier={bool(has_four)}")
+        self._log_to_terminal_safe(f"[DEBUG] last_500_chars: ...{terminal_text[-500:]}")
+
+        text = None
+        if has_four:
+            # Попытка 1: от "Fourier analysis" до начала следующей секции (Index, Total, DRAM)
+            markers = (
+                r'\n\s*Index\s+',
+                r'\n\s*Total (?:analysis|elapsed) time',
+                r'\n\s*Total DRAM available',
+                r'\n\s*Memory usage',
+            )
+            for marker in markers:
+                match = re.search(
+                    r'(?i)(fourier\s+analysis.*?)' + marker,
+                    terminal_text, re.DOTALL
+                )
+                if match:
+                    text = match.group(1).strip()
+                    self._log_to_terminal_safe(f"[DEBUG] FOURIER MATCHED (stop={marker[:30]}), len={len(text)}")
+                    break
+
+        if text is None and has_four:
+            # Попытка 2: от "Fourier analysis" до конца вывода ngspice
+            match = re.search(r'(?i)(fourier\s+analysis.*)', terminal_text, re.DOTALL)
+            if match:
+                raw = match.group(1).strip()
+                # обрезать по "Total", "Index", "DRAM" с начала строки
+                end = re.search(r'\n\s*(?:Total|Index|DRAM|Memory)', raw)
+                if end:
+                    raw = raw[:end.start()]
+                text = raw.strip()
+                self._log_to_terminal_safe(f"[DEBUG] FOURIER MATCHED (fallback 2), len={len(text)}")
+
+        if text is None:
+            # Показать полный вывод ngspice для диагностики
+            if len(terminal_text) > 20000:
+                snippet = (
+                    terminal_text[:5000]
+                    + f"\n[... {len(terminal_text) - 10000} символов скрыто ...]\n"
+                    + terminal_text[-5000:]
+                )
+            else:
+                snippet = terminal_text
+            text = (
+                "[INFO] Данные .FOUR не найдены в выводе ngspice.\n\n"
+                "Возможные причины:\n"
+                "  • .FOUR требует .TRAN (переходный анализ)\n"
+                "  • В temp-файл не попала директива .FOUR\n"
+                "  • Директива .FOUR имеет синтаксическую ошибку\n"
+                "  • Узел в .FOUR не существует\n\n"
+                "Полный вывод симуляции ngspice:\n"
+                "─" * 60 + "\n" + snippet
+            )
+            self._log_to_terminal_safe("[DEBUG] All Fourier regex attempts failed")
+        self._show_result_dialog("Результаты .FOUR (коэффициент гармоник)", text)
+
+    def _show_fourier_from_menu(self):
+        """Открыть .FOUR диалог из меню (использует последний буфер вывода)."""
+        text = self._terminal_text()
+        if not text.strip():
+            self._log_to_terminal_safe("[INFO] Нет данных симуляции. Запустите симуляцию с директивой .FOUR")
+            return
+        self._show_fourier_results(text)
 
     def _show_op_table(self, terminal_text: str):
         """Показать .OP результаты в отдельном окне."""
@@ -2350,7 +2446,7 @@ class PulsarMainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName("Pulsar")
-    app.setApplicationVersion("0.3.0")
+    app.setApplicationVersion("0.9.0")
     app.setOrganizationName("Pulsar")
     app.setStyle("Fusion")
     app.setWindowIcon(QIcon(str(Path(__file__).parent / "resources" / "icons" / "icons8-electronics.png")))

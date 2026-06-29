@@ -84,13 +84,12 @@ def _parse_raw_netlist(raw_netlist: str) -> dict:
             continue
         
         # Директивы анализа
-        if stripped.upper().startswith((".TRAN ", ".AC ", ".DC ", ".OP",
-                                       ".IC ", ".NODESET ", ".STEP ")):
+        if re.match(r'\.(?:TRAN|AC|DC|OP|IC|NODESET|STEP)\b', stripped.upper()):
             directives.append(line)
             continue
         
-        # Директивы вывода
-        if stripped.upper().startswith((".PRINT ", ".PROBE ", ".PLOT ")):
+        # Директивы вывода (PRINT, PLOT, PROBE, FOUR, MEASURE и т.д.)
+        if re.match(r'\.(?:PRINT|PLOT|PROBE|FOUR|MEASURE)\b', stripped.upper()):
             output.append(line)
             continue
         
@@ -152,13 +151,13 @@ def wrap_netlist_in_template(
             if d_upper.startswith((".TRAN ", ".AC ", ".DC ", ".OP")):
                 if d_upper not in existing_directives:
                     parsed["directives"].append(d_stripped)
-            elif d_upper.startswith((".PRINT ", ".PROBE ", ".PLOT ")):
+            elif re.match(r'\.(?:PRINT|PLOT|PROBE|FOUR|MEASURE)\b', d_upper):
                 if d_upper not in existing_output:
                     parsed["output"].append(d_stripped)
             else:
-                # Неизвестная директива — в "другие"
+                # Остальные директивы — всё равно сохраняем в выводе
                 if d_upper not in existing_other:
-                    parsed["other"].append(d_stripped)
+                    parsed["output"].append(d_stripped)
     
     # Если название не указано — использовать из netlist или default
     if not circuit_name:
@@ -366,7 +365,21 @@ def wrap_netlist_in_template(
     lines.append("")
     
     # =========================================================================
-    # СЕКЦИЯ 7: КОНЕЦ ФАЙЛА
+    # СЕКЦИЯ 7: ПРОЧИЕ ДИРЕКТИВЫ (.FOUR, .IC, .SAVE и т.д.)
+    # =========================================================================
+    if parsed["other"]:
+        lines.append(f"* {separator_dash}")
+        lines.append("* ПРОЧИЕ ДИРЕКТИВЫ")
+        lines.append(f"* {separator_dash}")
+        lines.append("*")
+        lines.append("")
+        for other_line in parsed["other"]:
+            lines.append(other_line)
+        lines.append("")
+        lines.append("")
+    
+    # =========================================================================
+    # СЕКЦИЯ 8: КОНЕЦ ФАЙЛА
     # =========================================================================
     lines.append(f"* {separator_dash}")
     lines.append("* КОНЕЦ СХЕМЫ")

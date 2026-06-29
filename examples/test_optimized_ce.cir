@@ -1,0 +1,15 @@
+Optimized CE amplifier — Vout = 1V @ 1kHz
+C1 5 2 1u
+C3 3 out 1u
+Q1 3 2 1 KT315B
+R1 2 4 47k
+R2 0 2 6.2k
+R3 3 4 680
+R4 0 1 75
+R5 0 out 10k
+V1 0 5 sin 0 150m 1k
+V2 4 0 DC 9
+.model KT315B NPN ( IS=5.0f BF=300 VAF=70 NF=1.0 ISE=0.5p NE=1.5 BR=10 NR=1.0 ISC=0.1p NC=2.0 IKF=0.1 IKR=0.03 RB=15 RC=3.0 RE=0.5 CJE=15p VJE=0.75 MJE=0.33 CJC=6.5p VJC=0.75 MJC=0.33 TF=0.5n TR=50n XTF=3 VTF=5 ITF=0.1 XTB=1.5 XTI=3 EG=1.11)
+.tran 1u 5m 0 10u
+.plot tran v(out) v(3)
+.end

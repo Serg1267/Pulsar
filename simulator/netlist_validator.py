@@ -214,13 +214,19 @@ def validate_netlist(file_path: Path) -> ValidationResult:
             suggestion="Добавьте, например: .TRAN 0 10m 0 1u для переходного процесса",
         ))
 
-    # --- 5. Проверка .PRINT / .PLOT ---
+    # --- 5. Проверка .PRINT / .PLOT / .FOUR ---
     has_output = False
     has_op_analysis = False
+    has_four = False
     for i, line in enumerate(lines):
         stripped = line.strip().upper()
         if stripped.startswith(".PRINT") or stripped.startswith(".PLOT"):
             has_output = True
+            break
+    for i, line in enumerate(lines):
+        stripped = line.strip().upper()
+        if stripped.startswith(".FOUR"):
+            has_four = True
             break
     # .OP analysis alone is sufficient (no PRINT/PLOT needed)
     if not has_output:
@@ -229,12 +235,22 @@ def validate_netlist(file_path: Path) -> ValidationResult:
                 has_op_analysis = True
                 break
 
-    if not has_output and not has_op_analysis and analysis_types_found:
+    if not has_output and not has_op_analysis and not has_four and analysis_types_found:
         errors.append(ValidationError(
             "warning",
             "Нет директивы вывода (.PRINT / .PLOT) — результаты не будут показаны",
             suggestion="Добавьте, например: .PLOT TRAN V(out) или .PRINT TRAN V(out)",
         ))
+
+    # --- 5b. .FOUR требует .TRAN ---
+    if has_four:
+        has_tran = any(at == 'tran' for at, _ in analysis_types_found)
+        if not has_tran:
+            errors.append(ValidationError(
+                "error",
+                "Директива .FOUR требует .TRAN (переходный анализ)",
+                suggestion="Добавьте директиву .TRAN перед .FOUR, например: .TRAN 0 10m 0 0.1m",
+            ))
 
     # --- 6. Базовый синтаксис компонентов ---
     for i, line in enumerate(lines):

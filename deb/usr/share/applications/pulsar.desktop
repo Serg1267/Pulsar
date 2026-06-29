@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Pulsar
+Exec=/usr/local/bin/pulsar
+Icon=pulsar
+Type=Application
+Categories=Development;Electronics;

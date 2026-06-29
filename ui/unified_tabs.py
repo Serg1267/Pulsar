@@ -717,13 +717,21 @@ class UnifiedTabWidget(QTabWidget):
 
     def open_error_log_tab(self, text: str):
         """Открыть read-only вкладку с логом ошибок симуляции."""
+        self._open_readonly_tab(text, "error.log")
+
+    def open_terminal_tab(self, text: str):
+        """Открыть read-only вкладку с выводом терминала NGspice."""
+        self._open_readonly_tab(text, "terminal.log")
+
+    def _open_readonly_tab(self, text: str, title: str):
+        """Открыть read-only вкладку cir-типа с заданным текстом и заголовком."""
         page = _CirTabPage(parent=self)
         page.editor.setPlainText(text)
         page.editor.setReadOnly(True)
         page._dirty = False
         page.filepath = None
         page._term_container.setVisible(False)
-        self.addTab(page, "error.log")
+        self.addTab(page, title)
         self.setCurrentWidget(page)
         self.tabs_count_changed.emit(self.count())
 
