@@ -11,3 +11,5 @@ sinus.*
 test_lm741.cir
 kicad_*
 no_filename.*
+*.deb
+deb/usr/local/bin/pulsar
