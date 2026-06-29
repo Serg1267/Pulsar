@@ -329,7 +329,8 @@ class PulsarMainWindow(QMainWindow):
         QMessageBox.about(self, "О программе Pulsar",
             "Pulsar — редактор принципиальных схем и SPICE-симулятор.\n\n"
             "Основан на PySide6, matplotlib и ngspice.\n"
-            "Версия 0.9.0")
+            "Версия 0.9.0\n\n"
+            "Иконки: https://icons8.com")
 
     def _create_toolbar(self):
         from PySide6.QtWidgets import QToolBar
