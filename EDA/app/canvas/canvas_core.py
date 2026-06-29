@@ -1409,7 +1409,11 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                                                     self._refresh_wire_endpoint_pins(rejoined.points()[-1])
                                             break
 
-                    # Фаза 2: сдвинуть провода
+                    # Фаза 2: сдвинуть junction вместе с проводами
+                    for j in self._drag_junctions:
+                        j.setPos(j.pos().x() + dx, j.pos().y() + dy)
+
+                    # Фаза 3: сдвинуть провода
                     for w in list(self._drag_wires):
                         w.translate(dx, dy)
                         self._refresh_wire_endpoint_pins(w.points()[0])
