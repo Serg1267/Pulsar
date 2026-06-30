@@ -1735,7 +1735,11 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
             ed_model.setMaximumHeight(200)
             ed_model.setPlaceholderText(".model 1N4148 D (IS=2.682n ...)")
             ed_model.setStyleSheet("QTextEdit { color: #ffffff; background-color: #2b2b2b; }")
-            if item.model_line():
+            _device = item._data.attributes.get("device", "").upper()
+            if _device == "TRANSFORMER":
+                ed_model.setPlaceholderText("Трансформатор: обмотки L1/L2 + K генерируются автоматически")
+                ed_model.setEnabled(False)
+            elif item.model_line():
                 ed_model.setText(item.model_line())
             else:
                 _auto_model = item.value().strip()
