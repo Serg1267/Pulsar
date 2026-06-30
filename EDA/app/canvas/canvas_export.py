@@ -20,6 +20,15 @@ class ExportMixin:
     @staticmethod
     def _auto_fill_model(comp: 'ComponentGraphicsItem'):
         """Заполнить model_line из .lib/.mod файлов по value компонента."""
+        if comp.model_line():
+            return
+        _wp = comp._data.attributes.get("winding_pins", "")
+        if _wp:
+            from pathlib import Path as _Path
+            _tf_lib = _Path(__file__).resolve().parent.parent.parent.parent / "Mod" / "Passive" / "transformer-viking-1.lib"
+            if _tf_lib.exists():
+                comp.set_model_line(_tf_lib.read_text(encoding="utf-8"))
+            return
         _value = comp.value().strip()
         if not _value:
             return
@@ -91,10 +100,10 @@ class ExportMixin:
                     power_ids.add(cid)
 
         # Шаг 3: назначить имена сетям
-        net_names: list[str] = []
-        net_counter = 0
-        for group in net_groups:
-            name = None
+        net_names: list[str | None] = [None] * len(net_groups)
+
+        # Фаза 3a: power symbols (GND → "0", VCC/VDD → их net=)
+        for i, group in enumerate(net_groups):
             for (cid, _pin_idx), (w, _wi, _px, _py) in self._comp_wire_links.items():
                 if cid not in power_ids:
                     continue
@@ -108,38 +117,68 @@ class ExportMixin:
                 if net_attr:
                     label = net_attr.split(":")[0] if ":" in net_attr else net_attr
                     if label.upper() == "GND":
-                        name = "0"
+                        net_names[i] = "0"
                     else:
-                        name = label
+                        net_names[i] = label
                 elif dev == "GND":
-                    name = "0"
+                    net_names[i] = "0"
                 break
-            # Шаг 3b: проверить метки узлов (NetLabelItem)
-            if name is None:
-                for item in self._scene.items():
-                    if not isinstance(item, NetLabelItem):
+
+        # Фаза 3b: метки узлов (NetLabelItem)
+        tol = 60.0
+        for i, group in enumerate(net_groups):
+            if net_names[i] is not None:
+                continue
+            for item in self._scene.items():
+                if not isinstance(item, NetLabelItem):
+                    continue
+                anchor = item.pos()
+                # Проверить провода группы
+                for w in group:
+                    pts = w.points()
+                    for j in range(len(pts) - 1):
+                        a, b = pts[j], pts[j + 1]
+                        if abs(a.x() - b.x()) < 0.1:
+                            if abs(anchor.x() - a.x()) <= tol:
+                                if min(a.y(), b.y()) - tol <= anchor.y() <= max(a.y(), b.y()) + tol:
+                                    net_names[i] = item.text()
+                                    break
+                        else:
+                            if abs(anchor.y() - a.y()) <= tol:
+                                if min(a.x(), b.x()) - tol <= anchor.x() <= max(a.x(), b.x()) + tol:
+                                    net_names[i] = item.text()
+                                    break
+                    if net_names[i] is not None:
+                        break
+                if net_names[i] is not None:
+                    break
+                # Проверить пины компонентов, подключённых к этой группе
+                for (cid, pin_idx), (w, _wi, px, py) in self._comp_wire_links.items():
+                    if w not in group:
                         continue
-                    anchor = item.pos()
-                    for w in group:
-                        pts = w.points()
-                        for i in range(len(pts) - 1):
-                            a, b = pts[i], pts[i + 1]
-                            if abs(a.x() - b.x()) < 0.1:  # Вертикаль
-                                if abs(anchor.x() - a.x()) <= 30:
-                                    if min(a.y(), b.y()) - 30 <= anchor.y() <= max(a.y(), b.y()) + 30:
-                                        name = item.text()
-                                        break
-                            else:  # Горизонталь
-                                if abs(anchor.y() - a.y()) <= 30:
-                                    if min(a.x(), b.x()) - 30 <= anchor.x() <= max(a.x(), b.x()) + 30:
-                                        name = item.text()
-                                        break
-                        if name is not None:
-                            break
-            if name is None:
-                net_counter += 1
-                name = str(net_counter)
-            net_names.append(name)
+                    dx = anchor.x() - px
+                    dy = anchor.y() - py
+                    if (dx * dx + dy * dy) <= tol * tol:
+                        net_names[i] = item.text()
+                        break
+                if net_names[i] is not None:
+                    break
+
+        # Фаза 3c: безымянные сети — нумеруем по пространственному положению (слева→направо, сверху→вниз)
+        unnamed = [(i, net_groups[i]) for i in range(len(net_groups)) if net_names[i] is None]
+        def _group_pos(g: tuple[int, set]) -> tuple:
+            _, group = g
+            xs, ys = [], []
+            for w in group:
+                for p in w.points():
+                    xs.append(p.x())
+                    ys.append(p.y())
+            if not xs:
+                return (0, 0)
+            return (min(ys), min(xs))
+        unnamed.sort(key=_group_pos)
+        for net_counter, (gi, _group) in enumerate(unnamed, start=1):
+            net_names[gi] = str(net_counter)
 
         # Шаг 4: pin_index → net_name для каждого компонента
         pin_to_net: dict[int, dict[int, str]] = {}
@@ -165,18 +204,44 @@ class ExportMixin:
             device = comp._data.attributes.get("device", "").upper()
             pins = comp._data.pins
 
-            line = self._spice_device_line(refdes, device, value, pins, pin_nets,
-                                               comp._data.attributes)
-            if line:
-                comp_lines.append(line)
-            else:
-                unconn = [str(p.pinnumber) for i, p in enumerate(pins)
-                          if i not in pin_nets]
-                if unconn:
-                    comp_lines.append(
-                        f"* {refdes}: device={device} — пины {','.join(unconn)} не подключены")
+            _skip = False
+            if device == "TRANSFORMER":
+                _ml = comp.model_line()
+                if _ml and ".SUBCKT" in _ml.upper():
+                    _model_name = ""
+                    import re as _re_sub
+                    _m_sub = _re_sub.search(r'\.SUBCKT\s+(\S+)', _ml, _re_sub.IGNORECASE)
+                    if _m_sub:
+                        _model_name = _m_sub.group(1)
+                    if _model_name:
+                        _nets = []
+                        for _pn in range(1, len(pins) + 1):
+                            _idx = None
+                            for _pi, _pp in enumerate(pins):
+                                if _pp.pinnumber == str(_pn):
+                                    _idx = _pi
+                                    break
+                            if _idx is not None:
+                                _n_sub = pin_nets.get(_idx)
+                                _nets.append(_n_sub if _n_sub else "NC")
+                            else:
+                                _nets.append("NC")
+                        if any(n != "NC" for n in _nets):
+                            comp_lines.append(f"X{refdes} {' '.join(_nets)} {_model_name}")
+                            _skip = True
+            if not _skip:
+                line = self._spice_device_line(refdes, device, value, pins, pin_nets,
+                                                   comp._data.attributes)
+                if line:
+                    comp_lines.append(line)
                 else:
-                    comp_lines.append(f"* {refdes}: device={device} не поддерживается")
+                    unconn = [str(p.pinnumber) for i, p in enumerate(pins)
+                              if i not in pin_nets]
+                    if unconn:
+                        comp_lines.append(
+                            f"* {refdes}: device={device} — пины {','.join(unconn)} не подключены")
+                    else:
+                        comp_lines.append(f"* {refdes}: device={device} не поддерживается")
 
         # Шаг 6: MODEL / DIRECTIVE — не-электрические аннотации, вставляются без привязки к проводам
         for cid, comp in all_comps.items():

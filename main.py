@@ -1603,6 +1603,10 @@ class PulsarMainWindow(QMainWindow):
                 fixed_lines.append(line)
                 continue
 
+            # Убрать пробелы после запятых в V(1, out) → V(1,out)
+            line = re.sub(r',\s+', ',', line)
+            s = line.strip()
+
             # Проверить, есть ли тип анализа после .PRINT
             parts = s.upper().split()
             if len(parts) >= 2:

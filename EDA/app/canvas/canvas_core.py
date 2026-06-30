@@ -293,8 +293,10 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                     power_ids.add(cid)
 
         new_positions: dict[int, QPointF] = {}
-        net_counter = 0
-        for group in net_groups:
+        named_indices: set[int] = set()
+
+        # Первый проход: named (power symbols), skip на NetLabelItem, GND
+        for i, group in enumerate(net_groups):
             name = None
             is_gnd = False
             skip = False
@@ -314,7 +316,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                     if label.upper() == "GND":
                         is_gnd = True
                     else:
-                        skip = True  # named power net (VCC, VDD и т.п.) — уже подписана символом
+                        skip = True
                     name = label
                 elif dev == "GND":
                     is_gnd = True
@@ -322,44 +324,81 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                 break
 
             if not skip and name is None:
+                tol = 60.0
                 for item in self._scene.items():
                     if not isinstance(item, NetLabelItem):
                         continue
                     anchor = item.pos()
+                    found = False
                     for w in group:
                         pts = w.points()
-                        for i in range(len(pts) - 1):
-                            a, b = pts[i], pts[i + 1]
+                        for j in range(len(pts) - 1):
+                            a, b = pts[j], pts[j + 1]
                             if abs(a.x() - b.x()) < 0.1:
-                                if abs(anchor.x() - a.x()) <= 30:
-                                    if min(a.y(), b.y()) - 30 <= anchor.y() <= max(a.y(), b.y()) + 30:
-                                        skip = True  # метка уже стоит — авто-номер не нужен
+                                if abs(anchor.x() - a.x()) <= tol:
+                                    if min(a.y(), b.y()) - tol <= anchor.y() <= max(a.y(), b.y()) + tol:
+                                        skip = True
+                                        found = True
                                         break
                             else:
-                                if abs(anchor.y() - a.y()) <= 30:
-                                    if min(a.x(), b.x()) - 30 <= anchor.x() <= max(a.x(), b.x()) + 30:
+                                if abs(anchor.y() - a.y()) <= tol:
+                                    if min(a.x(), b.x()) - tol <= anchor.x() <= max(a.x(), b.x()) + tol:
                                         skip = True
+                                        found = True
                                         break
-                    if skip:
+                        if found:
+                            break
+                    if found:
                         break
+                    for (cid, pin_idx), (w, _wi, px, py) in self._comp_wire_links.items():
+                        if w not in group:
+                            continue
+                        dx = anchor.x() - px
+                        dy = anchor.y() - py
+                        if (dx * dx + dy * dy) <= tol * tol:
+                            skip = True
+                            found = True
+                            break
+
+            if is_gnd:
+                named_indices.add(i)
+                continue
 
             if skip:
                 continue
 
-            if name is None:
-                net_counter += 1
-                name = str(net_counter)
-            elif name == "0":
-                is_gnd = True
+            if name is not None:
+                try:
+                    num = int(name)
+                except ValueError:
+                    num = 0
+                if num > 0 and num in self._net_label_positions:
+                    new_positions[num] = self._net_label_positions[num]
+                else:
+                    pts_sum = QPointF(0, 0)
+                    count = 0
+                    for w in group:
+                        for p in w.points():
+                            pts_sum += p
+                            count += 1
+                    new_positions[num] = pts_sum / count if count else QPointF(0, 0)
+                named_indices.add(i)
 
-            if is_gnd:
-                continue
+        # Второй проход: безымянные сети — нумеруем по пространственному положению
+        unnamed = [(i, net_groups[i]) for i in range(len(net_groups)) if i not in named_indices]
+        def _group_pos(g: tuple[int, set]) -> tuple:
+            _, group = g
+            xs, ys = [], []
+            for w in group:
+                for p in w.points():
+                    xs.append(p.x())
+                    ys.append(p.y())
+            if not xs:
+                return (0, 0)
+            return (min(ys), min(xs))
+        unnamed.sort(key=_group_pos)
 
-            try:
-                num = int(name)
-            except ValueError:
-                num = net_counter
-
+        for num, (gi, group) in enumerate(unnamed, start=1):
             if num in self._net_label_positions:
                 new_positions[num] = self._net_label_positions[num]
             else:
@@ -1719,13 +1758,15 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
             layout.addWidget(ed_refdes)
 
             _device = item._data.attributes.get("device", "").upper()
-            if _device == "TRANSFORMER":
-                _tf_attrs = item._data.attributes
-                _tf_wp = _tf_attrs.get("winding_pins", "")
-                if _tf_wp:
-                    _n_windings = len(_tf_wp.split(","))
-                else:
-                    _n_windings = len(item._data.pins) // 2
+            _tf_attrs = item._data.attributes
+            _tf_wp = _tf_attrs.get("winding_pins", "")
+            if _device == "TRANSFORMER" and _tf_wp:
+                # Многообмоточный трансформатор с готовой .lib моделью
+                ed_value = None
+                _transformer_uses_model = True
+            elif _device == "TRANSFORMER":
+                _transformer_uses_model = False
+                _n_windings = len(item._data.pins) // 2
                 _parts = item.value().split() if item.value() else ["1m"] * _n_windings + ["0.99"]
                 _k  = _parts[-1] if len(_parts) > _n_windings else "0.99"
                 while len(_parts) < _n_windings:
@@ -1774,7 +1815,17 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
             ed_model.setMaximumHeight(200)
             ed_model.setPlaceholderText(".model 1N4148 D (IS=2.682n ...)")
             ed_model.setStyleSheet("QTextEdit { color: #ffffff; background-color: #2b2b2b; }")
-            if _device == "TRANSFORMER":
+            if _device == "TRANSFORMER" and _transformer_uses_model:
+                from pathlib import Path as _TfPath
+                _tf_lib = _TfPath(__file__).resolve().parent.parent.parent.parent / "Mod" / "Passive" / "transformer-viking-1.lib"
+                if _tf_lib.exists():
+                    _tf_text = _tf_lib.read_text(encoding="utf-8")
+                    ed_model.setText(_tf_text)
+                    item.set_model_line(_tf_text)
+                else:
+                    ed_model.setPlaceholderText("Модель transformer-viking-1.lib не найдена")
+            elif _device == "TRANSFORMER":
+                _n_windings = len(item._data.pins) // 2
                 ed_model.setPlaceholderText(f"Трансформатор: обмотки L1..L{_n_windings} + K генерируются автоматически")
                 ed_model.setEnabled(False)
             elif item.model_line():
@@ -1859,7 +1910,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                 refdes = ed_refdes.text().strip()
                 if refdes:
                     item.set_refdes(refdes)
-                if _device == "TRANSFORMER":
+                if _device == "TRANSFORMER" and not _transformer_uses_model:
                     _l_vals = [f.text().strip() or "1m" for f in _l_fields]
                     _k  = ed_k.text().strip() or "0.99"
                     item.set_value(" ".join(_l_vals + [_k]))
@@ -1873,7 +1924,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                         item._data.attributes["transformer_rs"] = _rs
                     elif "transformer_rs" in item._data.attributes:
                         del item._data.attributes["transformer_rs"]
-                else:
+                elif ed_value is not None:
                     value = ed_value.text().strip()
                     item.set_value(value)
                 item.set_model_line(ed_model.toPlainText().strip())

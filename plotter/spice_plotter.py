@@ -648,7 +648,7 @@ class SpicePlotterWindow(QMainWindow):
             header_match = header_re.match(line)
             if header_match:
                 var_part = header_match.group(1)
-                new_vars = re.findall(r'[a-zA-Z][a-zA-Z0-9_]*(?:\([^)]*\)|#[a-zA-Z]+)', var_part)
+                new_vars = re.findall(r'[a-zA-Z][a-zA-Z0-9_]*(?:\([^)]*\)|#[a-zA-Z]+)(?:-[a-zA-Z][a-zA-Z0-9_]*(?:\([^)]*\)|#[a-zA-Z]+))*', var_part)
 
                 if not current_vars:
                     current_vars = new_vars
