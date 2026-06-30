@@ -251,8 +251,11 @@ class ComponentGraphicsItem(QGraphicsItem):
             center = self._p(c.x, c.y)
             if c.fill:
                 painter.setBrush(QBrush(QColor(lcol)))
+                _saved_pen = painter.pen()
+                painter.setPen(self._make_cosmetic_pen(lcol, _LEAD_LINE_WIDTH))
             painter.drawEllipse(center, c.radius, c.radius)
             if c.fill:
+                painter.setPen(_saved_pen)
                 painter.setBrush(Qt.BrushStyle.NoBrush)
         for poly in self._data.polygons:
             pts = [self._p(x, y) for x, y in poly]
