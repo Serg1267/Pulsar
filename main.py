@@ -437,6 +437,12 @@ class PulsarMainWindow(QMainWindow):
         act_g.triggered.connect(lambda: self._start_comp_placement("gnd-1"))
         tb.addAction(act_g)
         self._comp_actions.append(act_g)
+        ico_tf = QIcon(str(icons / "icons8-transformer-64.ico"))
+        act_tf = QAction(ico_tf, "Катушка (L)", self)
+        act_tf.setEnabled(False)
+        act_tf.triggered.connect(lambda: self._start_comp_placement("inductor-1"))
+        tb.addAction(act_tf)
+        self._comp_actions.append(act_tf)
 
         ico_el = QIcon(str(icons / "icons8-electronics-50.ico"))
         act_el = QAction(ico_el, "Компоненты…", self)
