@@ -249,7 +249,11 @@ class ComponentGraphicsItem(QGraphicsItem):
             painter.drawRect(QRectF(p1, p2).normalized())
         for c in self._data.circles:
             center = self._p(c.x, c.y)
+            if c.fill:
+                painter.setBrush(QBrush(QColor(lcol)))
             painter.drawEllipse(center, c.radius, c.radius)
+            if c.fill:
+                painter.setBrush(Qt.BrushStyle.NoBrush)
         for poly in self._data.polygons:
             pts = [self._p(x, y) for x, y in poly]
             painter.drawPolygon(QPolygonF(pts))

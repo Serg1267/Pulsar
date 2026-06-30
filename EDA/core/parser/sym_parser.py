@@ -14,7 +14,7 @@ class SymLine: x1: float; y1: float; x2: float; y2: float
 @dataclass
 class SymBox: x: float; y: float; width: float; height: float
 @dataclass
-class SymCircle: x: float; y: float; radius: float
+class SymCircle: x: float; y: float; radius: float; fill: bool = False
 @dataclass
 class SymText: x: float; y: float; content: str; visible: bool = True
 
@@ -128,10 +128,11 @@ class SymParser:
                     data.boxes.append(SymBox(x=x, y=y, width=w, height=h))
                 elif token == 'C' and len(parts) >= 4:
                     x, y, r = map(float, parts[1:4])
-                    data.circles.append(SymCircle(x=x, y=y, radius=r))
+                    data.circles.append(SymCircle(x=x, y=y, radius=r, fill=False))
                 elif token == 'V' and len(parts) >= 4:
                     x, y, r = float(parts[1]), float(parts[2]), float(parts[3])
-                    data.circles.append(SymCircle(x=x, y=y, radius=r))
+                    _fill = len(parts) > 7 and parts[7] in ('1',)
+                    data.circles.append(SymCircle(x=x, y=y, radius=r, fill=_fill))
                 elif token == 'A' and len(parts) >= 6:
                     x, y, r = float(parts[1]), float(parts[2]), float(parts[3])
                     start, sweep = float(parts[4]), float(parts[5])

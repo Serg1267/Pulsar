@@ -35,7 +35,7 @@ def _sym_box_from_dict(d: dict) -> SymBox:
     return SymBox(x=d["x"], y=d["y"], width=d["width"], height=d["height"])
 
 def _sym_circle_from_dict(d: dict) -> SymCircle:
-    return SymCircle(x=d["x"], y=d["y"], radius=d["radius"])
+    return SymCircle(x=d["x"], y=d["y"], radius=d["radius"], fill=d.get("fill", False))
 
 def _sym_text_from_dict(d: dict) -> SymText:
     return SymText(x=d["x"], y=d["y"], content=d["content"],
@@ -56,7 +56,7 @@ def sym_data_to_dict(sd: SymData) -> dict:
                   for l in sd.lines],
         "boxes": [{"x": b.x, "y": b.y, "width": b.width, "height": b.height}
                   for b in sd.boxes],
-        "circles": [{"x": c.x, "y": c.y, "radius": c.radius}
+        "circles": [{"x": c.x, "y": c.y, "radius": c.radius, "fill": c.fill}
                     for c in sd.circles],
         "polygons": [[list(pt) for pt in poly] for poly in sd.polygons],
         "arcs": [{"x": a.x, "y": a.y, "radius": a.radius,
