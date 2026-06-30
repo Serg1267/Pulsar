@@ -1718,9 +1718,36 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
             ed_refdes = QLineEdit(item.refdes())
             layout.addWidget(ed_refdes)
 
-            layout.addWidget(QLabel("Номинал (value):"))
-            ed_value = QLineEdit(item.value())
-            layout.addWidget(ed_value)
+            _device = item._data.attributes.get("device", "").upper()
+            if _device == "TRANSFORMER":
+                _parts = item.value().split() if item.value() else ["1m", "1m", "0.99"]
+                _l1 = _parts[0] if len(_parts) > 0 else "1m"
+                _l2 = _parts[1] if len(_parts) > 1 else "1m"
+                _k  = _parts[2] if len(_parts) > 2 else "0.99"
+                _rp = item._data.attributes.get("transformer_rp", "")
+                _rs = item._data.attributes.get("transformer_rs", "")
+                layout.addWidget(QLabel("Индуктивность первичной (L1):"))
+                ed_l1 = QLineEdit(_l1)
+                layout.addWidget(ed_l1)
+                layout.addWidget(QLabel("Индуктивность вторичной (L2):"))
+                ed_l2 = QLineEdit(_l2)
+                layout.addWidget(ed_l2)
+                layout.addWidget(QLabel("Коэффициент связи (K):"))
+                ed_k = QLineEdit(_k)
+                layout.addWidget(ed_k)
+                layout.addWidget(QLabel("Сопротивление первичной (Rp):"))
+                ed_rp = QLineEdit(_rp)
+                ed_rp.setPlaceholderText("не задано")
+                layout.addWidget(ed_rp)
+                layout.addWidget(QLabel("Сопротивление вторичной (Rs):"))
+                ed_rs = QLineEdit(_rs)
+                ed_rs.setPlaceholderText("не задано")
+                layout.addWidget(ed_rs)
+                ed_value = None
+            else:
+                layout.addWidget(QLabel("Номинал (value):"))
+                ed_value = QLineEdit(item.value())
+                layout.addWidget(ed_value)
 
             cb_refdes = QCheckBox("Показать имя")
             cb_refdes.setChecked(refdes_label is None or refdes_label.isVisible())
@@ -1735,7 +1762,6 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
             ed_model.setMaximumHeight(200)
             ed_model.setPlaceholderText(".model 1N4148 D (IS=2.682n ...)")
             ed_model.setStyleSheet("QTextEdit { color: #ffffff; background-color: #2b2b2b; }")
-            _device = item._data.attributes.get("device", "").upper()
             if _device == "TRANSFORMER":
                 ed_model.setPlaceholderText("Трансформатор: обмотки L1/L2 + K генерируются автоматически")
                 ed_model.setEnabled(False)
@@ -1819,10 +1845,26 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
 
             if dialog.exec() == QDialog.DialogCode.Accepted:
                 refdes = ed_refdes.text().strip()
-                value = ed_value.text().strip()
                 if refdes:
                     item.set_refdes(refdes)
-                item.set_value(value)
+                if _device == "TRANSFORMER":
+                    _l1 = ed_l1.text().strip() or "1m"
+                    _l2 = ed_l2.text().strip() or "1m"
+                    _k  = ed_k.text().strip() or "0.99"
+                    item.set_value(f"{_l1} {_l2} {_k}")
+                    _rp = ed_rp.text().strip()
+                    _rs = ed_rs.text().strip()
+                    if _rp:
+                        item._data.attributes["transformer_rp"] = _rp
+                    elif "transformer_rp" in item._data.attributes:
+                        del item._data.attributes["transformer_rp"]
+                    if _rs:
+                        item._data.attributes["transformer_rs"] = _rs
+                    elif "transformer_rs" in item._data.attributes:
+                        del item._data.attributes["transformer_rs"]
+                else:
+                    value = ed_value.text().strip()
+                    item.set_value(value)
                 item.set_model_line(ed_model.toPlainText().strip())
                 fp = ed_fp.currentText().strip()
                 if fp:

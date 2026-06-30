@@ -417,8 +417,19 @@ class ExportMixin:
                 l_val = parts[0]
                 parts = [l_val, l_val, "0.99"]
             l1_val, l2_val, k_val = parts[0], parts[1], parts[2]
-            s = f"{refdes}_L1 {np1} {np2} {l1_val}\n{refdes}_L2 {ns1} {ns2} {l2_val}\nK_{refdes} {refdes}_L1 {refdes}_L2 {k_val}"
-            return s
+            _rp = (attributes or {}).get("transformer_rp", "")
+            _rs = (attributes or {}).get("transformer_rs", "")
+            lines = []
+            if _rp:
+                lines.append(f"{refdes}_Rp1 {np1} {np1}_R {_rp}")
+                np1 = f"{np1}_R"
+            if _rs:
+                lines.append(f"{refdes}_Rp2 {ns1} {ns1}_R {_rs}")
+                ns1 = f"{ns1}_R"
+            lines.append(f"{refdes}_L1 {np1} {np2} {l1_val}")
+            lines.append(f"{refdes}_L2 {ns1} {ns2} {l2_val}")
+            lines.append(f"K_{refdes} {refdes}_L1 {refdes}_L2 {k_val}")
+            return "\n".join(lines)
 
         # SPICE voltage-controlled switch: S<refdes> N+ N- NC+ NC- <model>
         if device == "SPICE-VC-SWITCH":
