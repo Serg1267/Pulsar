@@ -398,37 +398,66 @@ class ExportMixin:
             model = value if value else device.lower()
             return f"X{refdes} {' '.join(net_list)} {model}"
 
-        # Трансформатор: две обмотки + коэффициент связи K
+        # Трансформатор: N обмоток + коэффициент связи K (мульти-обмоточный)
         if device == "TRANSFORMER":
-            i_p1 = pinnumber_index("1")
-            i_p2 = pinnumber_index("2")
-            i_s1 = pinnumber_index("3")
-            i_s2 = pinnumber_index("4")
-            if None in (i_p1, i_p2, i_s1, i_s2):
+            _attrs = attributes or {}
+            _wp = _attrs.get("winding_pins", "")
+            pairs: list[tuple[str, str, str]] = []
+            if _wp:
+                # Явное задание пар выводов из атрибута winding_pins, напр. "1-2,2-3,4-5,5-6,7-8"
+                _pair_strs = [s.strip() for s in _wp.split(",")]
+                for w, ps in enumerate(_pair_strs):
+                    _parts = ps.split("-")
+                    if len(_parts) != 2:
+                        continue
+                    i1 = pinnumber_index(_parts[0].strip())
+                    i2 = pinnumber_index(_parts[1].strip())
+                    if i1 is None or i2 is None:
+                        continue
+                    n1 = net(i1)
+                    n2 = net(i2)
+                    if n1 is None or n2 is None:
+                        continue
+                    pairs.append((f"{refdes}_L{w+1}", n1, n2))
+            else:
+                # По умолчанию — последовательная группировка (1-2, 3-4, 5-6...)
+                n_pins = len(pins)
+                n_windings = n_pins // 2
+                for w in range(n_windings):
+                    p1n = w * 2 + 1
+                    p2n = w * 2 + 2
+                    i1 = pinnumber_index(str(p1n))
+                    i2 = pinnumber_index(str(p2n))
+                    if i1 is None or i2 is None:
+                        continue
+                    n1 = net(i1)
+                    n2 = net(i2)
+                    if n1 is None or n2 is None:
+                        continue
+                    pairs.append((f"{refdes}_L{w+1}", n1, n2))
+            if not pairs:
                 return None
-            np1 = net(i_p1)
-            np2 = net(i_p2)
-            ns1 = net(i_s1)
-            ns2 = net(i_s2)
-            if None in (np1, np2, ns1, ns2):
-                return None
-            parts = value.split() if value else ["1m", "1m", "0.99"]
-            if len(parts) == 1:
-                l_val = parts[0]
-                parts = [l_val, l_val, "0.99"]
-            l1_val, l2_val, k_val = parts[0], parts[1], parts[2]
-            _rp = (attributes or {}).get("transformer_rp", "")
-            _rs = (attributes or {}).get("transformer_rs", "")
+            parts = value.split() if value else []
+            defaults = ["1m"] * len(pairs) + ["0.99"]
+            for i in range(len(defaults)):
+                if i >= len(parts):
+                    parts.append(defaults[i])
+            l_vals = parts[:len(pairs)]
+            k_val = parts[len(pairs)] if len(pairs) < len(parts) else "0.99"
+            _rp = _attrs.get("transformer_rp", "")
+            _rs = _attrs.get("transformer_rs", "")
             lines = []
-            if _rp:
-                lines.append(f"{refdes}_Rp1 {np1} {np1}_R {_rp}")
-                np1 = f"{np1}_R"
-            if _rs:
-                lines.append(f"{refdes}_Rp2 {ns1} {ns1}_R {_rs}")
-                ns1 = f"{ns1}_R"
-            lines.append(f"{refdes}_L1 {np1} {np2} {l1_val}")
-            lines.append(f"{refdes}_L2 {ns1} {ns2} {l2_val}")
-            lines.append(f"K_{refdes} {refdes}_L1 {refdes}_L2 {k_val}")
+            for w, (lname, np1, np2) in enumerate(pairs):
+                _n1, _n2 = np1, np2
+                if w == 0 and _rp:
+                    lines.append(f"{refdes}_Rp1 {_n1} {_n1}_R {_rp}")
+                    _n1 = f"{_n1}_R"
+                if w == 1 and _rs:
+                    lines.append(f"{refdes}_Rp2 {_n1} {_n1}_R {_rs}")
+                    _n1 = f"{_n1}_R"
+                lines.append(f"{lname} {_n1} {_n2} {l_vals[w]}")
+            inductors = " ".join(p[0] for p in pairs)
+            lines.append(f"K_{refdes} {inductors} {k_val}")
             return "\n".join(lines)
 
         # SPICE voltage-controlled switch: S<refdes> N+ N- NC+ NC- <model>

@@ -1720,25 +1720,31 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
 
             _device = item._data.attributes.get("device", "").upper()
             if _device == "TRANSFORMER":
-                _parts = item.value().split() if item.value() else ["1m", "1m", "0.99"]
-                _l1 = _parts[0] if len(_parts) > 0 else "1m"
-                _l2 = _parts[1] if len(_parts) > 1 else "1m"
-                _k  = _parts[2] if len(_parts) > 2 else "0.99"
-                _rp = item._data.attributes.get("transformer_rp", "")
-                _rs = item._data.attributes.get("transformer_rs", "")
+                _tf_attrs = item._data.attributes
+                _tf_wp = _tf_attrs.get("winding_pins", "")
+                if _tf_wp:
+                    _n_windings = len(_tf_wp.split(","))
+                else:
+                    _n_windings = len(item._data.pins) // 2
+                _parts = item.value().split() if item.value() else ["1m"] * _n_windings + ["0.99"]
+                _k  = _parts[-1] if len(_parts) > _n_windings else "0.99"
+                while len(_parts) < _n_windings:
+                    _parts.insert(-1 if len(_parts) > 1 else 0, "1m")
+                _l_fields = []
                 _qle_style = "QLineEdit { color: #ffffff; background-color: #2b2b2b; }"
-                layout.addWidget(QLabel("Индуктивность первичной обмотки (L1):"))
-                ed_l1 = QLineEdit(_l1)
-                ed_l1.setStyleSheet(_qle_style)
-                layout.addWidget(ed_l1)
-                layout.addWidget(QLabel("Индуктивность вторичной обмотки (L2):"))
-                ed_l2 = QLineEdit(_l2)
-                ed_l2.setStyleSheet(_qle_style)
-                layout.addWidget(ed_l2)
+                for w in range(_n_windings):
+                    _lbl = QLabel(f"Индуктивность обмотки {w+1} (L{w+1}):")
+                    _le = QLineEdit(_parts[w] if w < len(_parts) else "1m")
+                    _le.setStyleSheet(_qle_style)
+                    layout.addWidget(_lbl)
+                    layout.addWidget(_le)
+                    _l_fields.append(_le)
                 layout.addWidget(QLabel("Коэффициент связи (K):"))
                 ed_k = QLineEdit(_k)
                 ed_k.setStyleSheet(_qle_style)
                 layout.addWidget(ed_k)
+                _rp = item._data.attributes.get("transformer_rp", "")
+                _rs = item._data.attributes.get("transformer_rs", "")
                 layout.addWidget(QLabel("Сопротивление первичной обмотки (Rp):"))
                 ed_rp = QLineEdit(_rp)
                 ed_rp.setPlaceholderText("не задано")
@@ -1769,7 +1775,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
             ed_model.setPlaceholderText(".model 1N4148 D (IS=2.682n ...)")
             ed_model.setStyleSheet("QTextEdit { color: #ffffff; background-color: #2b2b2b; }")
             if _device == "TRANSFORMER":
-                ed_model.setPlaceholderText("Трансформатор: обмотки L1/L2 + K генерируются автоматически")
+                ed_model.setPlaceholderText(f"Трансформатор: обмотки L1..L{_n_windings} + K генерируются автоматически")
                 ed_model.setEnabled(False)
             elif item.model_line():
                 ed_model.setText(item.model_line())
@@ -1854,10 +1860,9 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                 if refdes:
                     item.set_refdes(refdes)
                 if _device == "TRANSFORMER":
-                    _l1 = ed_l1.text().strip() or "1m"
-                    _l2 = ed_l2.text().strip() or "1m"
+                    _l_vals = [f.text().strip() or "1m" for f in _l_fields]
                     _k  = ed_k.text().strip() or "0.99"
-                    item.set_value(f"{_l1} {_l2} {_k}")
+                    item.set_value(" ".join(_l_vals + [_k]))
                     _rp = ed_rp.text().strip()
                     _rs = ed_rs.text().strip()
                     if _rp:
