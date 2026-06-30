@@ -398,6 +398,28 @@ class ExportMixin:
             model = value if value else device.lower()
             return f"X{refdes} {' '.join(net_list)} {model}"
 
+        # Трансформатор: две обмотки + коэффициент связи K
+        if device == "TRANSFORMER":
+            i_p1 = pinnumber_index("1")
+            i_p2 = pinnumber_index("2")
+            i_s1 = pinnumber_index("3")
+            i_s2 = pinnumber_index("4")
+            if None in (i_p1, i_p2, i_s1, i_s2):
+                return None
+            np1 = net(i_p1)
+            np2 = net(i_p2)
+            ns1 = net(i_s1)
+            ns2 = net(i_s2)
+            if None in (np1, np2, ns1, ns2):
+                return None
+            parts = value.split() if value else ["1m", "1m", "0.99"]
+            if len(parts) == 1:
+                l_val = parts[0]
+                parts = [l_val, l_val, "0.99"]
+            l1_val, l2_val, k_val = parts[0], parts[1], parts[2]
+            s = f"{refdes}_L1 {np1} {np2} {l1_val}\n{refdes}_L2 {ns1} {ns2} {l2_val}\nK_{refdes} {refdes}_L1 {refdes}_L2 {k_val}"
+            return s
+
         # SPICE voltage-controlled switch: S<refdes> N+ N- NC+ NC- <model>
         if device == "SPICE-VC-SWITCH":
             i_nplus = pinnumber_index("1")
