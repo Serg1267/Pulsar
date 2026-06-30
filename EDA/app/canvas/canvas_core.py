@@ -1734,6 +1734,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
             ed_model = QTextEdit()
             ed_model.setMaximumHeight(200)
             ed_model.setPlaceholderText(".model 1N4148 D (IS=2.682n ...)")
+            ed_model.setStyleSheet("QTextEdit { color: #ffffff; background-color: #2b2b2b; }")
             if item.model_line():
                 ed_model.setText(item.model_line())
             else:
