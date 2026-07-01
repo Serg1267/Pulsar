@@ -2365,6 +2365,8 @@ class PulsarMainWindow(QMainWindow):
                     'name': refdes,
                     'voltage': v_mag,
                     'current': i_mag,
+                    'v_cmplx': v_diff,
+                    'i_cmplx': i_complex,
                 })
 
             elif ctype in ('V', 'I'):
@@ -2563,12 +2565,26 @@ class PulsarMainWindow(QMainWindow):
         )
 
     def _extract_all_components(self, cir_text: str) -> list[dict]:
-        """Разобрать .cir — список {refdes, type, pins, value}."""
+        """Разобрать .cir — список {refdes, type, pins, value}.
+           Пропускает содержимое .SUBCKT ... .ENDS блоков."""
         import re
         comps: list[dict] = []
+        in_subckt = 0
         for line in cir_text.split('\n'):
             s = line.strip()
-            if not s or s.startswith('*') or s.startswith(';') or s.startswith('.'):
+            if not s or s.startswith('*') or s.startswith(';'):
+                continue
+            # Отслеживание .SUBCKT / .ENDS
+            su = s.upper()
+            if su.startswith('.SUBCKT') or su.startswith('.MACRO'):
+                in_subckt += 1
+                continue
+            if in_subckt and su.startswith('.ENDS'):
+                in_subckt -= 1
+                continue
+            if in_subckt:
+                continue
+            if s.startswith('.'):
                 continue
             tokens = s.split()
             if not tokens:

@@ -36,7 +36,7 @@ def _mag_unit(v: float | None) -> str:
     return "n"
 
 
-_HEADERS = ["Компонент", "|V|", "|I|", "|S|"]
+_HEADERS = ["Компонент", "|V|", "|I|", "P, Вт"]
 
 
 class AcDialog(QDialog):
@@ -109,7 +109,11 @@ class AcDialog(QDialog):
             c = row.get("current")
 
             p = None
-            if v is not None and c is not None:
+            v_c = row.get('v_cmplx')
+            i_c = row.get('i_cmplx')
+            if v_c is not None and i_c is not None:
+                p = (v_c * i_c.conjugate()).real
+            elif v is not None and c is not None:
                 p = abs(v * c)
 
             name_item = QTableWidgetItem(f"  {name}")
@@ -137,7 +141,7 @@ class AcDialog(QDialog):
 
             p_val = _fmt_mag(p)
             p_unit = _mag_unit(p)
-            p_str = f"{p_val}{p_unit}VA" if p is not None else "—"
+            p_str = f"{p_val}{p_unit}Вт" if p is not None else "—"
             p_item = QTableWidgetItem(f"  {p_str}")
             p_item.setFont(font_val)
             p_item.setTextAlignment(
@@ -198,11 +202,17 @@ class AcDialog(QDialog):
         self._table.setColumnHidden(3, not self._cb_p.isChecked())
 
     def _copy_to_clipboard(self):
-        lines = ["Компонент\t|V|\t|I|\t|S|"]
+        lines = ["Компонент\t|V|\t|I|\tP, Вт"]
         for row in self._all_rows:
             v = row.get("voltage")
             c = row.get("current")
-            p = abs(v * c) if v is not None and c is not None else None
+            p = None
+            v_c = row.get('v_cmplx')
+            i_c = row.get('i_cmplx')
+            if v_c is not None and i_c is not None:
+                p = (v_c * i_c.conjugate()).real
+            elif v is not None and c is not None:
+                p = abs(v * c)
             v_str = f"{v:.6e}" if v is not None else ""
             c_str = f"{c:.6e}" if c is not None else ""
             p_str = f"{p:.6e}" if p is not None else ""
