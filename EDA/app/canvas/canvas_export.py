@@ -223,10 +223,10 @@ class ExportMixin:
                                     break
                             if _idx is not None:
                                 _n_sub = pin_nets.get(_idx)
-                                _nets.append(_n_sub if _n_sub else "NC")
+                                _nets.append(_n_sub if _n_sub else f"_NC_{refdes}_P{_pn}")
                             else:
-                                _nets.append("NC")
-                        if any(n != "NC" for n in _nets):
+                                _nets.append(f"_NC_{refdes}_P{_pn}")
+                        if any(not n.startswith("_NC_") for n in _nets):
                             comp_lines.append(f"X{refdes} {' '.join(_nets)} {_model_name}")
                             _skip = True
             if not _skip:
@@ -457,8 +457,8 @@ class ExportMixin:
                     return int(pn)
                 return i
             sorted_indices = sorted(range(len(pins)), key=_pin_sort_key)
-            net_list = [pin_nets.get(i, "NC") for i in sorted_indices]
-            if not any(n != "NC" for n in net_list):
+            net_list = [pin_nets.get(i, f"_NC_{refdes}_P{pins[i].pinnumber or i}") for i in sorted_indices]
+            if not any(not n.startswith("_NC_") for n in net_list):
                 return None
             model = value if value else device.lower()
             return f"X{refdes} {' '.join(net_list)} {model}"

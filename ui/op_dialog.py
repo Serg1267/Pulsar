@@ -1,121 +1,187 @@
 from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout,
                                QTableWidget, QTableWidgetItem, QPushButton,
-                               QHeaderView, QAbstractScrollArea)
-from PySide6.QtGui import QFont
+                               QHeaderView, QAbstractScrollArea, QCheckBox,
+                               QWidget, QLabel)
+from PySide6.QtGui import QFont, QGuiApplication
 from PySide6.QtCore import Qt
 
 
 def _fmt_voltage(v: float | None) -> str:
     if v is None:
         return "—"
-    a = abs(v)
-    if v == 0:
-        return "0 V"
-    if a >= 1.0:
-        return f"{v:.4g} V"
-    if a >= 1e-3:
-        return f"{v*1e3:.4g} mV"
-    return f"{v*1e6:.4g} µV"
+    return f"{v:.4g}"
 
 
 def _fmt_current(i: float | None) -> str:
     if i is None:
         return "—"
-    a = abs(i)
-    if i == 0:
-        return "0 A"
-    if a >= 1.0:
-        return f"{i:.4g} A"
-    if a >= 1e-3:
-        return f"{i*1e3:.4g} mA"
-    if a >= 1e-6:
-        return f"{i*1e6:.4g} µA"
-    return f"{i*1e9:.4g} nA"
+    return f"{i:.4g}"
+
+
+def _fmt_power(p: float | None) -> str:
+    if p is None:
+        return "—"
+    return f"{p:.4g}"
+
+
+_HEADERS = ["Компонент", "Напряжение, В", "Ток, А", "Мощность, Вт"]
 
 
 class OpDialog(QDialog):
     def __init__(self, parent, rows: list[dict]):
         super().__init__(parent)
-        self.setWindowTitle("Pulsar — .OP рабочая точка")
-        self.resize(500, 450)
+        self.setWindowTitle("Pulsar — Анализ по постоянному току (.OP)")
+        self.resize(640, 420)
+        self.setMinimumSize(400, 250)
 
-        self._rows = rows
+        self._all_rows = rows
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(6)
 
-        self._table = QTableWidget(len(rows), 3)
-        self._table.setHorizontalHeaderLabels(["Имя", "Напряжение", "Ток"])
+        # top: checkboxes
+        cb_row = QHBoxLayout()
+        cb_row.setContentsMargins(0, 0, 0, 0)
+        lbl = QLabel("Показать столбцы:")
+        lbl.setStyleSheet("font-size: 11px;")
+        cb_row.addWidget(lbl)
+
+        self._cb_v = QCheckBox("Напряжение")
+        self._cb_v.setChecked(True)
+        self._cb_v.toggled.connect(self._update_columns)
+        cb_row.addWidget(self._cb_v)
+
+        self._cb_i = QCheckBox("Ток")
+        self._cb_i.setChecked(True)
+        self._cb_i.toggled.connect(self._update_columns)
+        cb_row.addWidget(self._cb_i)
+
+        self._cb_p = QCheckBox("Мощность")
+        self._cb_p.setChecked(True)
+        self._cb_p.toggled.connect(self._update_columns)
+        cb_row.addWidget(self._cb_p)
+
+        cb_row.addStretch()
+        layout.addLayout(cb_row)
+
+        # table
+        self._table = QTableWidget(len(rows), 4)
+        self._table.setHorizontalHeaderLabels(_HEADERS)
         self._table.verticalHeader().hide()
         self._table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self._table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        self._table.setShowGrid(False)
-        self._table.setAlternatingRowColors(True)
+        self._table.setShowGrid(True)
+        self._table.setAlternatingRowColors(False)
         self._table.setSizeAdjustPolicy(
-            QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents
+            QAbstractScrollArea.SizeAdjustPolicy.AdjustToContentsOnFirstShow
         )
-        self._table.horizontalHeader().setStretchLastSection(True)
-        self._table.horizontalHeader().setSectionResizeMode(
-            0, QHeaderView.ResizeMode.ResizeToContents
-        )
-        self._set_dark_style()
+        self._table.verticalHeader().setDefaultSectionSize(22)
+
+        h = self._table.horizontalHeader()
+        h.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        for c in (1, 2, 3):
+            h.setSectionResizeMode(c, QHeaderView.ResizeMode.ResizeToContents)
+        h.setDefaultAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+
+        self._style_table()
+
+        font_name = QFont("Segoe UI", 9)
+        font_val = QFont("Consolas", 10)
 
         for i, row in enumerate(rows):
-            name_item = QTableWidgetItem(row["name"])
-            name_item.setFont(QFont("Monospace", 10))
+            name = row["name"]
+            v = row.get("voltage")
+            c = row.get("current")
+
+            # power = V * I (both present)
+            p = None
+            if v is not None and c is not None:
+                p = v * c
+
+            name_item = QTableWidgetItem(f"  {name}")
+            name_item.setFont(font_name)
+            name_item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             self._table.setItem(i, 0, name_item)
 
-            v_text = _fmt_voltage(row.get("voltage"))
-            v_item = QTableWidgetItem(v_text)
-            v_item.setFont(QFont("Monospace", 10))
+            v_item = QTableWidgetItem(f"  {_fmt_voltage(v)}")
+            v_item.setFont(font_val)
             v_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self._table.setItem(i, 1, v_item)
 
-            c_text = _fmt_current(row.get("current"))
-            c_item = QTableWidgetItem(c_text)
-            c_item.setFont(QFont("Monospace", 10))
+            c_item = QTableWidgetItem(f"  {_fmt_current(c)}")
+            c_item.setFont(font_val)
             c_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self._table.setItem(i, 2, c_item)
 
-        layout.addWidget(self._table)
+            p_item = QTableWidgetItem(f"  {_fmt_power(p)}")
+            p_item.setFont(font_val)
+            p_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            self._table.setItem(i, 3, p_item)
 
+        layout.addWidget(self._table, 1)
+
+        # bottom buttons
         btn_row = QHBoxLayout()
+        btn_row.setContentsMargins(0, 0, 0, 0)
+
+        info = QLabel(f"Элементов: {len(rows)}")
+        info.setStyleSheet("font-size: 11px; color: #666;")
+        btn_row.addWidget(info)
+        btn_row.addStretch()
+
         copy_btn = QPushButton("Копировать")
         copy_btn.clicked.connect(self._copy_to_clipboard)
         btn_row.addWidget(copy_btn)
-        btn_row.addStretch()
+
         close_btn = QPushButton("Закрыть")
         close_btn.clicked.connect(self.accept)
         btn_row.addWidget(close_btn)
+
         layout.addLayout(btn_row)
 
-    def _set_dark_style(self):
+    def _style_table(self):
         self._table.setStyleSheet("""
             QTableWidget {
-                background-color: #1e1e1e;
-                color: #d4d4d4;
-                gridline-color: #333;
-                alternate-background-color: #222;
+                background-color: #ffffff;
+                color: #000000;
+                gridline-color: #000000;
+                outline: none;
             }
             QTableWidget::item {
-                padding: 4px 8px;
+                padding: 1px 4px;
+                border: none;
+            }
+            QTableWidget::item:selected {
+                background-color: #cce5ff;
+                color: #000000;
             }
             QHeaderView::section {
-                background-color: #2a2a2a;
-                color: #aaa;
-                border: 1px solid #333;
-                padding: 4px 8px;
+                background-color: #e0e0e0;
+                color: #000000;
+                border: 1px solid #000000;
+                padding: 3px 8px;
                 font-weight: bold;
+                font-size: 11px;
             }
         """)
 
+    def _update_columns(self):
+        show_v = self._cb_v.isChecked()
+        show_i = self._cb_i.isChecked()
+        show_p = self._cb_p.isChecked()
+        self._table.setColumnHidden(1, not show_v)
+        self._table.setColumnHidden(2, not show_i)
+        self._table.setColumnHidden(3, not show_p)
+
     def _copy_to_clipboard(self):
-        from PySide6.QtGui import QGuiApplication
-        lines = ["Имя\tНапряжение\tТок"]
-        for row in self._rows:
+        lines = ["Компонент\tНапряжение, В\tТок, А\tМощность, Вт"]
+        for row in self._all_rows:
             v = row.get("voltage")
             c = row.get("current")
+            p = (v * c) if v is not None and c is not None else None
             v_str = f"{v:.6e}" if v is not None else ""
             c_str = f"{c:.6e}" if c is not None else ""
-            lines.append(f"{row['name']}\t{v_str}\t{c_str}")
+            p_str = f"{p:.6e}" if p is not None else ""
+            lines.append(f"{row['name']}\t{v_str}\t{c_str}\t{p_str}")
         QGuiApplication.clipboard().setText("\n".join(lines))

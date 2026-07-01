@@ -2033,13 +2033,17 @@ class PulsarMainWindow(QMainWindow):
             )
             return
 
-        # Убедиться, что .OP есть
+        # Убедиться, что .OP есть (вставить перед .end)
         has_op = any(
             s.strip().upper().startswith('.OP') and not s.strip().upper().startswith('.OPTION')
             for s in lines
         )
         if not has_op:
-            cir_text = cir_text.rstrip() + '\n.OP\n'
+            _end_idx = cir_text.lower().rfind('.end')
+            if _end_idx >= 0:
+                cir_text = cir_text[:_end_idx] + '.OP\n' + cir_text[_end_idx:]
+            else:
+                cir_text = cir_text.rstrip() + '\n.OP\n'
 
         # Записать temp-файл
         import subprocess
