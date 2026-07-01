@@ -2007,49 +2007,25 @@ class PulsarMainWindow(QMainWindow):
             self._op_temp_file = None
 
     def _run_op_analysis(self):
-        page_type = self._tabs.current_page_type()
-        if page_type not in ('sch', 'cir'):
+        cir_text = self._get_netlist_text()
+        if cir_text is None:
             return
 
-        if page_type == 'sch':
-            canvas = self._tabs.current_canvas()
-            if canvas is None:
-                return
-            cir_text = canvas.export_cir()
-            if not cir_text:
-                return
-        else:
-            editor = self._tabs.current_editor()
-            if editor is None:
-                return
-            cir_text = editor.toPlainText()
-
-        # Проверка наличия источников тока или напряжения
         import re
-        lines = cir_text.split('\n')
-        has_source = any(
-            re.match(r'^[VI]\S+\s+\S+', s) and not s.strip().startswith('*')
-            for s in lines
-        )
-        if not has_source:
-            QMessageBox.warning(
-                self, "Нет источников",
-                "В схеме нет источников тока и напряжения. Расчёт не возможен.\n"
-                "Для расчёта схемы по постоянному току, добавьте в схему источники тока или напряжения."
-            )
-            return
 
-        # Убедиться, что .OP есть (вставить перед .end)
+        # Проверить наличие .OP директивы
         has_op = any(
             s.strip().upper().startswith('.OP') and not s.strip().upper().startswith('.OPTION')
-            for s in lines
+            for s in cir_text.split('\n')
         )
         if not has_op:
-            _end_idx = cir_text.lower().rfind('.end')
-            if _end_idx >= 0:
-                cir_text = cir_text[:_end_idx] + '.OP\n' + cir_text[_end_idx:]
-            else:
-                cir_text = cir_text.rstrip() + '\n.OP\n'
+            QMessageBox.warning(
+                self, "Нет директивы анализа",
+                "Директивы анализа не обнаружены.\n"
+                "Добавьте на схему директиву вида .OP для постоянного тока\n"
+                "или .AC для переменного тока."
+            )
+            return
 
         # Записать temp-файл
         import subprocess
