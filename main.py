@@ -2153,28 +2153,13 @@ class PulsarMainWindow(QMainWindow):
         if ac_freq is None or ac_freq <= 0:
             ac_freq = 1000.0
 
-        # Получить все имена узлов из нетлиста
+        # Получить все имена узлов из компонентов нетлиста
         node_names: set[str] = set()
-        for line in cir_text.split('\n'):
-            s = line.strip()
-            if not s or s.startswith('*') or s.startswith(';') or s.startswith('.'):
-                continue
-            tokens = s.split()
-            if len(tokens) < 2:
-                continue
-            refdes = tokens[0]
-            if not refdes[0].isalpha():
-                continue
-            for tok in tokens[1:]:
-                if tok.upper() in ('0', 'GND'):
-                    continue
-                if tok.startswith('_NC_'):
-                    continue
-                if any(c in tok for c in '(){}[]'):
-                    continue
-                if tok.replace('.', '').replace('+', '').replace('-', '').isnumeric():
-                    continue
-                node_names.add(tok)
+        comps = self._extract_all_components(cir_text)
+        for comp in comps:
+            for pin in comp['pins']:
+                if pin.upper() not in ('0', 'GND') and not pin.startswith('_NC_'):
+                    node_names.add(pin)
 
         # Построить .PRINT со всеми узлами
         sorted_nodes = sorted(node_names)
@@ -2225,9 +2210,28 @@ class PulsarMainWindow(QMainWindow):
                                     f"ngspice завершился с ошибкой (код {result.returncode})")
                 return
 
+            # Проверить ошибки ngspice
+            if "singular matrix" in output.lower() or "no such vector" in output.lower():
+                err_lines = [l for l in output.split('\n')
+                             if 'warning' in l.lower() or 'error' in l.lower()]
+                err_text = '\n'.join(err_lines[:5])
+                self._log_to_terminal_safe(f"[ERROR] .AC анализ: {err_text}")
+                QMessageBox.warning(
+                    self, "Ошибка .AC",
+                    "ngspice не смог выполнить анализ.\n"
+                    "Возможно, в схеме есть плавающие узлы или неверная модель.\n\n"
+                    f"{err_text}"
+                )
+                return
+
             rows = self._parse_ac_output(output, cir_text, ac_freq)
             if not rows:
                 self._log_to_terminal_safe("[WARN] Не удалось распарсить .AC вывод")
+                QMessageBox.warning(
+                    self, "Нет данных",
+                    "Не удалось получить данные .AC анализа.\n"
+                    "Проверьте, что источник имеет параметр AC <амплитуда>."
+                )
                 return
 
             from ui.ac_dialog import AcDialog
