@@ -260,9 +260,15 @@ class PulsarMainWindow(QMainWindow):
         self._sch_run_action.triggered.connect(self._sch_run_simulation)
         self._analysis_menu.addAction(self._sch_run_action)
 
-        self._analysis_op_action = QAction("Анализ по постоянному току", self)
+        self._analysis_op_action = QAction("Анализ по постоянному току (.OP)", self)
         self._analysis_op_action.triggered.connect(self._toggle_op)
         self._analysis_menu.addAction(self._analysis_op_action)
+
+        self._analysis_ac_action = QAction("Анализ по переменному току (.AC)", self)
+        self._analysis_ac_action.triggered.connect(self._toggle_ac)
+        self._analysis_menu.addAction(self._analysis_ac_action)
+
+        self._analysis_menu.addSeparator()
 
         self._analysis_four_action = QAction("Коэффициент гармоник", self)
         self._analysis_four_action.triggered.connect(self._show_fourier_from_menu)
@@ -2087,6 +2093,371 @@ class PulsarMainWindow(QMainWindow):
 
     def _on_op_dialog_finished(self, _result: int):
         self._op_dialog = None
+
+    # ─── .AC анализ ───
+
+    def _toggle_ac(self):
+        self._run_ac_analysis()
+
+    def _get_netlist_text(self) -> str | None:
+        """Получить текст нетлиста из текущей вкладки."""
+        page_type = self._tabs.current_page_type()
+        if page_type not in ('sch', 'cir'):
+            return None
+        if page_type == 'sch':
+            canvas = self._tabs.current_canvas()
+            if canvas is None:
+                return None
+            text = canvas.export_cir()
+            return text if text else None
+        editor = self._tabs.current_editor()
+        if editor is None:
+            return None
+        return editor.toPlainText()
+
+    def _check_analysis_directives(self, text: str) -> tuple[bool, bool]:
+        """Проверить наличие .OP и .AC директив. Вернуть (has_op, has_ac)."""
+        import re
+        has_op = False
+        has_ac = False
+        for line in text.split('\n'):
+            s = line.strip().upper()
+            if not s or s.startswith('*') or s.startswith(';'):
+                continue
+            if s.startswith('.OP') and not s.startswith('.OPTION'):
+                has_op = True
+            if s.startswith('.AC') and not s.startswith('.ACCEPT'):
+                has_ac = True
+        return has_op, has_ac
+
+    def _run_ac_analysis(self):
+        cir_text = self._get_netlist_text()
+        if cir_text is None:
+            return
+
+        import re
+
+        # Проверить наличие .AC директивы
+        has_op, has_ac = self._check_analysis_directives(cir_text)
+        if not has_op and not has_ac:
+            QMessageBox.warning(
+                self, "Нет директивы анализа",
+                "Директивы анализа не обнаружены.\n"
+                "Добавьте на схему директиву вида .OP для постоянного тока\n"
+                "или .AC для переменного тока."
+            )
+            return
+        if not has_ac:
+            QMessageBox.warning(
+                self, "Нет .AC директивы",
+                "Директива .AC не обнаружена.\n"
+                "Добавьте на схему директиву вида:\n"
+                "  .AC LIN 1 1K 1K\n"
+                "где 1K — частота анализа."
+            )
+            return
+
+        # Определить частоту из .AC директивы
+        ac_freq = 1000.0  # default
+        for line in cir_text.split('\n'):
+            s = line.strip()
+            if not s or s.startswith('*') or s.startswith(';'):
+                continue
+            if re.match(r'\.AC\b', s, re.IGNORECASE):
+                parts = s.split()
+                # .AC LIN 1 1K 1K → последнее число
+                for part in reversed(parts):
+                    try:
+                        ac_freq = self._parse_spice_value(part)
+                        break
+                    except (ValueError, AttributeError):
+                        continue
+                break
+
+        if ac_freq is None or ac_freq <= 0:
+            ac_freq = 1000.0
+
+        # Получить все имена узлов из нетлиста
+        node_names: set[str] = set()
+        for line in cir_text.split('\n'):
+            s = line.strip()
+            if not s or s.startswith('*') or s.startswith(';') or s.startswith('.'):
+                continue
+            tokens = s.split()
+            if len(tokens) < 2:
+                continue
+            refdes = tokens[0]
+            if not refdes[0].isalpha():
+                continue
+            for tok in tokens[1:]:
+                if tok.upper() in ('0', 'GND'):
+                    continue
+                if tok.startswith('_NC_'):
+                    continue
+                if any(c in tok for c in '(){}[]'):
+                    continue
+                if tok.replace('.', '').replace('+', '').replace('-', '').isnumeric():
+                    continue
+                node_names.add(tok)
+
+        # Построить .PRINT со всеми узлами
+        sorted_nodes = sorted(node_names)
+        print_vars = ' '.join(f'V({n})' for n in sorted_nodes)
+        ac_directive = f'.AC LIN 1 {ac_freq} {ac_freq}'
+        print_directive = f'.PRINT AC {print_vars}'
+
+        # Собрать полный нетлист
+        has_print = any(
+            re.match(r'\.PRINT\b', line.strip(), re.IGNORECASE)
+            for line in cir_text.split('\n')
+            if not line.strip().startswith('*') and not line.strip().startswith(';')
+        )
+
+        if has_print:
+            fixed_text = cir_text
+        else:
+            # Вставить .PRINT перед .end
+            _end_idx = cir_text.lower().rfind('.end')
+            if _end_idx >= 0:
+                fixed_text = cir_text[:_end_idx] + print_directive + '\n' + cir_text[_end_idx:]
+            else:
+                fixed_text = cir_text.rstrip() + '\n' + print_directive + '\n.end\n'
+
+        # Убедиться что .AC есть
+        if not has_ac:
+            _end_idx = fixed_text.lower().rfind('.end')
+            if _end_idx >= 0:
+                fixed_text = fixed_text[:_end_idx] + ac_directive + '\n' + fixed_text[_end_idx:]
+            else:
+                fixed_text = fixed_text.rstrip() + '\n' + ac_directive + '\n'
+
+        # Записать temp-файл
+        import subprocess
+        from pathlib import Path
+        temp_path = Path(self._write_temp_sim_file(fixed_text))
+
+        try:
+            result = subprocess.run(
+                ["ngspice", "-b", str(temp_path)],
+                capture_output=True, text=True, timeout=30,
+            )
+            output = result.stdout + result.stderr
+
+            if result.returncode != 0 and not result.stdout:
+                self._log_to_terminal_safe(f"[ERROR] ngspice вернул код {result.returncode}")
+                QMessageBox.warning(self, "Ошибка .AC",
+                                    f"ngspice завершился с ошибкой (код {result.returncode})")
+                return
+
+            rows = self._parse_ac_output(output, cir_text, ac_freq)
+            if not rows:
+                self._log_to_terminal_safe("[WARN] Не удалось распарсить .AC вывод")
+                return
+
+            from ui.ac_dialog import AcDialog
+            dlg = AcDialog(self, rows, ac_freq)
+            dlg.show()
+            self._log_to_terminal_safe(
+                f"[SUCCESS] .AC анализ ({ac_freq:.4g} Гц) — {len(rows)} строк"
+            )
+
+        except subprocess.TimeoutExpired:
+            self._log_to_terminal_safe("[ERROR] .AC анализ превысил 30 с")
+            QMessageBox.warning(self, "Таймаут", "ngspice не завершился за 30 секунд")
+        except FileNotFoundError:
+            self._log_to_terminal_safe("[ERROR] ngspice не найден")
+            QMessageBox.critical(self, "Ошибка", "ngspice не найден")
+        except Exception as e:
+            self._log_to_terminal_safe(f"[ERROR] {e}")
+            import traceback
+            self._log_to_terminal_safe(traceback.format_exc())
+        finally:
+            self._cleanup_temp_file(temp_path)
+
+    def _parse_ac_output(self, ngspice_output: str, cir_text: str,
+                          frequency: float) -> list[dict]:
+        """Распарсить .AC вывод ngspice в список {name, voltage, current}."""
+        import re
+        import math
+
+        # ── 1. Парсинг комплексных напряжений ──
+        node_complex: dict[str, complex] = {}
+        current_vars: list[str] = []
+        in_table = False
+        freq_found = False
+
+        for line in ngspice_output.split('\n'):
+            s = line.strip()
+
+            # Заголовок таблицы — v(N) для каждого узла
+            header_match = re.match(r'Index\s+frequency\s+(.*)', s, re.IGNORECASE)
+            if header_match:
+                var_part = header_match.group(1).strip()
+                current_vars = re.findall(r'V\(([^)]+)\)', var_part, re.IGNORECASE)
+                in_table = True
+                continue
+
+            if not in_table:
+                continue
+
+            # Концом таблицы считается Total или пустая строка после данных
+            if s.startswith('Total'):
+                in_table = False
+                current_vars = []
+                continue
+            if s.startswith('---') or s.startswith('==='):
+                continue
+            if not s:
+                continue
+
+            # Строка данных
+            data_match = re.match(
+                r'^\s*(\d+)\s+([0-9eE+\-.]+)\s+([0-9eE+\-.]+),\s*([0-9eE+\-.]+)',
+                s,
+            )
+            if not data_match:
+                continue
+
+            # \f (form feed) может быть в конце строки — не мешает
+            freq_val = float(data_match.group(2))
+            # При первом совпадении частоты запомнить что нашли
+            if not freq_found:
+                if abs(freq_val - frequency) / max(frequency, 1e-12) > 0.01:
+                    continue
+                freq_found = True
+
+            # Первая пара real, imag
+            pairs = [(float(data_match.group(3)), float(data_match.group(4)))]
+            # Дополнительные пары (несколько узлов в одной строке)
+            rest = s[data_match.end():]
+            more = re.findall(r'\s+([0-9eE+\-.]+),\s*([0-9eE+\-.]+)', rest)
+            for r, i in more:
+                pairs.append((float(r), float(i)))
+
+            for vi, (real_part, imag_part) in enumerate(pairs):
+                if vi < len(current_vars):
+                    node_complex[current_vars[vi]] = complex(real_part, imag_part)
+
+        # GND
+        node_complex['0'] = complex(0, 0)
+        node_complex['GND'] = complex(0, 0)
+
+        if not node_complex:
+            return []
+
+        # ── 2. Построение строк компонентов ──
+        omega = 2 * math.pi * frequency
+        comps = self._extract_all_components(cir_text)
+        rows: list[dict] = []
+
+        for comp in comps:
+            refdes = comp['refdes']
+            ctype = comp['type']
+            pins = comp['pins']
+
+            if ctype in ('R', 'C', 'L'):
+                if len(pins) < 2:
+                    continue
+                vp = node_complex.get(pins[0])
+                vm = node_complex.get(pins[1])
+                if vp is None or vm is None:
+                    continue
+                v_diff = vp - vm
+                v_mag = abs(v_diff)
+
+                # Импеданс
+                val = self._parse_spice_value(comp.get('value', ''))
+                if val is None or val == 0:
+                    continue
+
+                if ctype == 'R':
+                    Z = complex(val, 0)
+                elif ctype == 'C':
+                    Z = complex(0, -1.0 / (omega * val))
+                elif ctype == 'L':
+                    Z = complex(0, omega * val)
+                else:
+                    continue
+
+                i_complex = v_diff / Z
+                i_mag = abs(i_complex)
+                rows.append({
+                    'name': refdes,
+                    'voltage': v_mag,
+                    'current': i_mag,
+                })
+
+            elif ctype in ('V', 'I'):
+                if len(pins) < 2:
+                    continue
+                vp = node_complex.get(pins[0])
+                vm = node_complex.get(pins[1])
+                if vp is None or vm is None:
+                    continue
+                v_diff = vp - vm
+                v_mag = abs(v_diff)
+                rows.append({
+                    'name': refdes,
+                    'voltage': v_mag,
+                    'current': None,
+                })
+
+            elif ctype in ('D',):
+                if len(pins) < 2:
+                    continue
+                vp = node_complex.get(pins[0])
+                vm = node_complex.get(pins[1])
+                if vp is None or vm is None:
+                    continue
+                v_diff = vp - vm
+                v_mag = abs(v_diff)
+                rows.append({
+                    'name': refdes,
+                    'voltage': v_mag,
+                    'current': None,
+                })
+
+            elif ctype == 'Q':
+                pin_names = comp.get('pin_names', ['C', 'B', 'E'])
+                for pi, pn in enumerate(pin_names):
+                    net = pins[pi] if pi < len(pins) else ''
+                    v = node_complex.get(net)
+                    v_mag = abs(v) if v is not None else None
+                    rows.append({
+                        'name': f'{refdes}({pn})',
+                        'voltage': v_mag,
+                        'current': None,
+                    })
+
+            elif ctype == 'M':
+                pin_names = comp.get('pin_names', ['D', 'G', 'S'])
+                for pi, pn in enumerate(pin_names):
+                    net = pins[pi] if pi < len(pins) else ''
+                    v = node_complex.get(net)
+                    v_mag = abs(v) if v is not None else None
+                    rows.append({
+                        'name': f'{refdes}({pn})',
+                        'voltage': v_mag,
+                        'current': None,
+                    })
+
+            elif ctype == 'X':
+                if pins:
+                    vp = node_complex.get(pins[0])
+                    vm = node_complex.get(pins[1]) if len(pins) > 1 else None
+                    if vp is not None and vm is not None:
+                        v_mag = abs(vp - vm)
+                    elif vp is not None:
+                        v_mag = abs(vp - node_complex.get('0', complex(0, 0)))
+                    else:
+                        continue
+                    rows.append({
+                        'name': refdes,
+                        'voltage': v_mag,
+                        'current': None,
+                    })
+
+        return rows
 
     def _parse_op_output(self, ngspice_output: str, cir_text: str) -> list[dict]:
         import re
