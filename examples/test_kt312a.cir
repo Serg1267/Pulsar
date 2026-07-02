@@ -1,0 +1,11 @@
+* Тест КТ312А — общий эмиттер, коэффициент усиления
+.title KT312A CE amplifier test
+VCC 3 0 DC 10
+RB 3 2 430k
+RC 3 1 1k
+Q1 1 2 0 KT312A
+.model KT312A NPN (BF=200 IS=1e-14 VAF=100 CJE=5p CJC=3p TF=0.3n RB=10 RC=1 RE=0.5)
+.op
+.dc VCC 0 20 1
+.print dc v(1) v(2) i(VCC)
+.end

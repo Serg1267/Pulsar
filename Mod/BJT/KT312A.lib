@@ -1,0 +1,22 @@
+* KT312A — NPN silicon transistor
+* Soviet general-purpose NPN, TO-5 / КТ-13 metal can
+* Replacement/analog: 2N2222, BC107, BC547
+*
+* Parameters from spicebridge_create_model (Jul 2026):
+*   BF=200    — hFE midpoint (datasheet: 50-280)
+*   VAF=100   — Early voltage
+*   IS=1e-14  — saturation current
+*   CJE=5p    — B-E junction capacitance
+*   CJC=3p    — B-C junction capacitance
+*   TF=0.3n   — forward transit time (ft ~ 530 MHz, min 150 MHz)
+*   RB=10     — base resistance
+*   RC=1      — collector resistance
+*   RE=0.5    — emitter resistance
+*
+* Verification (ngspice-44, Jul 2026):
+*   hFE ≈ 210 at VCE=5V, IC=4.5mA   ✓ (datasheet: 50-280)
+*   hFE ≈ 209 at VCE=5V, IC=10.8mA  ✓
+*   Vbe ≈ 0.70V at IC=4.5mA          ✓
+*   Vbe ≈ 0.72V at IC=10.8mA         ✓
+*
+.model KT312A NPN (BF=200 IS=1e-14 VAF=100 CJE=5p CJC=3p TF=0.3n RB=10 RC=1 RE=0.5)
