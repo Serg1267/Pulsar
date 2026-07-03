@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="48"
+   height="48"
+   viewBox="0 0 12.7 12.7"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   sodipodi:docname="node_label.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="11.5"
+     inkscape:cx="20.956522"
+     inkscape:cy="24.26087"
+     inkscape:window-width="1366"
+     inkscape:window-height="761"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="0.26458333"
+       spacingy="0.26458333"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <linearGradient
+       id="swatch5"
+       inkscape:swatch="solid">
+      <stop
+         style="stop-color:#ffd82d;stop-opacity:1;"
+         offset="0"
+         id="stop5" />
+    </linearGradient>
+    <linearGradient
+       id="swatch4"
+       inkscape:swatch="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4" />
+    </linearGradient>
+  </defs>
+  <g
+     inkscape:label="Слой 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#ff0e2d;fill-opacity:1;stroke:#ff0000;stroke-width:1.71068;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0.999999;stroke-opacity:1"
+       d="M 2.7074228,10.257159 5.49466,5.8824227"
+       id="path3" />
+    <path
+       style="fill:#e9052d;fill-opacity:1;stroke:#ff0000;stroke-width:1.5875;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0.999999;stroke-opacity:1"
+       d="M 5.5562496,5.820833 H 11.377083"
+       id="path4" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.52778px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;opacity:1;fill:#ffd82d;fill-opacity:1;stroke:none;stroke-width:2.64583;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0.999999;stroke-opacity:1"
+       x="1.0973707"
+       y="3.0620534"
+       id="text4"
+       transform="scale(0.96442637,1.0368858)"
+       inkscape:highlight-color="#6e9fcf"><tspan
+         sodipodi:role="line"
+         id="tspan4"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.52778px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffd82d;fill-opacity:1;stroke:none;stroke-width:2.64583;stroke-dasharray:none;stroke-opacity:1"
+         x="1.0973707"
+         y="3.0620534">NAME</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.52778px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffd82d;fill-opacity:1;stroke:none;stroke-width:2.64583;stroke-dasharray:none;stroke-opacity:1"
+         x="1.0973707"
+         y="7.4717784"
+         id="tspan21" /><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.52778px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#ffd82d;fill-opacity:1;stroke:none;stroke-width:2.64583;stroke-dasharray:none;stroke-opacity:1"
+         x="1.0973707"
+         y="11.881504"
+         id="tspan5" /></text>
+    <path
+       sodipodi:type="star"
+       style="fill:none;stroke:#ff0000;stroke-width:1.85208333;stroke-linecap:round;stroke-dashoffset:0.999999;fill-opacity:1;stroke-opacity:1;stroke-dasharray:none"
+       id="path1"
+       inkscape:flatsided="false"
+       sodipodi:sides="3"
+       sodipodi:cx="6.614583"
+       sodipodi:cy="10.318749"
+       sodipodi:r1="1.3491155"
+       sodipodi:r2="0.67455775"
+       sodipodi:arg1="0.19739556"
+       sodipodi:arg2="1.2445931"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 7.9374996,10.583333 6.8307442,10.957735 5.7239889,11.332137 5.9531247,10.186458 6.1822606,9.0407784 7.0598801,9.8120556 Z"
+       inkscape:transform-center-x="-0.31743314"
+       inkscape:transform-center-y="-0.022695473"
+       transform="rotate(-9.381855,2.0216875,32.516418)" />
+  </g>
+</svg>

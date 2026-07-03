@@ -504,7 +504,7 @@ class PulsarMainWindow(QMainWindow):
         self._toolbar_text_action.triggered.connect(self._sch_add_text)
         tb.addAction(self._toolbar_text_action)
 
-        self._toolbar_node_label_action = QAction(QIcon(str(icons / "icons8-add-tag-50.ico")), "Добавить метку узла", self)
+        self._toolbar_node_label_action = QAction(QIcon(str(icons / "icon_pulsar" / "node_label.svg")), "Добавить метку узла", self)
         self._toolbar_node_label_action.setEnabled(False)
         self._toolbar_node_label_action.triggered.connect(self._sch_add_node_label)
         tb.addAction(self._toolbar_node_label_action)
@@ -519,7 +519,7 @@ class PulsarMainWindow(QMainWindow):
         self._toolbar_netlist_action.triggered.connect(self._view_netlist_dialog)
         tb.addAction(self._toolbar_netlist_action)
 
-        self._net_numbers_action = QAction(QIcon(str(icons / "icons8-location-pin-24.ico")), "Узлы", self)
+        self._net_numbers_action = QAction(QIcon(str(icons / "icon_pulsar" / "node.svg")), "Узлы", self)
         self._net_numbers_action.setCheckable(True)
         self._net_numbers_action.setEnabled(False)
         self._net_numbers_action.triggered.connect(self._toggle_net_numbers)
