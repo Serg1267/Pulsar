@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="50"
+   height="50"
+   viewBox="0 0 13.229166 13.229167"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   sodipodi:docname="gnd_50.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="11.04"
+     inkscape:cx="25.13587"
+     inkscape:cy="25"
+     inkscape:window-width="1241"
+     inkscape:window-height="761"
+     inkscape:window-x="52"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     showguides="true">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="0.26458332"
+       spacingy="0.26458334"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Слой 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#eddc00;stroke:#fcdf1c;stroke-width:0.99999999;stroke-dasharray:none;paint-order:markers fill stroke"
+       d="M 6.6145832,0.52916632 V 7.9375002"
+       id="path1" />
+    <path
+       style="fill:#eddc00;stroke:#fcdf1c;stroke-width:1;stroke-dasharray:none;paint-order:markers fill stroke"
+       d="M 1.3229166,7.9375002 H 11.90625"
+       id="path2" />
+    <path
+       style="fill:#eddc00;stroke:#fcdf1c;stroke-width:0.99999999;stroke-dasharray:none;paint-order:markers fill stroke"
+       d="M 2.6458333,9.7895836 H 10.583333"
+       id="path2-7" />
+    <path
+       style="fill:#eddc00;stroke:#fcdf1c;stroke-width:0.99999999;stroke-dasharray:none;paint-order:markers fill stroke"
+       d="M 4.4979166,11.641667 H 8.7312499"
+       id="path2-7-2" />
+  </g>
+</svg>
