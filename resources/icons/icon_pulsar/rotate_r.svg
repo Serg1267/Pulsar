@@ -4,7 +4,7 @@
 <svg
    width="48"
    height="48"
-   viewBox="0 0 12.7 12.7"
+   viewBox="0 0 12.699999 12.7"
    version="1.1"
    id="svg1"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
@@ -25,12 +25,12 @@
      inkscape:document-units="px"
      showgrid="true"
      inkscape:zoom="11.5"
-     inkscape:cx="24.043478"
-     inkscape:cy="24"
-     inkscape:window-width="1241"
+     inkscape:cx="27.608696"
+     inkscape:cy="25.826087"
+     inkscape:window-width="1601"
      inkscape:window-height="761"
-     inkscape:window-x="-5"
-     inkscape:window-y="-5"
+     inkscape:window-x="93"
+     inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1">
     <inkscape:grid
@@ -59,8 +59,23 @@
        d="M 1.8520825,9.6080893 H 11.641666 L 1.8520825,4.5810075 Z"
        id="path6" />
     <path
-       style="fill:none;stroke:#94d82d;stroke-width:0.52916667;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+       style="fill:none;stroke:#94d82d;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
        d="M 7.1499041,10.77098 V 0.98139638 L 2.1228212,10.77098 Z"
        id="path6-7" />
+    <g
+       id="g7">
+      <path
+         style="fill:#ffd82d;fill-opacity:1;stroke:#ffd82d;stroke-width:0.79374997;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         d="M 10.583333,4.4979163 V 2.1166664"
+         id="path5" />
+      <path
+         style="fill:#ffd82d;fill-opacity:1;stroke:#ffd82d;stroke-width:0.79374997;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+         d="M 10.566796,2.1166665 H 8.4832033"
+         id="path7" />
+      <path
+         style="fill:none;fill-opacity:1;stroke:#ffd82d;stroke-width:0.746259;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         d="M 10.647939,7.6819576 9.1863281,4.6064624 h 2.9232209 z"
+         id="path4" />
+    </g>
   </g>
 </svg>

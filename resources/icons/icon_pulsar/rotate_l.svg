@@ -24,13 +24,13 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      showgrid="true"
-     inkscape:zoom="11.5"
-     inkscape:cx="24.086957"
-     inkscape:cy="24"
+     inkscape:zoom="8.131728"
+     inkscape:cx="24.041631"
+     inkscape:cy="23.980143"
      inkscape:window-width="1241"
      inkscape:window-height="761"
-     inkscape:window-x="20"
-     inkscape:window-y="0"
+     inkscape:window-x="56"
+     inkscape:window-y="19"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1">
     <inkscape:grid
@@ -62,5 +62,21 @@
        style="fill:none;stroke:#94d82d;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
        d="M 5.5562496,10.847916 V 1.0583323 l 5.0270834,9.7895837 z"
        id="path6-7" />
+    <g
+       id="g7"
+       transform="matrix(-1,0,0,1,12.764605,-0.10854597)">
+      <path
+         style="fill:#ffd82d;fill-opacity:1;stroke:#ffd82d;stroke-width:0.79375;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         d="M 10.583333,4.4979163 V 2.1166664"
+         id="path5" />
+      <path
+         style="fill:#ffd82d;fill-opacity:1;stroke:#ffd82d;stroke-width:0.79375;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+         d="M 10.566796,2.1166665 H 8.4832033"
+         id="path7" />
+      <path
+         style="fill:none;fill-opacity:1;stroke:#ffd82d;stroke-width:0.746259;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         d="M 10.647939,7.6819576 9.1863281,4.6064624 h 2.9232209 z"
+         id="path4" />
+    </g>
   </g>
 </svg>
