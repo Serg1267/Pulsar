@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="50"
+   height="50"
+   viewBox="0 0 13.229166 13.229167"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   sodipodi:docname="capasitor_50.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="11.04"
+     inkscape:cx="25.04529"
+     inkscape:cy="24.95471"
+     inkscape:window-width="1601"
+     inkscape:window-height="762"
+     inkscape:window-x="22"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     showguides="true">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="0.26458332"
+       spacingy="0.26458334"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Слой 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:none;stroke:#fcdf1c;stroke-width:1.36158;stroke-dasharray:none;stroke-opacity:1"
+       d="M 8.8960854,6.6620426 13.272355,6.6390212"
+       id="path1" />
+    <path
+       style="fill:none;stroke:#fcdf1c;stroke-width:1.38458;stroke-dasharray:none;stroke-opacity:1"
+       d="M 4.2659269,6.6385492 H 0"
+       id="path2" />
+    <path
+       style="fill:none;stroke:#fcdf1c;stroke-width:1.05833"
+       d="m 4.7011472,2.6602129 0.023966,7.9566731"
+       id="path3" />
+    <path
+       style="fill:none;stroke:#fcdf1c;stroke-width:1.05833"
+       d="M 8.4379075,2.5883152 8.4858394,10.59292"
+       id="path4" />
+  </g>
+</svg>
