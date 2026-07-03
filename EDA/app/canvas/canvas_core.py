@@ -65,7 +65,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
 
         # --- Курсоры ---
         self._load_cursors()
-        self._hand_cursor = QCursor(Qt.CursorShape.OpenHandCursor)
+        self._hand_cursor = QCursor(Qt.CursorShape.ClosedHandCursor)
 
         # --- Сцена, центрированная вокруг (0, 0) ---
 
@@ -764,6 +764,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                     scene_pos.x() - item.pos().x(),
                     scene_pos.y() - item.pos().y(),
                 )
+                self.setCursor(Qt.CursorShape.ClosedHandCursor)
                 event.accept()
                 return
             if isinstance(item, LabelItem):
@@ -809,6 +810,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                 for drag_item in self._drag_items:
                     if isinstance(drag_item, ComponentGraphicsItem):
                         self._update_live_pins(drag_item)
+                self.setCursor(Qt.CursorShape.ClosedHandCursor)
                 event.accept()
                 return
             if isinstance(item, WireItem):
@@ -874,6 +876,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                     scene_pos.x() - item.pos().x(),
                     scene_pos.y() - item.pos().y(),
                 )
+                self.setCursor(Qt.CursorShape.ClosedHandCursor)
                 event.accept()
                 return
             if isinstance(item, TextItem):
@@ -888,6 +891,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                     scene_pos.x() - item.pos().x(),
                     scene_pos.y() - item.pos().y(),
                 )
+                self.setCursor(Qt.CursorShape.ClosedHandCursor)
                 event.accept()
                 return
             if isinstance(item, RectangleItem):
@@ -906,6 +910,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                         scene_pos.x() - item.pos().x(),
                         scene_pos.y() - item.pos().y(),
                     )
+                    self.setCursor(Qt.CursorShape.ClosedHandCursor)
                 event.accept()
                 return
             if isinstance(item, CircleItem):
@@ -924,6 +929,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                         scene_pos.x() - item.pos().x(),
                         scene_pos.y() - item.pos().y(),
                     )
+                    self.setCursor(Qt.CursorShape.ClosedHandCursor)
                 event.accept()
                 return
             # На пустом месте — начинаем rubber band
@@ -1210,6 +1216,8 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
 
         # --- Перетаскивание группы компонентов ---
         if (event.buttons() & Qt.MouseButton.LeftButton) and self._drag_primary:
+            if self.cursor().shape() != Qt.CursorShape.ClosedHandCursor:
+                self.setCursor(Qt.CursorShape.ClosedHandCursor)
             scene_pos = self.mapToScene(event.pos())
             primary = self._drag_primary
             if isinstance(primary, (DirectiveItem, NetLabelItem, TextItem, RectangleItem, CircleItem)):
@@ -1472,7 +1480,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
             sy = round(scene_pos.y() / g) * g
             self._show_crosshair(QPointF(sx, sy))
 
-        # --- Курсор при наведении на узлы прямоугольника / окружности ---
+        # --- Курсор при наведении ---
         if not (event.buttons() & Qt.MouseButton.LeftButton):
             if self._wire_draw_mode or self._wire_mode or self._rect_placement or self._circle_placement:
                 self.setCursor(self._pencil_cursor)
@@ -1487,7 +1495,11 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                             hovered = True
                             break
                 if not hovered:
-                    self.unsetCursor()
+                    item_under = self.itemAt(event.pos())
+                    if isinstance(item_under, (ComponentGraphicsItem, NetLabelItem, DirectiveItem, TextItem, LabelItem)):
+                        self.setCursor(Qt.CursorShape.PointingHandCursor)
+                    else:
+                        self.unsetCursor()
 
         event.accept()
 
@@ -1598,6 +1610,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                 self._drag_items.clear()
                 self._drag_junctions.clear()
                 self._drag_primary = None
+                self.unsetCursor()
                 self.modified.emit()
                 event.accept()
                 return

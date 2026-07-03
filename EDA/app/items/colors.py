@@ -5,8 +5,8 @@ GREEN = "#00ee00"
 WHITE = "#ffffff"
 RED = "#ff0000"
 
-_BODY_LINE_WIDTH = 1.0
-_LEAD_LINE_WIDTH = 1.0
+_BODY_LINE_WIDTH = 1.5
+_LEAD_LINE_WIDTH = 1.5
 
 _is_light = False
 

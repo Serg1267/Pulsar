@@ -484,13 +484,13 @@ class PulsarMainWindow(QMainWindow):
         self._jump_mirror_action.triggered.connect(self._rotate_selected_right)
         tb.addAction(self._jump_mirror_action)
 
-        self._flip_h_action = QAction(QIcon(str(icons / "icon-flip-h.ico")), "Отразить по горизонтали…", self)
+        self._flip_h_action = QAction(QIcon(str(icons / "icon_pulsar" / "rotate_h.svg")), "Отразить по горизонтали…", self)
         self._flip_h_action.setToolTip("Отразить выделенный компонент по горизонтали (X)")
         self._flip_h_action.setEnabled(False)
         self._flip_h_action.triggered.connect(self._flip_selected_h)
         tb.addAction(self._flip_h_action)
 
-        self._flip_v_action = QAction(QIcon(str(icons / "icon-flip-v.ico")), "Отразить по вертикали…", self)
+        self._flip_v_action = QAction(QIcon(str(icons / "icon_pulsar" / "rotate_v.svg")), "Отразить по вертикали…", self)
         self._flip_v_action.setToolTip("Отразить выделенный компонент по вертикали (Y)")
         self._flip_v_action.setEnabled(False)
         self._flip_v_action.triggered.connect(self._flip_selected_v)
