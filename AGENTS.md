@@ -244,6 +244,7 @@ python3 -m pytest -x --tb=short           # остановиться на пер
 - Стиль приложения: `Fusion`.
 - Шрифт редактора по умолчанию: `Monospace`, размер 14.
 - Запуск: экран-заставка (2с) из `resources/images/splash.png`, затем главное окно.
+- **Использовать context7** активно: перед изменениями в незнакомых модулях (PySide6, matplotlib, ngspice, PyInstaller) — запрашивать документацию через context7. Не нужен для тривиальных правок (строка QAction, setEnabled, reorder).
 
 ## Удалено / Устарело
 
