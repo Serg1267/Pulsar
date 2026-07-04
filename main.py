@@ -332,11 +332,18 @@ class PulsarMainWindow(QMainWindow):
         help_menu.addAction(about_action)
 
     def _show_about(self):
-        QMessageBox.about(self, "О программе Pulsar",
-            "Pulsar — редактор принципиальных схем и SPICE-симулятор.\n\n"
-            "Основан на PySide6, matplotlib и ngspice.\n"
-            "Версия 0.9.0\n\n"
-            "Иконки: https://icons8.com")
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Icon.Information)
+        box.setWindowTitle("О программе Pulsar")
+        box.setText("Pulsar — редактор принципиальных схем и SPICE-симулятор.\n\n"
+                     "Основан на PySide6, matplotlib и ngspice.\n"
+                     "Версия 0.9.0\n\n"
+                     "Иконки: https://icons8.com")
+        box.setStyleSheet("QMessageBox { background: white; color: black; }"
+                          "QLabel { color: black; }"
+                          "QPushButton { background: #e0e0e0; color: black; border: 1px solid #999; padding: 4px 12px; }"
+                          "QPushButton:hover { background: #d0d0d0; }")
+        box.exec()
 
     def _create_toolbar(self):
         from PySide6.QtWidgets import QToolBar
