@@ -548,7 +548,7 @@ class PulsarMainWindow(QMainWindow):
         self._wire_mode_action.triggered.connect(self._toggle_wire_mode)
         tb2.addAction(self._wire_mode_action)
 
-        self._toolbar_text_action = QAction(_text_icon("T"), "Добавить текст", self)
+        self._toolbar_text_action = QAction(QIcon(str(icons / "icon_pulsar" / "text.svg")), "Добавить текст", self)
         self._toolbar_text_action.setEnabled(False)
         self._toolbar_text_action.triggered.connect(self._sch_add_text)
         tb2.addAction(self._toolbar_text_action)
