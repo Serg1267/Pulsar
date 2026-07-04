@@ -397,14 +397,14 @@ class PulsarMainWindow(QMainWindow):
         _dot_sep()
 
         self._zoom_in_action = QAction(QIcon(str(icons / "icon_pulsar" / "zoom_in.svg")), "Увеличить (+)", self)
-        self._zoom_in_action.setToolTip("Увеличить масштаб (Ctrl+=)")
-        self._zoom_in_action.setShortcut("Ctrl+=")
+        self._zoom_in_action.setToolTip("Увеличить масштаб (+)")
+        self._zoom_in_action.setShortcut("+")
         self._zoom_in_action.triggered.connect(self._zoom_in)
         tb.addAction(self._zoom_in_action)
 
         self._zoom_out_action = QAction(QIcon(str(icons / "icon_pulsar" / "zoom_out.svg")), "Уменьшить (−)", self)
-        self._zoom_out_action.setToolTip("Уменьшить масштаб (Ctrl+-)")
-        self._zoom_out_action.setShortcut("Ctrl+-")
+        self._zoom_out_action.setToolTip("Уменьшить масштаб (-)")
+        self._zoom_out_action.setShortcut("-")
         self._zoom_out_action.triggered.connect(self._zoom_out)
         tb.addAction(self._zoom_out_action)
 
