@@ -340,15 +340,10 @@ class PulsarMainWindow(QMainWindow):
 
     def _create_toolbar(self):
         from PySide6.QtWidgets import QToolBar
-        from PySide6.QtGui import QIcon
+        from PySide6.QtGui import QIcon, QPixmap, QPainter, QColor, QFont
         from PySide6.QtCore import QSize
 
         icons = Path(__file__).parent / "resources" / "icons"
-
-        tb = QToolBar("Инструменты")
-        tb.setIconSize(QSize(24, 24))
-        tb.setMovable(False)
-        self.addToolBar(tb)
 
         class DotSep(QWidget):
             def __init__(self, parent=None):
@@ -361,6 +356,27 @@ class PulsarMainWindow(QMainWindow):
                 for y in range(3, 24, 6):
                     p.drawPoint(5, y)
                 p.end()
+
+        def _text_icon(text, color="#2a4a8a"):
+            """Заглушка: иконка с текстом (符号/буква)."""
+            pm = QPixmap(24, 24)
+            pm.fill(QColor("transparent"))
+            p = QPainter(pm)
+            p.setRenderHint(QPainter.RenderHint.Antialiasing)
+            p.setPen(QColor(color))
+            font = QFont("Monospace", 16, QFont.Weight.Bold)
+            p.setFont(font)
+            p.drawText(pm.rect(), Qt.AlignmentFlag.AlignCenter, text)
+            p.end()
+            return QIcon(pm)
+
+        # ══════════════════════════════════════════════════════════
+        # Тулбар 1: Файл и симуляция
+        # ══════════════════════════════════════════════════════════
+        tb = QToolBar("Файл и симуляция")
+        tb.setIconSize(QSize(24, 24))
+        tb.setMovable(False)
+        self.addToolBar(tb)
 
         def _dot_sep():
             tb.addWidget(DotSep())
@@ -378,154 +394,28 @@ class PulsarMainWindow(QMainWindow):
         self._save_action.setIcon(QIcon(str(icons / "gschem-save.png")))
         tb.addAction(self._save_action)
 
-        self._wire_mode_action = QAction(QIcon(str(icons / "icons8-ball-point-pen-50.ico")), "Нарисовать провод", self)
-        self._wire_mode_action.setCheckable(True)
-        self._wire_mode_action.setEnabled(False)
-        self._wire_mode_action.triggered.connect(self._toggle_wire_mode)
+        _dot_sep()
+
+        self._zoom_in_action = QAction(_text_icon("+"), "Увеличить (+)", self)
+        self._zoom_in_action.setToolTip("Увеличить масштаб (Ctrl+=)")
+        self._zoom_in_action.setShortcut("Ctrl+=")
+        self._zoom_in_action.triggered.connect(self._zoom_in)
+        tb.addAction(self._zoom_in_action)
+
+        self._zoom_out_action = QAction(_text_icon("−"), "Уменьшить (−)", self)
+        self._zoom_out_action.setToolTip("Уменьшить масштаб (Ctrl+-)")
+        self._zoom_out_action.setShortcut("Ctrl+-")
+        self._zoom_out_action.triggered.connect(self._zoom_out)
+        tb.addAction(self._zoom_out_action)
+
+        self._zoom_fit_action = QAction(_text_icon("⊡"), "Уместить в окне (F12)", self)
+        self._zoom_fit_action.setToolTip("Уместить схему в окне (F12)")
+        self._zoom_fit_action.setShortcut("F12")
+        self._zoom_fit_action.triggered.connect(self._zoom_fit)
+        tb.addAction(self._zoom_fit_action)
 
         _dot_sep()
 
-        self._rect_action = QAction(QIcon(str(icons / "icon_pulsar" / "rectangle.svg")), "Прямоугольник", self)
-        self._rect_action.setCheckable(True)
-        self._rect_action.setEnabled(False)
-        self._rect_action.triggered.connect(self._toggle_rect_mode)
-        tb.addAction(self._rect_action)
-
-        self._circle_action = QAction(QIcon(str(icons / "icon_pulsar" / "circle.svg")), "Окружность", self)
-        self._circle_action.setCheckable(True)
-        self._circle_action.setEnabled(False)
-        self._circle_action.triggered.connect(self._toggle_circle_mode)
-        tb.addAction(self._circle_action)
-
-        _dot_sep()
-
-        # ── Быстрое размещение компонентов ──
-        self._comp_actions = []
-
-        def _make_comp_action(sym_id, icon_name, tooltip):
-            ico = QIcon()
-            ico.addPixmap(QPixmap(str(icons / f"{icon_name}.png")), QIcon.Mode.Normal)
-            ico.addPixmap(QPixmap(str(icons / f"{icon_name}_dim.png")), QIcon.Mode.Disabled)
-            act = QAction(ico, tooltip, self)
-            act.setEnabled(False)
-            act.triggered.connect(lambda checked, sid=sym_id: self._start_comp_placement(sid))
-            tb.addAction(act)
-            self._comp_actions.append(act)
-
-        ico_r = QIcon(str(icons / "icon_pulsar" / "resistor_50.svg"))
-        act_r = QAction(ico_r, "Резистор (R)", self)
-        act_r.setEnabled(False)
-        act_r.triggered.connect(lambda: self._start_comp_placement("resistor-2"))
-        tb.addAction(act_r)
-        self._comp_actions.append(act_r)
-        ico_c = QIcon(str(icons / "icon_pulsar" / "capasitor_50.svg"))
-        act_c = QAction(ico_c, "Конденсатор (C)", self)
-        act_c.setEnabled(False)
-        act_c.triggered.connect(lambda: self._start_comp_placement("capacitor-1"))
-        tb.addAction(act_c)
-        self._comp_actions.append(act_c)
-        ico_l = QIcon(str(icons / "icon_pulsar" / "inductor_50.svg"))
-        act_l = QAction(ico_l, "Индуктивность (L)", self)
-        act_l.setEnabled(False)
-        act_l.triggered.connect(lambda: self._start_comp_placement("inductor-1"))
-        tb.addAction(act_l)
-        self._comp_actions.append(act_l)
-        # Транзистор из .ico
-        ico_t = QIcon(str(icons / "icon_pulsar" / "transistor_50.svg"))
-        act_t = QAction(ico_t, "Транзистор (Q)", self)
-        act_t.setEnabled(False)
-        act_t.triggered.connect(lambda: self._start_comp_placement("npn-1"))
-        tb.addAction(act_t)
-        self._comp_actions.append(act_t)
-        ico_d = QIcon(str(icons / "icon_pulsar" / "diode_50.svg"))
-        act_d = QAction(ico_d, "Диод (D)", self)
-        act_d.setEnabled(False)
-        act_d.triggered.connect(lambda: self._start_comp_placement("diode-1"))
-        tb.addAction(act_d)
-        self._comp_actions.append(act_d)
-        ico_tf = QIcon(str(icons / "icon_pulsar" / "transformer_50.svg"))
-        act_tf = QAction(ico_tf, "Трансформатор", self)
-        act_tf.setEnabled(False)
-        act_tf.triggered.connect(lambda: self._start_comp_placement("transformer-1"))
-        tb.addAction(act_tf)
-        self._comp_actions.append(act_tf)
-        ico_g = QIcon(str(icons / "icon_pulsar" / "gnd_50.svg"))
-        act_g = QAction(ico_g, "Земля (G)", self)
-        act_g.setEnabled(False)
-        act_g.triggered.connect(lambda: self._start_comp_placement("gnd-1"))
-        tb.addAction(act_g)
-        self._comp_actions.append(act_g)
-
-        ico_el = QIcon(str(icons / "icon_pulsar" / "data_base.svg"))
-        act_el = QAction(ico_el, "Компоненты…", self)
-        act_el.setEnabled(False)
-        act_el.triggered.connect(self._sch_add_component)
-        tb.addAction(act_el)
-        self._comp_actions.append(act_el)
-
-        _dot_sep()
-
-        def _icon_with_dim(name):
-            """QIcon: Normal=red, Disabled=dim"""
-            ico = QIcon()
-            ico.addPixmap(QPixmap(str(icons / f"{name}.png")), QIcon.Mode.Normal)
-            ico.addPixmap(QPixmap(str(icons / f"{name}_dim.png")), QIcon.Mode.Disabled)
-            return ico
-
-        self._jump_action = QAction(QIcon(str(icons / "icon_pulsar" / "rotate_l.svg")), "Повернуть влево…", self)
-        self._jump_action.setToolTip("Повернуть выделенный компонент влево на 90°")
-        self._jump_action.setEnabled(False)
-        self._jump_action.triggered.connect(self._rotate_selected_left)
-        tb.addAction(self._jump_action)
-
-        self._jump_mirror_action = QAction(QIcon(str(icons / "icon_pulsar" / "rotate_r.svg")), "Повернуть вправо…", self)
-        self._jump_mirror_action.setToolTip("Повернуть выделенный компонент вправо на 90°")
-        self._jump_mirror_action.setEnabled(False)
-        self._jump_mirror_action.triggered.connect(self._rotate_selected_right)
-        tb.addAction(self._jump_mirror_action)
-
-        self._flip_h_action = QAction(QIcon(str(icons / "icon_pulsar" / "rotate_h.svg")), "Отразить по горизонтали…", self)
-        self._flip_h_action.setToolTip("Отразить выделенный компонент по горизонтали (X)")
-        self._flip_h_action.setEnabled(False)
-        self._flip_h_action.triggered.connect(self._flip_selected_h)
-        tb.addAction(self._flip_h_action)
-
-        self._flip_v_action = QAction(QIcon(str(icons / "icon_pulsar" / "rotate_v.svg")), "Отразить по вертикали…", self)
-        self._flip_v_action.setToolTip("Отразить выделенный компонент по вертикали (Y)")
-        self._flip_v_action.setEnabled(False)
-        self._flip_v_action.triggered.connect(self._flip_selected_v)
-        tb.addAction(self._flip_v_action)
-
-        _dot_sep()
-        tb.addAction(self._wire_mode_action)
-
-        self._toolbar_text_action = QAction(QIcon(str(icons / "icons8-type-50.ico")), "Добавить текст", self)
-        self._toolbar_text_action.setEnabled(False)
-        self._toolbar_text_action.triggered.connect(self._sch_add_text)
-        tb.addAction(self._toolbar_text_action)
-
-        self._toolbar_node_label_action = QAction(QIcon(str(icons / "icon_pulsar" / "node_label.svg")), "Добавить метку узла", self)
-        self._toolbar_node_label_action.setEnabled(False)
-        self._toolbar_node_label_action.triggered.connect(self._sch_add_node_label)
-        tb.addAction(self._toolbar_node_label_action)
-
-        self._toolbar_code_file_action = QAction(QIcon(str(icons / "icon_pulsar" / "spice_direktive.svg")), ".SPICE директива", self)
-        self._toolbar_code_file_action.setEnabled(False)
-        self._toolbar_code_file_action.triggered.connect(self._sch_add_directive)
-        tb.addAction(self._toolbar_code_file_action)
-
-        self._toolbar_netlist_action = QAction(QIcon(str(icons / "icons8-file-preview-50.ico")), "Просмотр SPICE netlist", self)
-        self._toolbar_netlist_action.setEnabled(False)
-        self._toolbar_netlist_action.triggered.connect(self._view_netlist_dialog)
-        tb.addAction(self._toolbar_netlist_action)
-
-        self._net_numbers_action = QAction(QIcon(str(icons / "icon_pulsar" / "node.svg")), "Узлы", self)
-        self._net_numbers_action.setCheckable(True)
-        self._net_numbers_action.setEnabled(False)
-        self._net_numbers_action.triggered.connect(self._toggle_net_numbers)
-        tb.addAction(self._net_numbers_action)
-
-        _dot_sep()
         self._toolbar_run_action = QAction(QIcon(str(icons / "icons8-shutdown-50.ico")), "Пуск", self)
         self._toolbar_run_action.setEnabled(False)
         self._toolbar_run_action.triggered.connect(self._sch_run_simulation)
@@ -535,6 +425,164 @@ class PulsarMainWindow(QMainWindow):
         self._toolbar_stop_action.setEnabled(False)
         self._toolbar_stop_action.triggered.connect(self._stop_simulation)
         tb.addAction(self._toolbar_stop_action)
+
+        # ══════════════════════════════════════════════════════════
+        # Тулбар 2: Инструменты схемы
+        # ══════════════════════════════════════════════════════════
+        self.addToolBarBreak()
+        tb2 = QToolBar("Инструменты схемы")
+        tb2.setIconSize(QSize(24, 24))
+        tb2.setMovable(False)
+        self.addToolBar(tb2)
+
+        def _dot_sep2():
+            tb2.addWidget(DotSep())
+
+        self._rect_action = QAction(QIcon(str(icons / "icon_pulsar" / "rectangle.svg")), "Прямоугольник", self)
+        self._rect_action.setCheckable(True)
+        self._rect_action.setEnabled(False)
+        self._rect_action.triggered.connect(self._toggle_rect_mode)
+        tb2.addAction(self._rect_action)
+
+        self._circle_action = QAction(QIcon(str(icons / "icon_pulsar" / "circle.svg")), "Окружность", self)
+        self._circle_action.setCheckable(True)
+        self._circle_action.setEnabled(False)
+        self._circle_action.triggered.connect(self._toggle_circle_mode)
+        tb2.addAction(self._circle_action)
+
+        _dot_sep2()
+
+        self._comp_actions = []
+
+        ico_r = QIcon(str(icons / "icon_pulsar" / "resistor_50.svg"))
+        act_r = QAction(ico_r, "Резистор (R)", self)
+        act_r.setEnabled(False)
+        act_r.triggered.connect(lambda: self._start_comp_placement("resistor-2"))
+        tb2.addAction(act_r)
+        self._comp_actions.append(act_r)
+        ico_c = QIcon(str(icons / "icon_pulsar" / "capasitor_50.svg"))
+        act_c = QAction(ico_c, "Конденсатор (C)", self)
+        act_c.setEnabled(False)
+        act_c.triggered.connect(lambda: self._start_comp_placement("capacitor-1"))
+        tb2.addAction(act_c)
+        self._comp_actions.append(act_c)
+        ico_l = QIcon(str(icons / "icon_pulsar" / "inductor_50.svg"))
+        act_l = QAction(ico_l, "Индуктивность (L)", self)
+        act_l.setEnabled(False)
+        act_l.triggered.connect(lambda: self._start_comp_placement("inductor-1"))
+        tb2.addAction(act_l)
+        self._comp_actions.append(act_l)
+        ico_t = QIcon(str(icons / "icon_pulsar" / "transistor_50.svg"))
+        act_t = QAction(ico_t, "Транзистор (Q)", self)
+        act_t.setEnabled(False)
+        act_t.triggered.connect(lambda: self._start_comp_placement("npn-1"))
+        tb2.addAction(act_t)
+        self._comp_actions.append(act_t)
+        ico_d = QIcon(str(icons / "icon_pulsar" / "diode_50.svg"))
+        act_d = QAction(ico_d, "Диод (D)", self)
+        act_d.setEnabled(False)
+        act_d.triggered.connect(lambda: self._start_comp_placement("diode-1"))
+        tb2.addAction(act_d)
+        self._comp_actions.append(act_d)
+        ico_tf = QIcon(str(icons / "icon_pulsar" / "transformer_50.svg"))
+        act_tf = QAction(ico_tf, "Трансформатор", self)
+        act_tf.setEnabled(False)
+        act_tf.triggered.connect(lambda: self._start_comp_placement("transformer-1"))
+        tb2.addAction(act_tf)
+        self._comp_actions.append(act_tf)
+        ico_g = QIcon(str(icons / "icon_pulsar" / "gnd_50.svg"))
+        act_g = QAction(ico_g, "Земля (G)", self)
+        act_g.setEnabled(False)
+        act_g.triggered.connect(lambda: self._start_comp_placement("gnd-1"))
+        tb2.addAction(act_g)
+        self._comp_actions.append(act_g)
+
+        ico_el = QIcon(str(icons / "icon_pulsar" / "data_base.svg"))
+        act_el = QAction(ico_el, "Компоненты…", self)
+        act_el.setEnabled(False)
+        act_el.triggered.connect(self._sch_add_component)
+        tb2.addAction(act_el)
+        self._comp_actions.append(act_el)
+
+        _dot_sep2()
+
+        self._jump_action = QAction(QIcon(str(icons / "icon_pulsar" / "rotate_l.svg")), "Повернуть влево…", self)
+        self._jump_action.setToolTip("Повернуть выделенный компонент влево на 90°")
+        self._jump_action.setEnabled(False)
+        self._jump_action.triggered.connect(self._rotate_selected_left)
+        tb2.addAction(self._jump_action)
+
+        self._jump_mirror_action = QAction(QIcon(str(icons / "icon_pulsar" / "rotate_r.svg")), "Повернуть вправо…", self)
+        self._jump_mirror_action.setToolTip("Повернуть выделенный компонент вправо на 90°")
+        self._jump_mirror_action.setEnabled(False)
+        self._jump_mirror_action.triggered.connect(self._rotate_selected_right)
+        tb2.addAction(self._jump_mirror_action)
+
+        self._flip_h_action = QAction(QIcon(str(icons / "icon_pulsar" / "rotate_h.svg")), "Отразить по горизонтали…", self)
+        self._flip_h_action.setToolTip("Отразить выделенный компонент по горизонтали (X)")
+        self._flip_h_action.setEnabled(False)
+        self._flip_h_action.triggered.connect(self._flip_selected_h)
+        tb2.addAction(self._flip_h_action)
+
+        self._flip_v_action = QAction(QIcon(str(icons / "icon_pulsar" / "rotate_v.svg")), "Отразить по вертикали…", self)
+        self._flip_v_action.setToolTip("Отразить выделенный компонент по вертикали (Y)")
+        self._flip_v_action.setEnabled(False)
+        self._flip_v_action.triggered.connect(self._flip_selected_v)
+        tb2.addAction(self._flip_v_action)
+
+        _dot_sep2()
+
+        self._wire_mode_action = QAction(QIcon(str(icons / "icons8-ball-point-pen-50.ico")), "Нарисовать провод", self)
+        self._wire_mode_action.setCheckable(True)
+        self._wire_mode_action.setEnabled(False)
+        self._wire_mode_action.triggered.connect(self._toggle_wire_mode)
+        tb2.addAction(self._wire_mode_action)
+
+        self._toolbar_text_action = QAction(_text_icon("T"), "Добавить текст", self)
+        self._toolbar_text_action.setEnabled(False)
+        self._toolbar_text_action.triggered.connect(self._sch_add_text)
+        tb2.addAction(self._toolbar_text_action)
+
+        self._toolbar_node_label_action = QAction(QIcon(str(icons / "icon_pulsar" / "node_label.svg")), "Добавить метку узла", self)
+        self._toolbar_node_label_action.setEnabled(False)
+        self._toolbar_node_label_action.triggered.connect(self._sch_add_node_label)
+        tb2.addAction(self._toolbar_node_label_action)
+
+        self._toolbar_code_file_action = QAction(QIcon(str(icons / "icon_pulsar" / "spice_direktive.svg")), ".SPICE директива", self)
+        self._toolbar_code_file_action.setEnabled(False)
+        self._toolbar_code_file_action.triggered.connect(self._sch_add_directive)
+        tb2.addAction(self._toolbar_code_file_action)
+
+        self._toolbar_netlist_action = QAction(_text_icon("≡"), "Просмотр SPICE netlist", self)
+        self._toolbar_netlist_action.setEnabled(False)
+        self._toolbar_netlist_action.triggered.connect(self._view_netlist_dialog)
+        tb2.addAction(self._toolbar_netlist_action)
+
+        self._net_numbers_action = QAction(QIcon(str(icons / "icon_pulsar" / "node.svg")), "Узлы", self)
+        self._net_numbers_action.setCheckable(True)
+        self._net_numbers_action.setEnabled(False)
+        self._net_numbers_action.triggered.connect(self._toggle_net_numbers)
+        tb2.addAction(self._net_numbers_action)
+
+    def _zoom_in(self):
+        canvas = self._tabs.current_canvas()
+        if canvas:
+            canvas._zoom = min(100.0, canvas._zoom * 1.3)
+            canvas._update_transform()
+
+    def _zoom_out(self):
+        canvas = self._tabs.current_canvas()
+        if canvas:
+            canvas._zoom = max(0.01, canvas._zoom / 1.3)
+            canvas._update_transform()
+
+    def _zoom_fit(self):
+        canvas = self._tabs.current_canvas()
+        if canvas:
+            items = canvas._scene.items()
+            if items:
+                rect = canvas._scene.itemsBoundingRect()
+                canvas.fitInView(rect, Qt.AspectRatioMode.KeepAspectRatio)
 
     def _update_jump_actions(self):
         canvas = self._tabs.current_canvas()
