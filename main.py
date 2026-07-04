@@ -1076,6 +1076,11 @@ class PulsarMainWindow(QMainWindow):
         from PySide6.QtWidgets import QFontComboBox, QSpinBox, QTextEdit
         dialog = QDialog(self)
         dialog.setWindowTitle("Добавить текст")
+        dialog.setStyleSheet("QDialog { background: #f0f0f0; color: black; }"
+                             "QLabel { color: black; }"
+                             "QComboBox, QSpinBox { background: white; color: black; }"
+                             "QPushButton { background: #e0e0e0; color: black; border: 1px solid #999; padding: 4px 12px; }"
+                             "QPushButton:hover { background: #d0d0d0; }")
         layout = QVBoxLayout(dialog)
         font_layout = QHBoxLayout()
         font_layout.addWidget(QLabel("Шрифт:"))
@@ -1090,6 +1095,7 @@ class PulsarMainWindow(QMainWindow):
         text_edit = QTextEdit()
         text_edit.setPlaceholderText("Введите текст…")
         text_edit.setMinimumHeight(100)
+        text_edit.setStyleSheet("QTextEdit { background: white; color: black; }")
         layout.addWidget(text_edit)
         btn_layout = QHBoxLayout()
         btn_cancel = QPushButton("Отмена")
