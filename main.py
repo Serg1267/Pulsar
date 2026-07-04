@@ -402,7 +402,7 @@ class PulsarMainWindow(QMainWindow):
         self._zoom_in_action.triggered.connect(self._zoom_in)
         tb.addAction(self._zoom_in_action)
 
-        self._zoom_out_action = QAction(_text_icon("−"), "Уменьшить (−)", self)
+        self._zoom_out_action = QAction(QIcon(str(icons / "icon_pulsar" / "zoom_out.svg")), "Уменьшить (−)", self)
         self._zoom_out_action.setToolTip("Уменьшить масштаб (Ctrl+-)")
         self._zoom_out_action.setShortcut("Ctrl+-")
         self._zoom_out_action.triggered.connect(self._zoom_out)
