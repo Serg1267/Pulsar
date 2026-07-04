@@ -563,7 +563,7 @@ class PulsarMainWindow(QMainWindow):
         self._toolbar_code_file_action.triggered.connect(self._sch_add_directive)
         tb2.addAction(self._toolbar_code_file_action)
 
-        self._toolbar_netlist_action = QAction(_text_icon("≡"), "Просмотр SPICE netlist", self)
+        self._toolbar_netlist_action = QAction(QIcon(str(icons / "icon_pulsar" / "view_spice.ico")), "Просмотр SPICE netlist", self)
         self._toolbar_netlist_action.setEnabled(False)
         self._toolbar_netlist_action.triggered.connect(self._view_netlist_dialog)
         tb2.addAction(self._toolbar_netlist_action)
