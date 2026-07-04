@@ -1,0 +1,55 @@
+site_name: Pulsar — Документация
+site_description: Руководство пользователя Pulsar — редактор принципиальных схем и SPICE-симулятор
+site_url: https://Serg1267.github.io/Pulsar/
+repo_url: https://github.com/Serg1267/Pulsar
+repo_name: Serg1267/Pulsar
+
+theme:
+  name: material
+  language: ru
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Тёмная тема
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Светлая тема
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+
+nav:
+  - Главная: index.md
+  - Быстрый старт:
+      - Установка: quick-start/01-install.md
+      - Первая схема: quick-start/02-first-schematic.md
+      - Первая симуляция: quick-start/03-first-simulation.md
+      - Просмотр графика: quick-start/04-view-graph.md
+      - Экспорт: quick-start/05-export.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Serg1267/Pulsar

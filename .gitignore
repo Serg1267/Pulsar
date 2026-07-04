@@ -13,3 +13,4 @@ kicad_*
 no_filename.*
 *.deb
 deb/usr/local/bin/pulsar
+site/
