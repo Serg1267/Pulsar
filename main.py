@@ -815,6 +815,20 @@ class PulsarMainWindow(QMainWindow):
         if editor:
             editor.redo()
 
+    def _update_undo_redo_actions(self):
+        canvas = self._tabs.current_canvas()
+        if canvas:
+            self._cir_undo_action.setEnabled(canvas.can_undo())
+            self._cir_redo_action.setEnabled(canvas.can_redo())
+        else:
+            editor = self._tabs.current_editor()
+            if editor:
+                self._cir_undo_action.setEnabled(editor.document().isUndoAvailable())
+                self._cir_redo_action.setEnabled(editor.document().isRedoAvailable())
+            else:
+                self._cir_undo_action.setEnabled(False)
+                self._cir_redo_action.setEnabled(False)
+
     def _edit_cut(self):
         canvas = self._tabs.current_canvas()
         if canvas:
@@ -859,6 +873,7 @@ class PulsarMainWindow(QMainWindow):
                 self._op_connected_canvas.modified.disconnect(self._on_dirty_changed)
                 self._op_connected_canvas.modified.disconnect(self._on_net_numbers_modified)
                 self._op_connected_canvas.selection_changed.disconnect(self._update_jump_actions)
+                self._op_connected_canvas.modified.disconnect(self._update_undo_redo_actions)
             except Exception:
                 pass
             self._op_connected_canvas = None
@@ -894,11 +909,14 @@ class PulsarMainWindow(QMainWindow):
                 self._op_connected_canvas = canvas
                 canvas.modified.connect(self._on_dirty_changed)
                 canvas.modified.connect(self._on_net_numbers_modified)
+                canvas.modified.connect(self._update_undo_redo_actions)
                 canvas.selection_changed.connect(self._update_jump_actions)
         elif is_cir:
             editor = self._tabs.current_editor()
             if editor is not None:
                 editor.textChanged.connect(self._on_dirty_changed)
+                editor.undoAvailable.connect(self._cir_undo_action.setEnabled)
+                editor.redoAvailable.connect(self._cir_redo_action.setEnabled)
                 self._dirty_connected_editor = editor
 
         # Сбросить показ узлов при переключении вкладки
@@ -907,6 +925,7 @@ class PulsarMainWindow(QMainWindow):
 
         self._update_save_actions(self._tabs.count() > 0)
         self._update_jump_actions()
+        self._update_undo_redo_actions()
 
         is_sch_now = self._tabs.current_page_type() == 'sch'
         self._sch_add_component_action.setEnabled(is_sch_now)
