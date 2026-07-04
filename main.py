@@ -408,7 +408,7 @@ class PulsarMainWindow(QMainWindow):
         self._zoom_out_action.triggered.connect(self._zoom_out)
         tb.addAction(self._zoom_out_action)
 
-        self._zoom_fit_action = QAction(_text_icon("⊡"), "Уместить в окне (F12)", self)
+        self._zoom_fit_action = QAction(QIcon(str(icons / "icon_pulsar" / "all_screen.svg")), "Уместить в окне (F12)", self)
         self._zoom_fit_action.setToolTip("Уместить схему в окне (F12)")
         self._zoom_fit_action.setShortcut("F12")
         self._zoom_fit_action.triggered.connect(self._zoom_fit)
