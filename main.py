@@ -385,13 +385,13 @@ class PulsarMainWindow(QMainWindow):
 
         _dot_sep()
 
-        self._rect_action = QAction(QIcon(str(icons / "insert-box.png")), "Прямоугольник", self)
+        self._rect_action = QAction(QIcon(str(icons / "icon_pulsar" / "rectangle.svg")), "Прямоугольник", self)
         self._rect_action.setCheckable(True)
         self._rect_action.setEnabled(False)
         self._rect_action.triggered.connect(self._toggle_rect_mode)
         tb.addAction(self._rect_action)
 
-        self._circle_action = QAction(QIcon(str(icons / "insert-circle.png")), "Окружность", self)
+        self._circle_action = QAction(QIcon(str(icons / "icon_pulsar" / "circle.svg")), "Окружность", self)
         self._circle_action.setCheckable(True)
         self._circle_action.setEnabled(False)
         self._circle_action.triggered.connect(self._toggle_circle_mode)
@@ -456,7 +456,7 @@ class PulsarMainWindow(QMainWindow):
         tb.addAction(act_g)
         self._comp_actions.append(act_g)
 
-        ico_el = QIcon(str(icons / "icons8-electronics-50.ico"))
+        ico_el = QIcon(str(icons / "icon_pulsar" / "data_base.svg"))
         act_el = QAction(ico_el, "Компоненты…", self)
         act_el.setEnabled(False)
         act_el.triggered.connect(self._sch_add_component)
@@ -509,7 +509,7 @@ class PulsarMainWindow(QMainWindow):
         self._toolbar_node_label_action.triggered.connect(self._sch_add_node_label)
         tb.addAction(self._toolbar_node_label_action)
 
-        self._toolbar_code_file_action = QAction(QIcon(str(icons / "icons8-code-file-50.ico")), ".SPICE директива", self)
+        self._toolbar_code_file_action = QAction(QIcon(str(icons / "icon_pulsar" / "spice_direktive.svg")), ".SPICE директива", self)
         self._toolbar_code_file_action.setEnabled(False)
         self._toolbar_code_file_action.triggered.connect(self._sch_add_directive)
         tb.addAction(self._toolbar_code_file_action)

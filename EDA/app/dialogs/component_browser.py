@@ -3,7 +3,7 @@ from typing import Optional
 
 from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLineEdit,
                                QTreeWidget, QTreeWidgetItem, QPushButton,
-                               QLabel, QSplitter, QTextEdit)
+                               QLabel)
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont
 
@@ -13,7 +13,6 @@ from EDA.core.library.library import ComponentLibrary, LIB_SYM_DIR
 class ComponentBrowser(QDialog):
     """Диалог выбора компонента из библиотеки .sym файлов."""
 
-    # Излучается при выборе: имя символа (id)
     symbol_selected = Signal(str)
 
     def __init__(self, library: ComponentLibrary, parent=None):
@@ -29,23 +28,43 @@ class ComponentBrowser(QDialog):
     def _build_ui(self):
         layout = QVBoxLayout(self)
 
-        # Поле поиска
+        self.setStyleSheet("""
+            QDialog { background: #f5f5f5; color: #1a1a1a; }
+            QLineEdit { background: #ffffff; color: #1a1a1a; border: 1px solid #c0c0c0;
+                         border-radius: 4px; padding: 4px 8px; font-size: 13px; }
+            QLineEdit:focus { border: 1px solid #4488cc; }
+            QTreeWidget {
+                background: #ffffff; color: #1a1a1a; border: 1px solid #c0c0c0;
+                font-size: 13px; outline: none;
+            }
+            QTreeWidget::item { padding: 3px 0; min-height: 22px; }
+            QTreeWidget::item:selected { background: #d0d8e8; color: #1a1a1a; }
+            QTreeWidget::item:hover { background: #e8ecf2; color: #1a1a1a; }
+            QTreeWidget::branch { background: #ffffff; }
+            QHeaderView::section { background: #e8e8e8; color: #1a1a1a; border: 1px solid #c0c0c0;
+                                   padding: 4px; font-weight: bold; }
+            QPushButton { background: #e8e8e8; color: #1a1a1a; border: 1px solid #c0c0c0;
+                          border-radius: 4px; padding: 5px 16px; font-size: 13px; }
+            QPushButton:hover { background: #d0d0d0; }
+            QPushButton:pressed { background: #b8b8b8; }
+            QPushButton:disabled { color: #999999; background: #f0f0f0; }
+            QLabel { color: #1a1a1a; font-size: 12px; }
+        """)
+
         self._search = QLineEdit()
         self._search.setPlaceholderText("Поиск компонента...")
         self._search.textChanged.connect(self._on_search)
         layout.addWidget(self._search)
 
-        # Дерево: категории -> символы
         self._tree = QTreeWidget()
         self._tree.setHeaderLabels(["Компонент", "Описание"])
         self._tree.header().setStretchLastSection(True)
         self._tree.setColumnWidth(0, 200)
-        self._tree.setAlternatingRowColors(True)
+        self._tree.setAlternatingRowColors(False)
         self._tree.itemClicked.connect(self._on_item_clicked)
         self._tree.itemDoubleClicked.connect(self._on_item_double_clicked)
         layout.addWidget(self._tree, stretch=1)
 
-        # Кнопки
         btn_layout = QHBoxLayout()
         btn_cancel = QPushButton("Отмена")
         btn_cancel.clicked.connect(self.reject)
@@ -60,7 +79,6 @@ class ComponentBrowser(QDialog):
 
         layout.addLayout(btn_layout)
 
-        # Информация о выбранном
         self._info = QLabel()
         self._info.setWordWrap(True)
         self._info.setVisible(False)
