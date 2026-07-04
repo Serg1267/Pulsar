@@ -2923,7 +2923,7 @@ def main():
     app.setApplicationVersion("0.9.0")
     app.setOrganizationName("Pulsar")
     app.setStyle("Fusion")
-    app.setWindowIcon(QIcon(str(Path(__file__).parent / "resources" / "icons" / "icon_pulsar" / "icons8-electronics-100.png")))
+    app.setWindowIcon(QIcon(str(Path(__file__).parent / "resources" / "icons" / "icon_pulsar" / "icons8-electronics-96.png")))
 
     # Применить тему из сохранённых настроек
     settings = QSettings("Pulsar", "Pulsar")
