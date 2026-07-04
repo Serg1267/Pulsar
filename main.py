@@ -414,8 +414,6 @@ class PulsarMainWindow(QMainWindow):
         self._zoom_fit_action.triggered.connect(self._zoom_fit)
         tb.addAction(self._zoom_fit_action)
 
-        _dot_sep()
-
         self._toolbar_run_action = QAction(QIcon(str(icons / "icons8-shutdown-50.ico")), "Пуск", self)
         self._toolbar_run_action.setEnabled(False)
         self._toolbar_run_action.triggered.connect(self._sch_run_simulation)
