@@ -396,6 +396,13 @@ class PulsarMainWindow(QMainWindow):
 
         _dot_sep()
 
+        self._cir_undo_action.setIcon(QIcon(str(icons / "icon_pulsar" / "undo.png")))
+        tb.addAction(self._cir_undo_action)
+        self._cir_redo_action.setIcon(QIcon(str(icons / "icon_pulsar" / "redo.png")))
+        tb.addAction(self._cir_redo_action)
+
+        _dot_sep()
+
         self._zoom_in_action = QAction(QIcon(str(icons / "icon_pulsar" / "zoom_in.svg")), "Увеличить (+)", self)
         self._zoom_in_action.setToolTip("Увеличить масштаб (+)")
         self._zoom_in_action.setShortcut("+")
