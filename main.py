@@ -327,9 +327,17 @@ class PulsarMainWindow(QMainWindow):
 
         # ─── Справка (самый правый пункт) ───
         help_menu = menubar.addMenu("Справка")
+        quickstart_action = QAction("Быстрый старт", self)
+        quickstart_action.triggered.connect(self._show_quickstart)
+        help_menu.addAction(quickstart_action)
         about_action = QAction("О программе", self)
         about_action.triggered.connect(self._show_about)
         help_menu.addAction(about_action)
+
+    def _show_quickstart(self):
+        from PySide6.QtGui import QDesktopServices
+        from PySide6.QtCore import QUrl
+        QDesktopServices.openUrl(QUrl("https://Serg1267.github.io/Pulsar/quick-start/01-install/"))
 
     def _show_about(self):
         box = QMessageBox(self)
