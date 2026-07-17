@@ -1,7 +1,7 @@
 """Pulsar — Главное окно приложения.
 """
 
-__version__ = "0.9.0"
+__version__ = "0.11.0"
 
 import sys
 import json
@@ -345,7 +345,7 @@ class PulsarMainWindow(QMainWindow):
         box.setWindowTitle("О программе Pulsar")
         box.setText("Pulsar — редактор принципиальных схем и SPICE-симулятор.\n\n"
                      "Основан на PySide6, matplotlib и ngspice.\n"
-                     "Версия 0.9.0\n\n"
+                     f"Версия {__version__}\n\n"
                      "Иконки: https://icons8.com")
         box.setStyleSheet("QMessageBox { background: white; color: black; }"
                           "QLabel { color: black; }"
@@ -2935,7 +2935,7 @@ class PulsarMainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName("Pulsar")
-    app.setApplicationVersion("0.9.0")
+    app.setApplicationVersion(__version__)
     app.setOrganizationName("Pulsar")
     app.setStyle("Fusion")
     app.setWindowIcon(QIcon(str(Path(__file__).parent / "resources" / "icons" / "icon_pulsar" / "icons8-electronics-96.png")))
