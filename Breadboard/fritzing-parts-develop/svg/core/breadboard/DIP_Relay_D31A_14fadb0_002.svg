@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="63" height="29.7" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <g id="breadboard">
+    <g transform="translate(0 -1022.7)">
+      <rect x=".87373" y="1026.2" width="61.298" height="22.559" fill="#333" stroke="#333" stroke-dasharray="10.24724745, 1.70787459" stroke-linecap="square" stroke-width="1.7079"/>
+      <rect x=".0041323" y="1025.4" width="63" height="2.2138" fill="#3d3d3d"/>
+      <rect x=".0041323" y="1047.5" width="63" height="2.2138"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="49.86 3.931 49.86 19.829 50.4 21.601 50.4 2.16" fill="#141414"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="0.54 3.931 0.54 19.829 0 21.601 0 2.16" fill="#1f1f1f"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="0.403 9.777 0.403 11.88 3.6 11.88 3.6 8.28 0.54 8.251" fill="#1c1c1c"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="3.6 11.88 0.403 11.88 0.403 13.981 0.54 15.517 3.6 15.517" fill="#383838"/>
+      <path d="m0.50788 1034.9v5.2487c1.3238-0.1537 2.3588-1.2612 2.3588-2.63 0-1.3687-1.0262-2.465-2.3588-2.6187z" fill="#262626"/>
+      <path d="m0.67913 1027.6v5.3913c2.1425 0.405 3.7725 2.2762 3.7725 4.5362s-1.6225 4.1401-3.7725 4.5451v0.01h4.5v-14.483h-4.5z" fill="#303030"/>
+      <circle transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" cx="4.68" cy="16.898" r="1.483" fill="#212121"/>
+      <g transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" fill="#ccc" font-family="OCR-Fritzing-mono" font-size="5">
+      <text x="6.8302426" y="13.406791" fill="#cccccc">D31A*</text>
+      </g>
+      <rect id="connector0" x="3.1541" y="1048.5" width="2.7" height="3.905" fill="#8c8c8c"/>
+      <rect x="3.1462" y="1049.7" width="2.7" height="2.6988" fill="#999"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="4.68 22.075 6.12 21.413 6.12 20.636 2.52 20.636 2.52 22.075" fill="#8c8c8c"/>
+      <rect  id="connector13" x="3.1541" y="1022.7" width="2.7" height="3.9062" fill="#8c8c8c"/>
+      <rect x="3.1463" y="1022.7" width="2.7" height="2.7" fill="#999"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="4.68 1.685 2.52 1.685 2.52 3.125 6.12 3.125 6.12 2.347" fill="#8c8c8c"/>
+      <rect id="connector6" x="57.154" y="1048.5" width="2.6975" height="3.905" fill="#8c8c8c"/>
+      <rect x="57.157" y="1049.7" width="2.6975" height="2.6988" fill="#999"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="45.72 22.075 47.88 22.075 47.88 20.636 44.28 20.636 44.28 21.413" fill="#8c8c8c"/>
+      <rect id="connector7" x="57.154" y="1022.7" width="2.6975" height="3.9062" fill="#8c8c8c"/>
+      <rect x="57.157" y="1022.7" width="2.6975" height="2.7" fill="#999"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="45.72 1.685 44.28 2.347 44.28 3.125 47.88 3.125 47.88 1.685" fill="#8c8c8c"/>
+      <rect id="connector1" x="12.154" y="1048.5" width="2.6975" height="3.905" fill="#8c8c8c"/>
+      <rect x="12.157" y="1049.7" width="2.6975" height="2.6988" fill="#999"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="13.32 20.636 8.28 20.636 8.28 21.413 9.72 22.075 11.88 22.075 13.32 21.413" fill="#8c8c8c"/>
+      <rect id="connector12" x="12.154" y="1022.7" width="2.6975" height="3.9062" fill="#8c8c8c"/>
+      <rect x="12.16" y="1022.7" width="2.6975" height="2.7" fill="#999"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="8.28 3.125 13.32 3.125 13.32 2.347 11.88 1.685 9.72 1.685 8.28 2.347" fill="#8c8c8c"/>
+      <rect id="connector5" x="48.154" y="1048.5" width="2.7" height="3.905" fill="#8c8c8c"/>
+      <rect x="48.154" y="1049.7" width="2.7" height="2.6988" fill="#999"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="42.12 20.636 37.08 20.636 37.08 21.413 38.52 22.075 40.68 22.075 42.12 21.413" fill="#8c8c8c"/>
+      <rect id="connector8" x="48.154" y="1022.7" width="2.7" height="3.9062" fill="#8c8c8c"/>
+      <rect x="48.154" y="1022.7" width="2.7" height="2.7" fill="#999"/>
+      <polygon transform="matrix(1.25 0 0 1.25 .0041326 1022.7)" points="37.08 3.125 42.12 3.125 42.12 2.347 40.68 1.685 38.52 1.685 37.08 2.347" fill="#8c8c8c"/>
+    </g>
+  </g>
+</svg>

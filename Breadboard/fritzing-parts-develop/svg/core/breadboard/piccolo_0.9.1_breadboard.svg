@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="2.5591in" height="3.587in" baseProfile="tiny" version="1.2" viewBox="0 0 184.25 258.26" xmlns="http://www.w3.org/2000/svg">
+ <g id="breadboard">
+  <g id="icon">
+   <path d="m0 252.28v-94.489a5.6693 5.6693 0 0 1 1.1339-3.401l6.2362-8.315a5.6693 5.6693 0 0 0 1.1339-3.402v-137.01a5.6693 5.6693 0 0 1 5.6693-5.6693h161.57a5.6693 5.6693 0 0 1 5.67 5.6693v243.01a8.8949 8.8949 0 0 1-8.505 9.269h-167.24a5.6693 5.6693 0 0 1-5.6693-5.669m13.323-243.21a4.252 4.252 0 1 0 8.5039 0 4.252 4.252 0 1 0-8.5039 0zm0 92.976a4.252 4.252 0 1 0 8.5039 0 4.252 4.252 0 1 0-8.5039 0zm0 146.84a4.252 4.252 0 1 0 8.5039 0 4.252 4.252 0 1 0-8.5039 0zm154.77 0a4.252 4.252 0 1 0 8.5039 0 4.252 4.252 0 1 0-8.5039 0zm0-146.84a4.252 4.252 0 1 0 8.5039 0 4.252 4.252 0 1 0-8.5039 0zm0-92.976a4.252 4.252 0 1 0 8.5039 0 4.252 4.252 0 1 0-8.5039 0zm-65.135 235.25a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm-43.2 0a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0 7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0 7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0 7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0 7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0 7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0 7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0 7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0 7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0 7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0 7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0 7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm-24.469-74.24a0.85039 0.85039 0 1 0 1.7008 0 0.85039 0.85039 0 1 0-1.7008 0zm7.0867 0a0.85039 0.85039 0 1 0 1.7008 0 0.85039 0.85039 0 1 0-1.7008 0zm-7.0867 25.513a0.85039 0.85039 0 1 0 1.7008 0 0.85039 0.85039 0 1 0-1.7008 0zm7.0867 0a0.85039 0.85039 0 1 0 1.7008 0 0.85039 0.85039 0 1 0-1.7008 0zm-7.0867 25.512a0.85039 0.85039 0 1 0 1.7008 0 0.85039 0.85039 0 1 0-1.7008 0zm7.0867 0a0.85039 0.85039 0 1 0 1.7008 0 0.85039 0.85039 0 1 0-1.7008 0zm-5.6693 18.992a0.99212 0.99212 0 1 0 1.9843 0 0.99212 0.99212 0 1 0-1.9843 0zm5.6693 0a0.99212 0.99212 0 1 0 1.9843 0 0.99212 0.99212 0 1 0-1.9843 0zm102.05-4.819a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm7.2 0a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm-7.2-7.2a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm7.2 0a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm-7.2-7.2a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm7.2 0a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm-7.2-7.2a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm7.2 0a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm-7.2-7.2a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm7.2 0a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm-7.2-7.2a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm7.2 0a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm-7.2-7.2a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm7.2 0a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm-7.2-7.2a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm7.2 0a1.4457 1.4457 0 1 0 2.8913 0 1.4457 1.4457 0 1 0-2.8913 0zm-12.445-35.49a1.4173 1.4173 0 1 0 2.8346 0 1.4173 1.4173 0 1 0-2.8346 0zm0 7.087a1.4173 1.4173 0 1 0 2.8346 0 1.4173 1.4173 0 1 0-2.8346 0zm0 7.086a1.4173 1.4173 0 1 0 2.8346 0 1.4173 1.4173 0 1 0-2.8346 0zm28.063-7.086a1.4173 1.4173 0 1 0 2.8346 0 1.4173 1.4173 0 1 0-2.8346 0zm4.564-27.412a1.4173 1.4173 0 1 0 2.8346 0 1.4173 1.4173 0 1 0-2.8346 0zm0-14.173a1.4173 1.4173 0 1 0 2.8346 0 1.4173 1.4173 0 1 0-2.8346 0zm-7.512 17.008a1.8425 1.8425 0 1 0 3.685 0 1.8425 1.8425 0 1 0-3.685 0zm0-19.842a1.8425 1.8425 0 1 0 3.685 0 1.8425 1.8425 0 1 0-3.685 0zm-48.67 135.3a1.4173 1.4173 0 1 0 2.8346 0 1.4173 1.4173 0 1 0-2.8346 0zm14.173 0a1.4173 1.4173 0 1 0 2.8346 0 1.4173 1.4173 0 1 0-2.8346 0zm-17.434-7.086a1.8425 1.8425 0 1 0 3.685 0 1.8425 1.8425 0 1 0-3.685 0zm19.843 0a1.8425 1.8425 0 1 0 3.685 0 1.8425 1.8425 0 1 0-3.685 0zm-129.59-6.35a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-10.007a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-9.722a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0zm0-7.2a1.44 1.44 0 1 0 2.88 0 1.44 1.44 0 1 0-2.88 0z" fill="#1F7A34" stroke-width="0"/>
+  
+   <g transform="translate(174.28 29.084)">
+    <g transform="rotate(-90)">
+     <text fill="#ffffff" font-family="OCRA" font-size=".052611" stroke-width="0" text-anchor="end">C:/Users/BG/Downloads/diatom_logo_1bit.bmp</text>
+    </g>
+   </g>
+   <g transform="translate(27.955 112.87)">
+    <g transform="rotate(90)">
+     <text fill="#ffffff" font-family="OCRA" font-size="5.0112" stroke-width="0">www.piccolo.cc</text>
+    </g>
+   </g>
+   <g transform="translate(19.355 112.87)">
+    <g transform="rotate(90)">
+     <text fill="#ffffff" font-family="OCRA" font-size="5.0112" stroke-width="0">piccolo pcb v0.9</text>
+    </g>
+   </g>
+   <g stroke="#fff" stroke-linecap="round" stroke-width=".36">
+    <line x1="57.543" x2="108" y1="161.57" y2="161.57"/>
+    <line x1="108" x2="108" y1="161.57" y2="255.12"/>
+    <line x1="108" x2="57.543" y1="255.12" y2="255.12"/>
+    <line x1="57.543" x2="57.543" y1="255.12" y2="161.57"/>
+   </g>
+   <text x="68.0882" y="161.556" fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0" text-anchor="end">A1</text>
+   <g transform="translate(97.776 177.49)">
+    <g transform="rotate(-90)">
+     <text fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0" text-anchor="end">ARDUINO_PRO_MICRO</text>
+    </g>
+   </g>
+   <text x="39.8551" y="158.481" fill="#ffffff" font-family="OCRA" font-size="3.3408" stroke-width="0" text-anchor="end">C1</text>
+   <circle cx="39.685" cy="170.08" r="11.339" fill="none" stroke="#fff" stroke-width=".36"/>
+   <text x="33.5905" y="172.979" fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0" text-anchor="end">+</text>
+   <text x="29.0551" y="187.593" fill="#ffffff" font-family="OCRA" font-size="3.3408" stroke-width="0" text-anchor="end">C2</text>
+   <circle cx="39.685" cy="195.59" r="11.339" fill="none" stroke="#fff" stroke-width=".36"/>
+   <text x="33.5905" y="198.491" fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0" text-anchor="end">+</text>
+   <text x="29.0551" y="215.94" fill="#ffffff" font-family="OCRA" font-size="3.3408" stroke-width="0" text-anchor="end">C3</text>
+   <circle cx="39.685" cy="221.1" r="11.339" fill="none" stroke="#fff" stroke-width=".36"/>
+   <text x="33.5905" y="224.003" fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0" text-anchor="end">+</text>
+   <text x="34.4976" y="249.392" fill="#ffffff" font-family="OCRA" font-size="3.617" stroke-width="0">DC_IN</text>
+   <text x="34.8661" y="254.268" fill="#ffffff" font-family="OCRA" font-size="3.3408" stroke-width="0">5V-6V</text>
+   <g stroke="#fff" stroke-linecap="round" stroke-width=".36">
+    <line x1="32.173" x2="32.173" y1="257.1" y2="236.27"/>
+    <line x1="48.898" x2="48.898" y1="236.27" y2="257.1"/>
+    <line x1="48.898" x2="32.315" y1="236.27" y2="236.27"/>
+   </g>
+   <text x="31.748" y="257.846" fill="#ffffff" font-family="OCRA" font-size="5.8464" stroke-width="0" text-anchor="end">+</text>
+   <text x="55.1339" y="257.846" fill="#ffffff" font-family="OCRA" font-size="5.8464" stroke-width="0" text-anchor="end">-</text>
+   <text x="163.871" y="245.39" fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0" text-anchor="end">H1</text>
+   <g stroke="#fff" stroke-linecap="round" stroke-width=".36">
+    <line x1="180.07" x2="157.61" y1="181.28" y2="181.28"/>
+    <line x1="157.61" x2="180.07" y1="238.88" y2="238.88"/>
+    <line x1="157.61" x2="157.61" y1="238.88" y2="181.28"/>
+   </g>
+   <text x="139.436" y="137.934" fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0">P1</text>
+   <g stroke="#fff" stroke-width=".36">
+    <g stroke-linecap="round">
+     <line x1="161.57" x2="140.32" y1="144.43" y2="144.43"/>
+     <line x1="140.32" x2="140.32" y1="144.43" y2="146.55"/>
+     <line x1="140.32" x2="140.32" y1="166.39" y2="168.52"/>
+     <line x1="140.32" x2="161.57" y1="168.52" y2="168.52"/>
+    </g>
+    <path d="m161.57 168.52a12.047 12.047 0 1 0 0-24.094" fill="none"/>
+    <circle cx="161.57" cy="156.47" r="2.241" fill="none"/>
+   </g>
+   <text x="163.842" y="122.834" fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0" text-anchor="end">S1</text>
+   <g stroke="#fff" stroke-linecap="round" stroke-width=".36">
+    <line x1="176.06" x2="180.31" y1="131.9" y2="131.9"/>
+    <line x1="180.31" x2="180.31" y1="131.9" y2="112.05"/>
+    <line x1="180.31" x2="176.06" y1="112.05" y2="112.05"/>
+    <line x1="170.39" x2="170.39" y1="126.23" y2="117.72"/>
+   </g>
+   <text x="120.969" y="240.265" fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0">S2</text>
+   <g stroke="#fff" stroke-linecap="round" stroke-width=".36">
+    <line x1="114.21" x2="114.21" y1="250.19" y2="254.44"/>
+    <line x1="114.21" x2="134.05" y1="254.44" y2="254.44"/>
+    <line x1="134.05" x2="134.05" y1="254.44" y2="250.19"/>
+    <line x1="119.88" x2="128.38" y1="244.52" y2="244.52"/>
+   </g>
+   <g transform="translate(15.877 229.23)">
+    <g transform="rotate(270)">
+     <text fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0">X</text>
+    </g>
+   </g>
+   <g stroke="#fff" stroke-linecap="round" stroke-width=".576">
+    <line x1="2.2535" x2=".45354" y1="223.12" y2="221.32"/>
+    <line x1=".45354" x2=".45354" y1="221.32" y2="217.72"/>
+    <line x1=".45354" x2="2.2535" y1="217.72" y2="215.92"/>
+    <line x1="5.8535" x2="7.6535" y1="215.92" y2="217.72"/>
+    <line x1="7.6535" x2="7.6535" y1="217.72" y2="221.32"/>
+    <line x1="7.6535" x2="5.8535" y1="221.32" y2="223.12"/>
+    <line x1=".45354" x2=".45354" y1="235.72" y2="232.12"/>
+    <line x1=".45354" x2="2.2535" y1="232.12" y2="230.32"/>
+    <line x1="5.8535" x2="7.6535" y1="230.32" y2="232.12"/>
+    <line x1="2.2535" x2=".45354" y1="230.32" y2="228.52"/>
+    <line x1=".45354" x2=".45354" y1="228.52" y2="224.92"/>
+    <line x1=".45354" x2="2.2535" y1="224.92" y2="223.12"/>
+    <line x1="5.8535" x2="7.6535" y1="223.12" y2="224.92"/>
+    <line x1="7.6535" x2="7.6535" y1="224.92" y2="228.52"/>
+    <line x1="7.6535" x2="5.8535" y1="228.52" y2="230.32"/>
+    <line x1="2.2535" x2="5.8535" y1="237.52" y2="237.52"/>
+    <line x1=".45354" x2="2.2535" y1="235.72" y2="237.52"/>
+    <line x1="5.8535" x2="7.6535" y1="237.52" y2="235.72"/>
+    <line x1="7.6535" x2="7.6535" y1="232.12" y2="235.72"/>
+    <line x1="2.2535" x2="5.8535" y1="215.92" y2="215.92"/>
+   </g>
+   <g transform="translate(15.877 204.82)">
+    <g transform="rotate(270)">
+     <text fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0">Y</text>
+    </g>
+   </g>
+   <g stroke="#fff" stroke-linecap="round" stroke-width=".576">
+    <line x1="2.2535" x2=".45354" y1="198.71" y2="196.91"/>
+    <line x1=".45354" x2=".45354" y1="196.91" y2="193.31"/>
+    <line x1=".45354" x2="2.2535" y1="193.31" y2="191.51"/>
+    <line x1="5.8535" x2="7.6535" y1="191.51" y2="193.31"/>
+    <line x1="7.6535" x2="7.6535" y1="193.31" y2="196.91"/>
+    <line x1="7.6535" x2="5.8535" y1="196.91" y2="198.71"/>
+    <line x1=".45354" x2=".45354" y1="211.31" y2="207.71"/>
+    <line x1=".45354" x2="2.2535" y1="207.71" y2="205.91"/>
+    <line x1="5.8535" x2="7.6535" y1="205.91" y2="207.71"/>
+    <line x1="2.2535" x2=".45354" y1="205.91" y2="204.11"/>
+    <line x1=".45354" x2=".45354" y1="204.11" y2="200.51"/>
+    <line x1=".45354" x2="2.2535" y1="200.51" y2="198.71"/>
+    <line x1="5.8535" x2="7.6535" y1="198.71" y2="200.51"/>
+    <line x1="7.6535" x2="7.6535" y1="200.51" y2="204.11"/>
+    <line x1="7.6535" x2="5.8535" y1="204.11" y2="205.91"/>
+    <line x1="2.2535" x2="5.8535" y1="213.11" y2="213.11"/>
+    <line x1=".45354" x2="2.2535" y1="211.31" y2="213.11"/>
+    <line x1="5.8535" x2="7.6535" y1="213.11" y2="211.31"/>
+    <line x1="7.6535" x2="7.6535" y1="207.71" y2="211.31"/>
+    <line x1="2.2535" x2="5.8535" y1="191.51" y2="191.51"/>
+   </g>
+   <g transform="translate(15.877 180.7)">
+    <g transform="rotate(270)">
+     <text fill="#ffffff" font-family="OCRA" font-size="4.176" stroke-width="0">Z</text>
+    </g>
+   </g>
+   <g stroke="#fff" stroke-linecap="round" stroke-width=".576">
+    <line x1="2.2535" x2=".45354" y1="174.59" y2="172.79"/>
+    <line x1=".45354" x2=".45354" y1="172.79" y2="169.19"/>
+    <line x1=".45354" x2="2.2535" y1="169.19" y2="167.39"/>
+    <line x1="5.8535" x2="7.6535" y1="167.39" y2="169.19"/>
+    <line x1="7.6535" x2="7.6535" y1="169.19" y2="172.79"/>
+    <line x1="7.6535" x2="5.8535" y1="172.79" y2="174.59"/>
+    <line x1=".45354" x2=".45354" y1="187.19" y2="183.59"/>
+    <line x1=".45354" x2="2.2535" y1="183.59" y2="181.79"/>
+    <line x1="5.8535" x2="7.6535" y1="181.79" y2="183.59"/>
+    <line x1="2.2535" x2=".45354" y1="181.79" y2="179.99"/>
+    <line x1=".45354" x2=".45354" y1="179.99" y2="176.39"/>
+    <line x1=".45354" x2="2.2535" y1="176.39" y2="174.59"/>
+    <line x1="5.8535" x2="7.6535" y1="174.59" y2="176.39"/>
+    <line x1="7.6535" x2="7.6535" y1="176.39" y2="179.99"/>
+    <line x1="7.6535" x2="5.8535" y1="179.99" y2="181.79"/>
+    <line x1="2.2535" x2="5.8535" y1="188.99" y2="188.99"/>
+    <line x1=".45354" x2="2.2535" y1="187.19" y2="188.99"/>
+    <line x1="5.8535" x2="7.6535" y1="188.99" y2="187.19"/>
+    <line x1="7.6535" x2="7.6535" y1="183.59" y2="187.19"/>
+    <line x1="2.2535" x2="5.8535" y1="167.39" y2="167.39"/>
+   </g>
+   <g fill="#fff" fill-opacity=".15" stroke-width="0">
+    <rect x="142.62" y="181.28" width="39.081" height="57.6"/>
+    <rect x="138.9" y="133.8" width="45.354" height="45.354"/>
+    <rect x="166.14" y="112.05" width="18" height="19.843"/>
+    <rect x="114.21" y="240.26" width="19.843" height="18"/>
+   </g>
+   <g fill="none" stroke="#9A916C">
+    <g stroke-width="1.224">
+     <circle id="connector0pin" cx="104.4" cy="244.32" r="2.052" connectorname="TX"/>
+     <circle id="connector1pin" cx="104.4" cy="237.12" r="2.052" connectorname="RX"/>
+     <circle id="connector2pin" cx="104.4" cy="229.92" r="2.052" connectorname="GND"/>
+     <circle id="connector3pin" cx="104.4" cy="222.72" r="2.052" connectorname="GND"/>
+     <circle id="connector4pin" cx="104.4" cy="215.52" r="2.052" connectorname="PIN2"/>
+     <circle id="connector5pin" cx="104.4" cy="208.32" r="2.052" connectorname="X_PWM_PIN3"/>
+     <circle id="connector6pin" cx="104.4" cy="201.12" r="2.052" connectorname="PIN4"/>
+     <circle id="connector7pin" cx="104.4" cy="193.92" r="2.052" connectorname="Y_PWM_PIN5"/>
+     <circle id="connector8pin" cx="104.4" cy="186.72" r="2.052" connectorname="Z_PWM_PIN6"/>
+     <circle id="connector9pin" cx="104.4" cy="179.52" r="2.052" connectorname="PIN7"/>
+     <circle id="connector10pin" cx="104.4" cy="172.32" r="2.052" connectorname="11"/>
+     <circle id="connector11pin" cx="104.4" cy="165.12" r="2.052" connectorname="PIN9"/>
+     <circle id="connector12pin" cx="61.2" cy="165.12" r="2.052" connectorname="PIN10"/>
+     <circle id="connector13pin" cx="61.2" cy="172.32" r="2.052" connectorname="PIN16"/>
+     <circle id="connector14pin" cx="61.2" cy="179.52" r="2.052" connectorname="15"/>
+     <circle id="connector15pin" cx="61.2" cy="186.72" r="2.052" connectorname="16"/>
+     <circle id="connector16pin" cx="61.2" cy="193.92" r="2.052" connectorname="PIN_A0"/>
+     <circle id="connector17pin" cx="61.2" cy="201.12" r="2.052" connectorname="PIN_A1"/>
+     <circle id="connector18pin" cx="61.2" cy="208.32" r="2.052" connectorname="PIN_A2"/>
+     <circle id="connector19pin" cx="61.2" cy="215.52" r="2.052" connectorname="A3"/>
+     <circle id="connector20pin" cx="61.2" cy="222.72" r="2.052" connectorname="VCC"/>
+     <circle id="connector21pin" cx="61.2" cy="229.92" r="2.052" connectorname="RESET"/>
+     <circle id="connector22pin" cx="61.2" cy="237.12" r="2.052" connectorname="GND"/>
+     <circle id="connector23pin" cx="61.2" cy="244.32" r="2.052" connectorname="PWR_RAW"/>
+    </g>
+    <g stroke-width=".72">
+     <circle id="connector24pin" cx="36.142" cy="170.08" r="1.2104" connectorname="PWR_RAW"/>
+     <circle id="connector25pin" cx="43.228" cy="170.08" r="1.2104" connectorname="GND"/>
+     <circle id="connector26pin" cx="36.142" cy="195.59" r="1.2104" connectorname="PWR_RAW"/>
+     <circle id="connector27pin" cx="43.228" cy="195.59" r="1.2104" connectorname="GND"/>
+     <circle id="connector28pin" cx="36.142" cy="221.1" r="1.2104" connectorname="PWR_RAW"/>
+     <circle id="connector29pin" cx="43.228" cy="221.1" r="1.2104" connectorname="GND"/>
+    </g>
+    <circle id="connector30pin" cx="37.701" cy="240.1" r="1.5221" stroke-width="1.0599" connectorname="PWR_RAW"/>
+    <circle id="connector31pin" cx="43.37" cy="240.1" r="1.5221" stroke-width="1.0599" connectorname="GND"/>
+    <g stroke-width=".72284">
+     <circle id="connector32pin" cx="145.87" cy="235.28" r="1.8071" connectorname="PIN_A0"/>
+     <circle id="connector33pin" cx="153.07" cy="235.28" r="1.8071" connectorname="GND"/>
+     <circle id="connector34pin" cx="145.87" cy="228.08" r="1.8071" connectorname="PIN_A1"/>
+     <circle id="connector35pin" cx="153.07" cy="228.08" r="1.8071" connectorname="GND"/>
+     <circle id="connector36pin" cx="145.87" cy="220.88" r="1.8071" connectorname="PIN_A2"/>
+     <circle id="connector37pin" cx="153.07" cy="220.88" r="1.8071" connectorname="VCC"/>
+     <circle id="connector38pin" cx="145.87" cy="213.68" r="1.8071" connectorname="PIN2"/>
+     <circle id="connector39pin" cx="153.07" cy="213.68" r="1.8071" connectorname="RX"/>
+     <circle id="connector40pin" cx="145.87" cy="206.48" r="1.8071" connectorname="PIN4"/>
+     <circle id="connector41pin" cx="153.07" cy="206.48" r="1.8071" connectorname="TX"/>
+     <circle id="connector42pin" cx="145.87" cy="199.28" r="1.8071" connectorname="PIN7"/>
+     <circle id="connector43pin" cx="153.07" cy="199.28" r="1.8071" connectorname="RESET"/>
+     <circle id="connector44pin" cx="145.87" cy="192.08" r="1.8071" connectorname="PIN9"/>
+     <circle id="connector45pin" cx="153.07" cy="192.08" r="1.8071" connectorname="PIN16"/>
+     <circle id="connector46pin" cx="145.87" cy="184.88" r="1.8071" connectorname="PWR_RAW"/>
+     <circle id="connector47pin" cx="153.07" cy="184.88" r="1.8071" connectorname="PIN10"/>
+    </g>
+    <g stroke-width=".72">
+     <circle id="connector48pin" cx="140.6" cy="149.39" r="1.7773" connectorname="GND"/>
+     <circle id="connector49pin" cx="140.6" cy="156.47" r="1.7773" connectorname="A3"/>
+     <circle id="connector50pin" cx="140.6" cy="163.56" r="1.7773" connectorname="VCC"/>
+     <circle id="connector51pin" cx="168.66" cy="156.47" r="1.7773" connectorname="P$4"/>
+     <circle id="connector52pin" cx="173.23" cy="129.06" r="1.7773" connectorname="GND"/>
+     <circle id="connector53pin" cx="173.23" cy="114.89" r="1.7773" connectorname="2"/>
+    </g>
+    <circle id="connector54pin" cx="166.14" cy="131.9" r="2.3032" stroke-width=".92126" connectorname="PE1"/>
+    <circle id="connector55pin" cx="166.14" cy="112.05" r="2.3032" stroke-width=".92126" connectorname="PE2"/>
+    <circle id="connector56pin" cx="117.04" cy="247.35" r="1.7773" stroke-width=".72" connectorname="1"/>
+    <circle id="connector57pin" cx="131.22" cy="247.35" r="1.7773" stroke-width=".72" connectorname="GND"/>
+    <circle id="connector58pin" cx="114.21" cy="240.26" r="2.3032" stroke-width=".92126" connectorname="PE1"/>
+    <circle id="connector59pin" cx="134.05" cy="240.26" r="2.3032" stroke-width=".92126" connectorname="PE2"/>
+    <g stroke-width="1.224">
+     <circle id="connector60pin" cx="4.0535" cy="233.92" r="2.052" connectorname="GND"/>
+     <circle id="connector61pin" cx="4.0535" cy="226.72" r="2.052" connectorname="PWR_RAW"/>
+     <circle id="connector62pin" cx="4.0535" cy="219.52" r="2.052" connectorname="X_PWM_PIN3"/>
+     <circle id="connector63pin" cx="4.0535" cy="209.51" r="2.052" connectorname="GND"/>
+     <circle id="connector64pin" cx="4.0535" cy="202.31" r="2.052" connectorname="PWR_RAW"/>
+     <circle id="connector65pin" cx="4.0535" cy="195.11" r="2.052" connectorname="Y_PWM_PIN5"/>
+     <circle id="connector66pin" cx="4.0535" cy="185.39" r="2.052" connectorname="GND"/>
+     <circle id="connector67pin" cx="4.0535" cy="178.19" r="2.052" connectorname="PWR_RAW"/>
+     <circle id="connector68pin" cx="4.0535" cy="170.99" r="2.052" connectorname="Z_PWM_PIN6"/>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>

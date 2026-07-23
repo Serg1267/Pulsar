@@ -33,6 +33,7 @@ pip install -r requirements.txt           # зависимости: PySide6, mat
 | `core/` | `component_lib.py` — загрузка .lib файлов из `resources/LIB/`. |
 | `examples/` | Примеры `.cir` файлов (RC-фильтр, делитель напряжения и др.). |
 | `resources/` | Иконки, изображения, LIB/ (модели компонентов), themes/ (цветовые схемы редактора). |
+| `docs/` | MkDocs документация (Material theme), деплой на GitHub Pages. |
 
 ## Архитектура UI
 
@@ -832,7 +833,6 @@ pyinstaller Pulsar.spec        # → dist/Pulsar (один ELF, 90 MB)
 4. Поворот влево / Поворот вправо / Отразить H / Отразить V
 5. Текст / Метка узла / .SPICE директива / Просмотр SPICE netlist
 
-### Важные изменения (26.06.2026)
 
 #### Симуляция — batch-вывод (без очередей и таймера)
 - **Проблема**: `QTimer` + `deque` + `_process_output_queue()` каждые 50ms — даже с `deque.popleft()` (O(1)) GUI тормозил из-за постоянных переключений контекста между таймером и потоком.

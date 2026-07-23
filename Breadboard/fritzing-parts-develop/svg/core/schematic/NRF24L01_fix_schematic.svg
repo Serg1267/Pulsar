@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg width="1.1878in" height=".52504in" enable-background="new -20.625 -0.5 85.525 37.803" version="1.1" viewBox="0 0 85.525 37.803" xmlns="http://www.w3.org/2000/svg" xmlns:xml="http://www.w3.org/XML/1998/namespace">
+	<g transform="translate(20.625 .5)">
+		<g id="schematic">
+			<desc>
+				<referenceFile>Schematic.AD584.svg</referenceFile>
+			</desc>
+			<g fill="none"  stroke="#787878">
+				<line id="connector14pin" x1="64.899" x2="50.494" y1="14.4" y2="14.4"/>
+				<line id="connector13pin" x1="50.494" x2="64.895" y1="7.201" y2="7.201"/>
+			</g>
+			<g transform="matrix(.8074 0 0 1 44.961 24.069)">
+				<text font-family="Droid Sans" font-size="4">CE</text>
+			</g>
+			<g transform="matrix(.8074 0 0 1 42.795 16.936)">
+				<text font-family="Droid Sans" font-size="4">SCK</text>
+			</g>
+			<g transform="matrix(.8074 0 0 1 41.295 9.7361)">
+				<text font-family="Droid Sans" font-size="4">MISO</text>
+			</g>
+			<g transform="matrix(.9059 0 0 1 13.903 6.1526)">
+				<text font-family="Droid Sans" font-size="4">NRF24L01</text>
+			</g>
+			<g fill="none" stroke="#000">
+				<polygon points="-6.218 0 50.494 2e-3 50.494 36.803 -6.218 36.803"/>
+				<line id="connector15pin" x1="64.897" x2="50.492" y1="21.741" y2="21.741" stroke="#787878"/>
+				<line id="connector16pin" x1="64.9" x2="50.495" y1="28.833" y2="28.833" stroke="#787878"/>
+			</g>
+			<g transform="matrix(.8074 0 0 1 -4.4138 9.7361)">
+				<text font-family="Droid Sans" font-size="4">IRQ</text>
+			</g>
+			<g transform="matrix(.8074 0 0 1 42.295 31.403)">
+				<text font-family="Droid Sans" font-size="4">GND</text>
+			</g>
+			<g fill="none" stroke="#787878">
+				<line id="connector8pin" x1="-6.144" x2="-20.549" y1="7.054" y2="7.054"/>
+				<line id="connector9pin" x1="-6.218" x2="-20.623" y1="14.543" y2="14.543"/>
+				<line id="connector10pin" x1="-6.219" x2="-20.625" y1="21.561" y2="21.561"/>
+				<line id="connector12pin" x1="-6.217" x2="-20.622" y1="28.653" y2="28.653"/>
+			</g>
+			<g transform="matrix(.8074 0 0 1 -4.4138 24.737)">
+				<text font-family="Droid Sans" font-size="4">CSN</text>
+			</g>
+			<g transform="matrix(.8074 0 0 1 -4.7478 17.603)">
+				<text font-family="Droid Sans" font-size="4">MOSI</text>
+			</g>
+			<g transform="matrix(.8074 0 0 1 -4.4138 32.069)">
+				<text font-family="Droid Sans" font-size="4">VCC</text>
+			</g>
+		</g>
+	</g>
+</svg>

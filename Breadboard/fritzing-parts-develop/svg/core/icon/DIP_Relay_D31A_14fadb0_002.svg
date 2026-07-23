@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generator: Adobe Illustrator 13.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 14948)  -->
+<svg width=".7in" height=".33in" enable-background="new 0 0 50.4 23.76" version="1.1" viewBox="0 0 50.4 23.76" xmlns="http://www.w3.org/2000/svg" xmlns:xml="http://www.w3.org/XML/1998/namespace">
+  <g id="icon">
+    <rect y="2.16" width="50.4" height="19.44" fill="#303030"/>
+    <rect y="2.16" width="50.4" height="1.771" fill="#3d3d3d"/>
+    <rect y="19.829" width="50.4" height="1.771"/>
+    <polygon points="49.86 19.829 50.4 21.601 50.4 2.16 49.86 3.931" fill="#141414"/>
+    <polygon points="0.54 19.829 0 21.601 0 2.16 0.54 3.931" fill="#1f1f1f"/>
+    <polygon points="0.403 9.777 0.403 11.88 3.6 11.88 3.6 8.28 0.54 8.251" fill="#1c1c1c"/>
+    <polygon points="3.6 11.88 0.403 11.88 0.403 13.981 0.54 15.517 3.6 15.517" fill="#383838"/>
+    <path d="m0.403 9.777v4.199c1.059-0.123 1.887-1.009 1.887-2.104s-0.821-1.972-1.887-2.095z" fill="#262626"/>
+    <path d="m0.54 3.931v4.313c1.714 0.324 3.018 1.821 3.018 3.629s-1.298 3.312-3.018 3.636v8e-3h3.6v-11.586h-3.6z" fill="#303030"/>
+    <circle cx="4.68" cy="16.898" r="1.483" fill="#212121"/>
+    <g fill="#ccc" font-family="OCR-Fritzing-mono" font-size="5" xml:space="preserve">
+   <text x="6.8302426" y="13.406791">D31A*</text>
+  </g>
+    <g fill="#8c8c8c">
+      <rect x="2.52" y="21.601" width="2.16" height="2.159"/>
+      <polygon points="4.68 22.075 6.12 21.413 6.12 20.636 2.52 20.636 2.52 22.075"/>
+      <rect x="2.52" width="2.16" height="2.16"/>
+      <polygon points="4.68 1.685 2.52 1.685 2.52 3.125 6.12 3.125 6.12 2.347"/>
+      <rect x="45.72" y="21.601" width="2.158" height="2.159"/>
+      <polygon points="45.72 22.075 47.88 22.075 47.88 20.636 44.28 20.636 44.28 21.413"/>
+      <rect x="45.72" width="2.158" height="2.16"/>
+      <polygon points="45.72 1.685 44.28 2.347 44.28 3.125 47.88 3.125 47.88 1.685"/>
+      <rect x="9.72" y="21.601" width="2.158" height="2.159"/>
+      <polygon points="9.72 22.075 11.88 22.075 13.32 21.413 13.32 20.636 8.28 20.636 8.28 21.413"/>
+      <rect x="9.72" width="2.158" height="2.16"/>
+      <polygon points="11.88 1.685 9.72 1.685 8.28 2.347 8.28 3.125 13.32 3.125 13.32 2.347"/>
+      <rect x="38.52" y="21.601" width="2.16" height="2.159"/>
+      <polygon points="38.52 22.075 40.68 22.075 42.12 21.413 42.12 20.636 37.08 20.636 37.08 21.413"/>
+      <rect x="38.52" width="2.16" height="2.16"/>
+      <polygon points="40.68 1.685 38.52 1.685 37.08 2.347 37.08 3.125 42.12 3.125 42.12 2.347"/>
+    </g>
+  </g>
+</svg>

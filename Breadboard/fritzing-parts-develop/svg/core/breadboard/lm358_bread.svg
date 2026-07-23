@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width=".4in" height=".33in" version="1.0" viewBox="0 0 40 33" xmlns="http://www.w3.org/2000/svg">
+ <g fill="#8c8c8c">
+  <rect id="connector0pin" x="3.5" y="28.66" width="3" height="4.34"/>
+  <rect id="connector1pin" x="13.5" y="28.66" width="3" height="4.34"/>
+  <rect id="connector2pin" x="23.5" y="28.66" width="3" height="4.34"/>
+  <rect id="connector3pin" x="33.5" y="28.66" width="3" height="4.34"/>
+  <rect id="connector4pin" x="33.5" width="3" height="4.34"/>
+  <rect id="connector5pin" x="23.5" width="3" height="4.34"/>
+  <rect id="connector6pin" x="13.5" width="3" height="4.34"/>
+  <rect id="connector7pin" x="3.5" width="3" height="4.34"/>
+  <rect id="connector0terminal" x="3.5" y="30" width="3" height="3"/>
+  <rect id="connector1terminal" x="13.5" y="30" width="3" height="3"/>
+  <rect id="connector2terminal" x="23.5" y="30" width="3" height="3"/>
+  <rect id="connector3terminal" x="33.5" y="30" width="3" height="3"/>
+  <rect id="connector4terminal" x="33.5" width="3" height="3"/>
+  <rect id="connector5terminal" x="23.5" width="3" height="3"/>
+  <rect id="connector6terminal" x="13.5" width="3" height="3"/>
+  <rect id="connector7terminal" x="3.5" width="3" height="3"/>
+ </g>
+ <g id="breadboard">
+  <g fill="#8c8c8c">
+   <rect x="3.5" y="26.32" width="3" height="6.68"/>
+   <rect x="13.5" y="26.32" width="3" height="6.68"/>
+   <rect x="23.5" y="26.32" width="3" height="6.68"/>
+   <rect x="33.5" y="26.32" width="3" height="6.68"/>
+   <rect x="3.5" width="3" height="6.68"/>
+   <rect x="13.5" width="3" height="6.68"/>
+   <rect x="23.5" width="3" height="6.68"/>
+   <rect x="33.5" width="3" height="6.68"/>
+  </g>
+  <polygon points="0 3 40 3 39.25 11.5 0 11.5" fill="#3d3d3d"/>
+  <polygon points="0 21.5 39.25 21.5 40 30 0 30"/>
+  <g fill="#8c8c8c">
+   <polygon points="8.5 4.34 8.5 3.26 6.5 2.34 3.5 2.34 3.5 4.34"/>
+   <polygon points="18.5 4.34 18.5 3.26 16.5 2.34 13.5 2.34 11.5 3.26 11.5 4.34"/>
+   <polygon points="36.5 4.34 36.5 2.34 33.5 2.34 31.5 3.26 31.5 4.34"/>
+   <polygon points="28.5 4.34 28.5 3.26 26.5 2.34 23.5 2.34 21.5 3.26 21.5 4.34"/>
+   <polygon points="3.5 28.66 3.5 30.66 6.5 30.66 8.5 29.74 8.5 28.66"/>
+   <polygon points="31.5 28.66 31.5 29.74 33.5 30.66 36.5 30.66 36.5 28.66"/>
+   <polygon points="11.5 28.66 11.5 29.74 13.5 30.66 16.5 30.66 18.5 29.74 18.5 28.66"/>
+   <polygon points="21.5 28.66 21.5 29.74 23.5 30.66 26.5 30.66 28.5 29.74 28.5 28.66"/>
+  </g>
+  <polygon points="40 3 39.25 5.46 37.853 5.46 37.853 27.53 39.25 27.54 40 30" fill="#141414"/>
+  <polygon points="0 3 0.75 5.46 0.75 11.5 5 11.5 5 21.5 0.75 21.5 0.75 27.54 0 30" fill="#1f1f1f"/>
+  <polygon points="5 11.5 0.75 11.46 0.56 13.58 0.56 16.49 5 16.49" fill="#1c1c1c"/>
+  <polygon points="0.75 21.55 5 21.55 5 16.49 0.56 16.49 0.56 19.42" fill="#383838"/>
+  <path d="m0.75 5.46v5.99c2.38 0.45 4.19 2.53 4.19 5.04s-1.8 4.6-4.19 5.05v5.99h38.5v-22.07h-38.5z" fill="#303030"/>
+  <path d="m0.56 13.58v5.83c1.47-0.17 2.62-1.4 2.62-2.92s-1.14-2.74-2.62-2.91z" fill="#262626"/>
+  <circle cx="6.5" cy="23.47" r="2.06" fill="#212121"/>
+  <text x="6" y="18" fill="#e3dbdb" font-family="'OCRA'" font-size="9">LM358</text>
+  
+ </g>
+</svg>

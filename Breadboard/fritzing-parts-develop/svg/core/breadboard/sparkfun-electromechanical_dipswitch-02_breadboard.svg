@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
+<svg id="Ebene_1" width="19.296px" height="28.699px" enable-background="new 0 0 19.296 28.699" version="1.1" viewBox="0 0 19.296 28.699" xmlns="http://www.w3.org/2000/svg">
+	<g id="breadboard">
+		<g fill="none">
+			<circle id="connector0pin" cx="6.048" cy="27.603" r="1.512"/>
+			<circle id="connector1pin" cx="13.248" cy="27.603" r="1.512"/>
+			<circle id="connector2pin" cx="13.248" cy="6.003" r="1.512"/>
+			<circle id="connector3pin" cx="6.048" cy="6.003" r="1.512"/>
+		</g>
+		<g id="Ebene_1_1_" xmlns:svg="http://www.w3.org/2000/svg">
+			<path d="m14.076 24.437h-1.656v3.625s0.5 0.639 0.828 0.639 0.828-0.639 0.828-0.639v-3.625z" fill="#999"/>
+			<path d="m6.875 24.437h-1.656v3.625s0.5 0.639 0.827 0.639c0.328 0 0.829-0.639 0.829-0.639v-3.625z" fill="#999"/>
+			<path d="m6.875 24.437h-1.656" fill="#808080"/>
+			<path d="m6.046 28.699c0.328 0 0.829-0.637 0.829-0.637v-3.625" fill="#808080"/>
+			<path d="m14.076 24.437h-1.656v3.625s0.5 0.639 0.828 0.639 0.828-0.639 0.828-0.639v-3.625z" fill="#999"/>
+			<path d="m14.076 24.437h-1.656" fill="#808080"/>
+			<path d="m13.248 28.699c0.328 0 0.828-0.637 0.828-0.637v-3.625" fill="#808080"/>
+			<path d="m13.587 24.437h-0.685v3.625s0.206 0.639 0.343 0.639 0.342-0.639 0.342-0.639v-3.625z" fill="#B3B3B3"/>
+			<path d="m6.393 24.437h-0.69v3.625s0.208 0.639 0.345 0.639 0.346-0.639 0.346-0.639l-1e-3 -3.625z" fill="#B3B3B3"/>
+			<rect width="19.296" height="21.795" fill="#0071BC"/>
+			<rect y="21.795" width="19.296" height="5.063" fill="#07466F"/>
+			<rect faction="switch2" x="11.066" y="5.476" width="4.32" height="10.802" fill="#E6E6E6"/>
+			<rect faction="switch1" x="3.888" y="5.497" width="4.32" height="10.802" fill="#E6E6E6"/>
+			<g fill="#ccc">
+				<rect x="12.169" y="6.794" width="2.16" height="8.751"/>
+				<rect x="4.968" y="6.794" width="2.16" height="8.751"/>
+			</g>
+			<g fill="#fff">
+				<rect x="11.996" y="6.794" width=".174" height="8.751" enable-background="new    " opacity=".2"/>
+				<rect x="4.799" y="6.794" width=".169" height="8.751" enable-background="new    " opacity=".2"/>
+			</g>
+			<g fill="#B3B3B3">
+				<rect x="12.169" y="6.794" width="2.16" height=".221"/>
+				<rect x="4.968" y="6.794" width="2.16" height=".221"/>
+			</g>
+		
+			<g fill="#07466F">
+				<rect x="3.888" y="5.497" width="4.32" height=".714"/>
+				<rect x="11.089" y="5.497" width="4.32" height=".714"/>
+				<rect y="6.412" width="1.728" height="9.361"/>
+			</g>
+			<rect y="9.864" width="1.728" height="5.909" fill="#333"/>
+			<rect x="17.568" y="6.412" width="1.729" height="9.361" fill="#07466F"/>
+			<rect x="17.568" y="9.864" width="1.729" height="5.909" fill="#333"/>
+			<g faction-switch2-on="transform:translate(0,-5.2)" faction-switch2-off="transform:translate(0,0)">
+				<rect x="11.808" y="10.849" width="2.88" height="4.729" fill="#B3B3B3"/>
+				<rect x="11.841" y="10.849" width="2.88" height="1.128" fill="#F2F2F2"/>
+				<rect x="11.808" y="12.253" width="2.88" height="1.524" fill="#F2F2F2"/>
+				<rect x="14.494" y="13.982" width=".194" height="1.596" enable-background="new    " opacity=".2"/>
+				<rect x="12.9" y="15.383" width="1.594" height=".193" enable-background="new    " opacity=".2"/>
+				<rect x="14.494" y="12.446" width=".194" height="1.331" enable-background="new    " opacity=".11"/>
+				<rect x="12.9" y="13.582" width="1.594" height=".194" enable-background="new    " opacity=".11"/>
+				<rect x="11.8" y="12.253" width=".193" height="1.33" fill="#fff"/>
+				<rect x="11.996" y="12.252" width="1.594" height=".194" fill="#fff"/>
+				<rect x="14.494" y="10.836" width=".194" height="1.143" enable-background="new    " opacity=".11"/>
+				<rect x="12.9" y="11.782" width="1.594" height=".193" enable-background="new    " opacity=".11"/>
+				<rect x="11.8" y="10.849" width=".193" height="1.105" fill="#fff"/>
+				<rect x="11.996" y="10.898" width="1.594" height=".192" fill="#fff"/>
+			</g>
+			<g faction-switch1-on="transform:translate(0,0)" faction-switch1-off="transform:translate(0,5.2)">
+				<rect x="4.608" y="5.68" width="2.88" height="4.729" fill="#B3B3B3"/>
+				<rect x="4.608" y="5.68" width="2.88" height="1.128" fill="#F2F2F2"/>
+				<rect x="4.608" y="7.083" width="2.88" height="1.524" fill="#F2F2F2"/>
+				<rect x="7.294" y="8.813" width=".194" height="1.596" enable-background="new    " opacity=".2"/>
+				<rect x="5.699" y="10.213" width="1.595" height=".193" enable-background="new    " opacity=".2"/>
+				<rect x="7.298" y="7.277" width=".194" height="1.331" enable-background="new    " opacity=".11"/>
+				<rect x="5.704" y="8.412" width="1.594" height=".194" enable-background="new    " opacity=".11"/>
+				<rect x="4.604" y="7.083" width=".194" height="1.33" fill="#fff"/>
+				<rect x="4.799" y="7.082" width="1.594" height=".194" fill="#fff"/>
+				<rect x="7.298" y="5.666" width=".194" height="1.143" enable-background="new    " opacity=".11"/>
+				<rect x="5.704" y="6.613" width="1.594" height=".193" enable-background="new    " opacity=".11"/>
+				<rect x="4.604" y="5.68" width=".194" height="1.105" fill="#fff"/>
+				<rect x="4.799" y="5.729" width="1.594" height=".192" fill="#fff"/>
+			</g>
+			<g fill="#fff">
+				<rect x="3.69" y="5.497" width=".198" height="10.802" enable-background="new    " opacity=".2"/>
+				<rect x="10.889" y="5.497" width=".198" height="10.802" enable-background="new    " opacity=".2"/>
+				<g font-family="'OCRA'" font-size="5.2111">
+					<text transform="translate(5.2183 4.741)">ON</text>
+					<text transform="translate(4.5356 20.615)">1</text>
+					<text transform="translate(7.9546 20.615)"></text>
+					<text transform="translate(11.556 20.615)">2</text>
+				</g>
+				<rect y="15.773" width=".288" height="6.021" enable-background="new    " opacity=".2"/>
+				<rect y="21.795" width=".288" height="5.041" enable-background="new    " opacity=".2"/>
+			</g>
+			<rect x="19.007" width=".289" height="6.412" enable-background="new    " opacity=".2"/>
+			<rect x="19.007" y="6.412" width=".289" height="3.452" enable-background="new    " opacity=".2"/>
+			<rect x="19.007" y="21.795" width=".289" height="5.063" enable-background="new    " opacity=".2"/>
+			<rect x="5.047" y="26.57" width="13.96" height=".287" enable-background="new    " opacity=".2"/>
+			<rect x="19.007" y="16.732" width=".289" height="5.063" enable-background="new    " opacity=".2"/>
+			<rect x="10.179" y="21.506" width="8.828" height=".289" enable-background="new    " opacity=".2"/>
+			<rect y=".001" width=".288" height="5.063" enable-background="new    " fill="#fff" opacity=".2"/>
+			<rect x=".288" y=".001" width="8.829" height=".288" enable-background="new    " fill="#fff" opacity=".2"/>
+			<rect x=".013" y="6.412" width=".288" height="3.452" enable-background="new    " opacity=".2"/>
+		</g>
+	</g>
+</svg>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg>
+<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg width=".39375in" height=".49208in" enable-background="new 0 0 28.35 35.43" version="1.1" viewBox="0 0 28.35 35.43" xmlns="http://www.w3.org/2000/svg" xmlns:xml="http://www.w3.org/XML/1998/namespace">
+	<desc>
+		<referenceFile>BMP180_SCHEMATIC_v2.svg</referenceFile>
+	</desc>
+	<g id="schematic">
+		<rect x="3.653" y="3.685" width="21.042" height="28.059" fill="#fff" stroke="#010101" stroke-linecap="round" stroke-width=".9002"/>
+		<g fill="none">
+			<line id="connector6pin" x1="14.176" x2="14.176" y1="31.744" y2="35.252" stroke="#565656" stroke-linecap="round" stroke-linejoin="round" stroke-width=".7"/>
+			<line id="connector9pin" x1=".146" x2="3.653" y1="14.208" y2="14.208" stroke="#565656" stroke-linecap="round" stroke-linejoin="round" stroke-width=".7"/>
+			<line id="connector5pin" x1="14.176" x2="14.176" y1="3.686" y2=".178" stroke="#565656" stroke-linecap="round" stroke-linejoin="round" stroke-width=".7"/>
+			<line id="connector10pin" x1="24.697" x2="28.203" y1="14.208" y2="14.208" stroke="#565656" stroke-linecap="round" stroke-linejoin="round" stroke-width=".7"/>
+			<rect x="28.549" y="14.207" width=".008412" height=".0014" stroke-width="0"/>
+		</g>
+		<g transform="translate(12.134 30.617)">
+			<text fill="#565656" font-family="Droid Sans" font-size="2.1921">Gnd</text>
+		</g>
+		<g transform="translate(12.573 6.2842)">
+			<text fill="#565656" font-family="Droid Sans" font-size="2.1921">Vin</text>
+		</g>
+		<g transform="translate(4.6357 14.784)">
+			<text fill="#565656" font-family="Droid Sans" font-size="2.1921">SCL</text>
+		</g>
+		<g transform="translate(19.978 14.784)">
+			<text fill="#565656" font-family="Droid Sans" font-size="2.1921">SDA</text>
+		</g>
+		<g transform="translate(9.4111 19.173)">
+			<g enable-background="new    " fill="#010101" font-family="Droid Sans" font-size="2.7882">
+				<text>BMP180</text>
+				<text x="-1.362" y="3.346">Barometer</text>
+				<text x="-0.762" y="6.691">Breakout </text>
+			</g>
+		</g>
+	</g>
+</svg>

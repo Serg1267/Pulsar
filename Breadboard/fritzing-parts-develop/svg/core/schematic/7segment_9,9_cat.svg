@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
+<svg width="113.13px" height="28.742px" enable-background="new 0 0 113.129 28.742" version="1.1" viewBox="0 0 113.13 28.742" xmlns="http://www.w3.org/2000/svg">
+	<g id="schematic">
+		<g stroke-linecap="round" stroke-width=".7">
+			<g fill="none" stroke="#000">
+				<polyline points="3.6 7.2 104.4 7.2 104.4 14.401" stroke-miterlimit="10"/>	
+				<line x1="86.398" x2="93.6" y1="14.401" y2="14.401"/>			
+			</g>
+			<polygon points="90 14.401 93.6 21.602 90 21.602 86.398 21.602" fill="#fff" stroke="#000"/>
+			<line x1="90" x2="90" y1="7.2" y2="14.401" stroke="#000"/>
+			<line id="connector1pin" x1="90" x2="90" y1="28.801" y2="21.602" stroke="#787878"/>
+			<line x1="72" x2="79.2" y1="14.401" y2="14.401" stroke="#000"/>
+			<polygon points="75.6 14.401 79.2 21.602 75.6 21.602 72 21.602" fill="#fff" stroke="#000"/>
+			<line x1="75.6" x2="75.6" y1="7.2" y2="14.401" stroke="#000"/>
+			<line id="connector2pin" x1="75.6" x2="75.6" y1="28.801" y2="21.602" stroke="#787878"/>
+			<line x1="57.6" x2="64.8" y1="14.401" y2="14.401" stroke="#000"/>
+			<polygon points="61.2 14.401 64.8 21.602 61.2 21.602 57.6 21.602" fill="#fff" stroke="#000"/>
+			<line x1="61.2" x2="61.2" y1="7.2" y2="14.401" stroke="#000"/>
+			<line id="connector4pin" x1="61.2" x2="61.2" y1="28.801" y2="21.602" stroke="#787878"/>
+			<line x1="43.2" x2="50.4" y1="14.401" y2="14.401" stroke="#000"/>
+			<polygon points="46.8 14.401 50.4 21.602 46.8 21.602 43.2 21.602" fill="#fff" stroke="#000"/>
+			<line x1="46.8" x2="46.8" y1="7.2" y2="14.401" stroke="#000"/>
+			<line id="connector5pin" x1="46.8" x2="46.8" y1="28.801" y2="21.602" stroke="#787878"/>
+			<g stroke="#000">
+				<line x1="28.8" x2="36" y1="14.401" y2="14.401"/>
+				<polygon points="32.4 14.401 36 21.602 32.4 21.602 28.8 21.602" fill="#fff"/>
+				<line x1="32.4" x2="32.4" y1="7.2" y2="14.401"/>
+			</g>
+			<line id="connector7pin" x1="32.4" x2="32.4" y1="28.801" y2="21.602" stroke="#787878"/>
+			<line x1="14.4" x2="21.6" y1="14.401" y2="14.401" stroke="#000"/>
+			<polygon points="18 14.401 21.6 21.602 18 21.602 14.4 21.602" fill="#fff" stroke="#000"/>
+			<line x1="18" x2="18" y1="7.2" y2="14.401" stroke="#000"/>
+			<line id="connector9pin" x1="18" x2="18" y1="28.801" y2="21.602" stroke="#787878"/>
+			<line x2="7.2" y1="14.401" y2="14.401" stroke="#000"/>
+			<polygon points="3.601 14.401 7.2 21.602 3.601 21.602 0 21.602" fill="#fff" stroke="#000"/>
+			<line x1="3.601" x2="3.601" y1="7.2" y2="14.401" stroke="#000"/>
+			<line id="connector10pin" x1="3.601" x2="3.601" y1="28.801" y2="21.602" stroke="#787878"/>
+			<line x1="100.8" x2="108" y1="14.401" y2="14.401" stroke="#000"/>
+			<polygon points="104.4 14.401 108 21.6 104.4 21.6 100.8 21.6" fill="#fff" stroke="#000"/>
+			<line x1="104.4" x2="104.4" y1="7.199" y2="14.401" stroke="#000"/>
+			<line id="connector6pin" x1="104.4" x2="104.4" y1="28.8" y2="21.6" stroke="#787878"/>
+		</g>
+		<g fill="#787878" font-family="Noto Sans" font-size="2">
+			<text transform="translate(106.2 27.941)">6</text>
+			<text transform="translate(91.8 27.941)">1</text>
+			<text transform="translate(55.53 4.6992)">3, 8</text>
+			<text transform="translate(77.4 27.941)">2</text>
+			<text transform="translate(63 27.941)">4</text>
+			<text transform="translate(48.6 27.941)">5</text>
+			<text transform="translate(34.2 27.941)">7</text>
+			<text transform="translate(19.8 27.941)">9</text>
+			<text transform="translate(5.4004 27.941)">10</text>
+		</g>
+		<g fill="none" stroke-linecap="round">
+			<line id="connector3pin" x1="54" x2="54" y1="7.2" stroke="#787878" stroke-miterlimit="10" stroke-width=".7"/>
+			<line id="connector8pin" x1="54" x2="54" y1="7.2" stroke="#787878" stroke-miterlimit="10" stroke-width=".7"/>
+			<g stroke="#ccc" stroke-width=".5">
+				<line x1="7.075" x2="4.885" y1="12.991" y2="12.991"/>
+				<line x1="5.25" x2="7.44" y1="10.802" y2="10.802"/>
+				<line x1="5.25" x2="4.885" y1="10.802" y2="12.991"/>
+				<line x1="5.615" x2="5.25" y1="8.61" y2="10.802"/>
+				<line x1="7.44" x2="7.075" y1="10.802" y2="12.991"/>
+				<line x1="7.806" x2="7.44" y1="8.61" y2="10.802"/>
+				<line x1="22.179" x2="19.989" y1="8.61" y2="8.61"/>
+				<line x1="21.449" x2="19.259" y1="12.991" y2="12.991"/>
+				<line x1="7.8" x2="7.8" y1="12.991" y2="12.9"/>
+				<line x1="19.624" x2="21.815" y1="10.802" y2="10.802"/>
+				<line x1="22.179" x2="22.179" y1="12.991" y2="12.99"/>
+				<line x1="19.624" x2="19.259" y1="10.802" y2="12.991"/>
+				<line x1="19.989" x2="19.624" y1="8.61" y2="10.802"/>
+				<line x1="21.815" x2="21.449" y1="10.802" y2="12.991"/>
+				<line x1="36.554" x2="34.363" y1="8.61" y2="8.61"/>
+				<line x1="35.824" x2="33.633" y1="12.991" y2="12.991"/>
+				<line x1="33.999" x2="36.189" y1="10.802" y2="10.802"/>
+				<line x1="36.554" x2="36.554" y1="12.991" y2="12.9"/>
+				<line x1="33.999" x2="33.633" y1="10.802" y2="12.991"/>
+				<line x1="34.363" x2="33.999" y1="8.61" y2="10.802"/>
+				<line x1="36.554" x2="36.189" y1="8.61" y2="10.802"/>
+				<line x1="50.927" x2="48.738" y1="8.61" y2="8.61"/>
+				<line x1="48.373" x2="50.563" y1="10.802" y2="10.802"/>
+				<line x1="50.927" x2="50.927" y1="12.991" y2="12.9"/>
+				<line x1="48.373" x2="48.007" y1="10.802" y2="12.991"/>
+				<line x1="48.738" x2="48.373" y1="8.61" y2="10.802"/>
+				<line x1="50.563" x2="50.198" y1="10.802" y2="12.991"/>
+				<line x1="50.928" x2="50.563" y1="8.61" y2="10.802"/>
+				<line x1="65.302" x2="63.111" y1="8.61" y2="8.61"/>
+				<line x1="64.572" x2="62.381" y1="12.991" y2="12.991"/>
+				<line x1="62.747" x2="64.938" y1="10.802" y2="10.802"/>
+				<line x1="65.302" x2="65.302" y1="12.991" y2="12.9"/>
+				<line x1="63.113" x2="62.747" y1="8.61" y2="10.802"/>
+				<line x1="64.938" x2="64.572" y1="10.802" y2="12.991"/>
+				<line x1="65.302" x2="64.938" y1="8.61" y2="10.802"/>
+				<line x1="79.675" x2="77.486" y1="8.61" y2="8.61"/>
+				<line x1="78.945" x2="76.756" y1="12.991" y2="12.991"/>
+				<line x1="77.121" x2="79.311" y1="10.802" y2="10.802"/>
+				<line x1="79.675" x2="79.675" y1="12.991" y2="12.9"/>
+				<line x1="77.121" x2="76.756" y1="10.802" y2="12.991"/>
+				<line x1="79.311" x2="78.945" y1="10.802" y2="12.991"/>
+				<line x1="79.675" x2="79.311" y1="8.61" y2="10.802"/>
+				<line x1="94.05" x2="91.859" y1="8.61" y2="8.61"/>
+				<line x1="93.32" x2="91.13" y1="12.991" y2="12.991"/>
+				<line x1="94.05" x2="94.05" y1="12.991" y2="12.9"/>
+				<line x1="91.496" x2="91.13" y1="10.802" y2="12.991"/>
+				<line x1="91.861" x2="91.496" y1="8.61" y2="10.802"/>
+				<line x1="93.686" x2="93.32" y1="10.802" y2="12.991"/>
+				<line x1="94.05" x2="93.686" y1="8.61" y2="10.802"/>
+				<line x1="108.42" x2="106.24" y1="8.61" y2="8.61"/>
+				<line x1="107.7" x2="105.51" y1="12.991" y2="12.991"/>
+				<line x1="105.87" x2="108.06" y1="10.802" y2="10.802"/>
+				<line x1="105.87" x2="105.51" y1="10.802" y2="12.991"/>
+				<line x1="106.24" x2="105.87" y1="8.61" y2="10.802"/>
+				<line x1="108.06" x2="107.7" y1="10.802" y2="12.991"/>
+				<line x1="108.42" x2="108.06" y1="8.61" y2="10.802"/>
+			</g>
+		</g>
+		<g stroke="#000">
+			<g faction-a-off="stroke:#000 fill:#000" faction-a-on="stroke:#EF1818 fill:#EF1818">
+				<g stroke-linecap="round">
+					<line x1="8.01" x2="10.35" y1="16.2" y2="13.861" stroke-width=".45"/>
+					<line x1="8.37" x2="10.71" y1="19.439" y2="17.102" stroke-width=".45"/>
+					<line x1="7.729" x2="5.538" y1="8.61" y2="8.61" stroke-width=".5"/>
+				</g>
+				<path d="m11.97 12.241-1.08 2.52-1.44-1.44 2.52-1.08z" stroke="none"/>
+				<path d="m12.33 15.48-1.08 2.521-1.44-1.438 2.52-1.083z" stroke="none"/>
+			</g>
+			<g faction-b-off="stroke:#000 fill:#000" faction-b-on="stroke:#EF1818 fill:#EF1818">
+				<g stroke-linecap="round">
+					<line x1="22.18" x2="21.815" y1="8.61" y2="10.802" stroke-width=".5"/>
+					<line x1="22.77" x2="25.11" y1="19.439" y2="17.102" stroke-width=".45"/>
+					<line x1="22.41" x2="24.75" y1="16.2" y2="13.861" stroke-width=".45"/>
+				</g>
+				<path d="m26.73 15.48-1.08 2.521-1.44-1.438 2.52-1.083z" stroke="none"/>
+				<path d="m26.37 12.241-1.08 2.52-1.439-1.439 2.519-1.081z" stroke="none"/>
+			</g>
+			<g faction-c-off="stroke:#000 fill:#000" faction-c-on="stroke:#EF1818 fill:#EF1818">
+				<g stroke-linecap="round">
+					<line x1="36.189" x2="35.824" y1="10.802" y2="12.991" stroke-width=".5"/>
+					<line x1="37.17" x2="39.51" y1="19.439" y2="17.102" stroke-width=".45"/>
+					<line x1="36.81" x2="39.149" y1="16.2" y2="13.861" stroke-width=".45"/>
+				</g>
+				<path d="m41.13 15.48-1.08 2.521-1.44-1.438 2.52-1.083z" stroke="none"/>
+				<path d="m40.77 12.241-1.08 2.52-1.439-1.439 2.519-1.081z" stroke="none"/>
+			</g>
+			<g faction-d-off="stroke:#000 fill:#000" faction-d-on="stroke:#EF1818 fill:#EF1818">
+				<g stroke-linecap="round">
+					<line x1="50.198" x2="48.007" y1="12.991" y2="12.991" stroke-width=".5"/>
+					<line x1="51.57" x2="53.91" y1="19.439" y2="17.102" stroke-width=".45"/>
+					<line x1="51.209" x2="53.549" y1="16.109" y2="13.77" stroke-width=".45"/>
+				</g>
+				<path d="m55.53 15.48-1.08 2.521-1.44-1.438 2.52-1.083z" stroke="none"/>
+				<path d="m55.169 12.241-1.08 2.52-1.439-1.439 2.519-1.081z" stroke="none"/>
+			</g>
+			<g faction-e-off="stroke:#000 fill:#000" faction-e-on="stroke:#EF1818 fill:#EF1818">
+				<g stroke-linecap="round">
+					<line x1="62.747" x2="62.381" y1="10.802" y2="12.991" stroke-width=".5"/>
+					<line x1="65.971" x2="68.311" y1="19.439" y2="17.102" stroke-width=".45"/>
+					<line x1="65.609" x2="67.949" y1="16.2" y2="13.861" stroke-width=".45"/>
+				</g>
+				<path d="m69.93 15.48-1.08 2.521-1.438-1.438 2.518-1.083z" stroke="none"/>
+				<path d="m69.568 12.241-1.08 2.52-1.438-1.439 2.518-1.081z" stroke="none"/>
+			</g>
+			<g faction-f-off="stroke:#000 fill:#000" faction-f-on="stroke:#EF1818 fill:#EF1818">
+				<g stroke-linecap="round">
+					<line x1="77.486" x2="77.121" y1="8.61" y2="10.802" stroke-width=".5"/>
+					<line x1="80.37" x2="82.709" y1="19.439" y2="17.102" stroke-width=".45"/>
+					<line x1="80.009" x2="82.35" y1="16.2" y2="13.861" stroke-width=".45"/>
+				</g>
+				<path d="m84.33 15.48-1.08 2.521-1.439-1.438 2.519-1.083z" stroke="none"/>
+				<path d="m83.969 12.241-1.08 2.52-1.438-1.439 2.518-1.081z" stroke="none"/>
+			</g>
+			<g faction-g-off="stroke:#000 fill:#000" faction-g-on="stroke:#EF1818 fill:#EF1818">
+				<g stroke-linecap="round">
+					<line x1="91.496" x2="93.686" y1="10.802" y2="10.802" stroke-width=".5"/>
+					<line x1="94.77" x2="97.109" y1="19.439" y2="17.102" stroke-width=".45"/>
+					<line x1="94.409" x2="96.749" y1="16.2" y2="13.861" stroke-width=".45"/>
+				</g>
+				<path d="m98.729 15.48-1.08 2.521-1.438-1.438 2.518-1.083z" stroke="none"/>
+				<path d="m98.369 12.241-1.08 2.52-1.439-1.439 2.519-1.081z" stroke="none"/>
+			</g>
+			<g faction-dp-off="stroke:#000 fill:#000" faction-dp-on="stroke:#EF1818 fill:#EF1818">
+				<g stroke-linecap="round" stroke-width=".45">
+					<line x1="109.17" x2="111.51" y1="19.439" y2="17.1"/>
+					<line x1="108.81" x2="111.15" y1="16.197" y2="13.86"/>
+					<line x1="108.4" x2="108.4" y1="12.991" y2="12.9"/>
+				</g>
+				<path d="m113.13 15.48-1.08 2.521-1.439-1.438 2.519-1.083z" stroke="none"/>
+				<path d="m112.77 12.24-1.08 2.521-1.438-1.439 2.518-1.082z" stroke="none"/>
+			</g>
+		</g>
+	</g>
+</svg>

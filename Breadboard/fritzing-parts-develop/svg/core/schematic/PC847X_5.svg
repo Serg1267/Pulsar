@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg width="230.31" height="65.551" enable-background="new 0 0 57.6 50.4" version="1.1" viewBox="0 0 184.25 52.441" xmlns="http://www.w3.org/2000/svg" xmlns:xml="http://www.w3.org/XML/1998/namespace">
+ <desc>
+  <referenceFile>svg.schematic.Optocoupler_TLP621_schematic.svg</referenceFile>
+ </desc>
+ <metadata>
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work rdf:about="" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <dc:format xmlns:dc="http://purl.org/dc/elements/1.1/">image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/"/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g id="schematic">
+  <g transform="rotate(-90)">
+   <rect x="-44.551" y="7.9981" width="36.624" height="167.91" fill="#fff" stroke="#000" stroke-linecap="round" stroke-width="1.0715"/>
+  </g>
+  <line x1="30.765" x2="30.765" y1="32.625" y2="36.224" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  <line x1="30.765" x2="30.765" y1="36.224" y2="39.825" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  <g transform="matrix(0 -1 1 0 1.9633 51.891)">
+   <polygon points="15.667 28.802 12.066 21.601 15.667 21.601 19.266 21.601" fill="#fff" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  </g>
+  <g fill="none" stroke-linecap="round">
+   <line x1="23.564" x2="30.765" y1="36.224" y2="36.224" stroke="#000" stroke-width=".45"/>
+   <g stroke-width=".7">
+    <g transform="matrix(0 -1 1 0 1.9633 51.891)" stroke="#000">
+     <polyline id="connector1pin_1_" points="7.36 36 15.667 36 15.667 28.802"/>
+     <polyline id="connector0pin_1_" points="7.36 14.4 15.667 14.4 15.667 21.601"/>
+    </g>
+    <line id="connector1pin" x1="37.963" x2="37.963" y1="51.891" y2="44.691" stroke="#787878" stroke-linejoin="round"/>
+    <line id="connector0pin" x1="16.363" x2="16.363" y1="51.891" y2="44.691" stroke="#787878" stroke-linejoin="round"/>
+    <line x1="21.494" x2="32.294" y1="19.666" y2="19.666" stroke="#000"/>
+    <g transform="matrix(0 -1 1 0 1.9633 58.291)" stroke="#000">
+     <polyline id="connector1pin_4_" points="38.625 25.777 45.125 29.866 45.125 36 50.239 36"/>
+     <polyline id="connector1pin_2_" points="50.239 14.4 45.125 14.4 45.125 19.531 38.625 23.421"/>
+    </g>
+    <line id="connector15pin" x1="37.963" x2="37.963" y1="7.892" y2=".69095" stroke="#787878" stroke-linejoin="round"/>
+    <line id="connector16pin" x1="16.363" x2="16.363" y1="7.892" y2=".69095" stroke="#787878" stroke-linejoin="round"/>
+   </g>
+  </g>
+
+  <line x1="28.064" x2="25.723" y1="28.124" y2="30.464" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".45"/>
+  <line x1="31.304" x2="28.964" y1="28.485" y2="30.825" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".45"/>
+  <path d="m28.6 29.025-1.438-1.438 2.521-1.08-1.083 2.518z"/>
+  <path d="m31.841 29.382-1.438-1.438 2.521-1.08-1.083 2.518z"/>
+  <path d="m30.701 16.793-1.704-1.111 2.243-1.577-0.539 2.688z"/>
+ 
+  <line x1="73.965" x2="73.965" y1="32.625" y2="36.224" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  <line x1="73.965" x2="73.965" y1="36.224" y2="39.825" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  <g transform="matrix(0 -1 1 0 45.163 51.891)">
+   <polygon points="15.667 28.802 12.066 21.601 15.667 21.601 19.266 21.601" fill="#fff" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  </g>
+  <g fill="none" stroke-linecap="round">
+   <line x1="66.764" x2="73.965" y1="36.224" y2="36.224" stroke="#000" stroke-width=".45"/>
+   <g stroke-width=".7">
+    <g transform="matrix(0 -1 1 0 45.163 51.891)" stroke="#000">
+     <polyline id="connector1pin_1_-9" points="7.36 36 15.667 36 15.667 28.802"/>
+     <polyline id="connector0pin_1_-9" points="7.36 14.4 15.667 14.4 15.667 21.601"/>
+    </g>
+    <line id="connector3pin" x1="81.163" x2="81.163" y1="51.891" y2="44.691" stroke="#787878" stroke-linejoin="round"/>
+    <line id="connector2pin" x1="59.563" x2="59.563" y1="51.891" y2="44.691" stroke="#787878" stroke-linejoin="round"/>
+    <line x1="64.694" x2="75.494" y1="19.666" y2="19.666" stroke="#000"/>
+    <g transform="matrix(0 -1 1 0 45.163 58.291)" stroke="#000">
+     <polyline id="connector1pin_4_-8" points="38.625 25.777 45.125 29.866 45.125 36 50.239 36"/>
+     <polyline id="connector1pin_2_-0" points="50.239 14.4 45.125 14.4 45.125 19.531 38.625 23.421"/>
+    </g>
+    <line id="connector13pin" x1="81.163" x2="81.163" y1="7.892" y2=".69094" stroke="#787878" stroke-linejoin="round"/>
+    <line id="connector14pin" x1="59.563" x2="59.563" y1="7.892" y2=".69094" stroke="#787878" stroke-linejoin="round"/>
+   </g>
+  </g>
+
+  <line x1="71.264" x2="68.923" y1="28.124" y2="30.464" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".45"/>
+  <line x1="74.504" x2="72.164" y1="28.485" y2="30.825" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".45"/>
+  <path d="m71.8 29.025-1.438-1.438 2.521-1.08-1.083 2.518z"/>
+  <path d="m75.041 29.382-1.438-1.438 2.521-1.08-1.083 2.518z"/>
+  <path d="m73.901 16.793-1.704-1.111 2.243-1.577-0.539 2.688z"/>
+ 
+  <line x1="117.15" x2="117.15" y1="32.625" y2="36.224" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  <line x1="117.15" x2="117.15" y1="36.224" y2="39.825" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  <g transform="matrix(0 -1 1 0 88.346 51.891)">
+   <polygon points="15.667 28.802 12.066 21.601 15.667 21.601 19.266 21.601" fill="#fff" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  </g>
+  <g fill="none" stroke-linecap="round">
+   <line x1="109.95" x2="117.15" y1="36.224" y2="36.224" stroke="#000" stroke-width=".45"/>
+   <g stroke-width=".7">
+    <g transform="matrix(0 -1 1 0 88.346 51.891)" stroke="#000">
+     <polyline points="7.36 36 15.667 36 15.667 28.802"/>
+     <polyline points="7.36 14.4 15.667 14.4 15.667 21.601"/>
+    </g>
+    <line id="connector5pin" x1="124.35" x2="124.35" y1="51.891" y2="44.691" stroke="#787878" stroke-linejoin="round"/>
+    <line id="connector4pin" x1="102.75" x2="102.75" y1="51.891" y2="44.691" stroke="#787878" stroke-linejoin="round"/>
+    <line x1="107.88" x2="118.68" y1="19.666" y2="19.666" stroke="#000"/>
+    <g transform="matrix(0 -1 1 0 88.346 58.291)" stroke="#000">
+     <polyline id="connector1pin_4_-4" points="38.625 25.777 45.125 29.866 45.125 36 50.239 36"/>
+     <polyline id="connector1pin_2_-4" points="50.239 14.4 45.125 14.4 45.125 19.531 38.625 23.421"/>
+    </g>
+    <line id="connector11pin" x1="124.35" x2="124.35" y1="7.892" y2=".69095" stroke="#787878" stroke-linejoin="round"/>
+    <line id="connector12pin" x1="102.75" x2="102.75" y1="7.892" y2=".69095" stroke="#787878" stroke-linejoin="round"/>
+   </g>
+  </g>
+  <g transform="translate(104.95 13.216)" fill="#787878" font-family="Droid Sans" font-size="2" letter-spacing="0px" word-spacing="0px" style="line-height:125%">
+   <text x="-4.4224968" y="-6.817369" font-family="Droid Sans" text-align="center" text-anchor="middle">12</text>
+  </g>
+  <line x1="114.45" x2="112.11" y1="28.124" y2="30.464" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".45"/>
+  <line x1="117.69" x2="115.35" y1="28.485" y2="30.825" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".45"/>
+  <path d="m114.98 29.025-1.438-1.438 2.521-1.08-1.083 2.518z"/>
+  <path d="m118.22 29.382-1.438-1.438 2.521-1.08-1.083 2.518z"/>
+  <path d="m117.08 16.793-1.704-1.111 2.243-1.577-0.539 2.688z"/>
+  <g fill="#787878" font-family="Droid Sans" font-size="2" text-anchor="middle">
+   <text transform="translate(14.229 49.594)" text-align="center">1</text>
+   <text transform="translate(39.902 49.8)" text-align="center">2</text>
+   <text transform="translate(169.67 49.366)" text-align="center">8</text>
+   <text transform="translate(143.63 49.561)" text-align="center">7</text>
+   <text transform="translate(143.24 6.026)" text-align="center">10</text>
+   <text transform="translate(170.06 6.024)" text-align="center">9</text>
+   <text transform="translate(14.188 6.219)" text-align="center">16</text>
+   <text transform="translate(40.427 6.025)" text-align="center">15</text>
+   <text transform="translate(56.946 6.026)" text-align="center">14</text>
+   <text transform="translate(83.767 6.025)" text-align="center">13</text>
+   <text transform="translate(52.088 56.947)" x="5.095654" y="-6.817369" text-align="center">3</text>
+   <text transform="translate(130.61 13.217)" x="-4.4168162" y="-6.817369" text-align="center">11</text>
+   <text transform="translate(79.103 56.946)" x="4.891624" y="-6.817369" text-align="center">4</text>
+   <text transform="translate(99.9 56.947)" y="-6.817369" text-align="center">5</text>
+   <text transform="translate(121.47 56.752)" x="4.891624" y="-6.817369" text-align="center">6</text>
+  </g>
+  <line x1="160.35" x2="160.35" y1="32.625" y2="36.224" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  <line x1="160.35" x2="160.35" y1="36.224" y2="39.825" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  <g transform="matrix(0 -1 1 0 131.55 51.891)">
+   <polygon points="19.266 21.601 15.667 28.802 12.066 21.601 15.667 21.601" fill="#fff" stroke="#000" stroke-linecap="round" stroke-width=".7"/>
+  </g>
+  <g fill="none" stroke-linecap="round">
+   <line x1="153.15" x2="160.35" y1="36.224" y2="36.224" stroke="#000" stroke-width=".45"/>
+   <g stroke-width=".7">
+    <g transform="matrix(0 -1 1 0 131.55 51.891)" stroke="#000">
+     <polyline id="connector1pin_1_-9-2" points="7.36 36 15.667 36 15.667 28.802"/>
+     <polyline id="connector0pin_1_-9-5" points="7.36 14.4 15.667 14.4 15.667 21.601"/>
+    </g>
+    <line id="connector8pin" x1="167.55" x2="167.55" y1="51.891" y2="44.691" stroke="#787878" stroke-linejoin="round"/>
+    <line id="connector7pin" x1="145.95" x2="145.95" y1="51.891" y2="44.691" stroke="#787878" stroke-linejoin="round"/>
+    <line x1="151.08" x2="161.88" y1="19.666" y2="19.666" stroke="#000"/>
+    <g transform="matrix(0 -1 1 0 131.55 58.291)" stroke="#000">
+     <polyline id="connector1pin_4_-8-0" points="38.625 25.777 45.125 29.866 45.125 36 50.239 36"/>
+     <polyline id="connector1pin_2_-0-7" points="50.239 14.4 45.125 14.4 45.125 19.531 38.625 23.421"/>
+    </g>
+    <line id="connector9pin" x1="167.55" x2="167.55" y1="7.892" y2=".69094" stroke="#787878" stroke-linejoin="round"/>
+    <line id="connector10pin" x1="145.95" x2="145.95" y1="7.892" y2=".69094" stroke="#787878" stroke-linejoin="round"/>
+   </g>
+  </g>
+  <line x1="157.65" x2="155.31" y1="28.124" y2="30.464" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".45"/>
+  <line x1="160.89" x2="158.55" y1="28.485" y2="30.825" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".45"/>
+  <path d="m158.18 29.025-1.438-1.438 2.521-1.08-1.083 2.518z"/>
+  <path d="m161.42 29.382-1.438-1.438 2.521-1.08-1.083 2.518z"/>
+  <path d="m160.28 16.793-1.704-1.111 2.243-1.577-0.539 2.688z"/>
+
+ </g>
+</svg>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
+<svg id="Layer_1" width="14.111px" height="22.3px" enable-background="new 0 0 14.111 22.3" version="1.1" viewBox="0 0 14.111 22.3" xmlns="http://www.w3.org/2000/svg">
+ <g id="schematic">
+  <line x1="13.752" x2="10.152" y1="14.75" y2="14.75" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".5"/>
+  <line x1="10.152" x2="6.552" y1="14.75" y2="14.75" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".5"/>
+  <polygon points="13.752 7.55 10.152 14.75 6.552 7.55 10.152 7.55" fill="#fff" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width=".9"/>
+  <line x1="4.392" x2="1.543" y1="9.71" y2="12.558" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".5"/>
+  <line x1="4.752" x2="1.859" y1="12.951" y2="15.843" fill="none" stroke="#000" stroke-linecap="round" stroke-width=".5"/>
+  <line id="connector0pin" x1="10.152" x2="10.152" y1="21.951" y2="14.75" fill="none" stroke="#787878" stroke-linecap="round" stroke-width=".75"/>
+  <line id="connector3pin" x1="10.152" x2="10.152" y1="21.951" y2="14.75" fill="none" stroke="#787878" stroke-linecap="round" stroke-width=".75"/>
+  <line id="connector2pin" x1="10.152" x2="10.152" y1=".35" y2="7.55" fill="none" stroke="#787878" stroke-linecap="round" stroke-width=".75"/>
+  <line id="connector1pin" x1="10.152" x2="10.152" y1=".35" y2="7.55" fill="none" stroke="#787878" stroke-linecap="round" stroke-width=".75"/>
+ 
+  <path d="m0.432 13.669 1.08-2.52 1.44 1.439-2.52 1.081z" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width=".2"/>
+  <path d="m0.792 16.91 1.08-2.52 1.439 1.439-2.519 1.081z" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width=".2"/>
+ </g>
+</svg>

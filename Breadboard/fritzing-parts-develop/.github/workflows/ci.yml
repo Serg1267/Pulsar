@@ -1,0 +1,108 @@
+name: check-all-parts
+on: [push, pull_request]
+jobs:
+  python-scripts:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+      - name: Install requirements
+        run: pip install -r scripts/requirements.txt
+      - name: Avoid non-ASCII in part and SVG filenames
+        run: python scripts/checkascii.py .
+      - name: Check that image filenames use same case
+        run: python scripts/checkcase.py
+      - name: Dry run script to test the script itself
+        run: python scripts/obsolete.py core/sparkfun-connectors-rca-.fzp dummy -s
+      - name: Check that SVGs and FZPs are ASCII or UTF-8
+        run: python scripts/utf8stats.py . --verbose
+
+  check_modified_files_pull_request:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install requirements
+        run: pip install --no-cache-dir -r scripts/checks/requirements.txt
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46.0.5
+        with:
+          files: |
+            **/*.fzp
+            **/*.svg
+          files_ignore: |
+            **/obsolete/**
+          write_output_files: true
+          json: true
+          safe_output: false
+      - name: List changed files
+        run: cat .github/outputs/all_changed_files.json
+      - name: Run fzp checker
+        run: python fzp_checker.py . -f .github/outputs/all_changed_files.json -v
+
+  check_modified_files_default:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install requirements
+        run: pip install --no-cache-dir -r scripts/checks/requirements.txt
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46.0.5
+        with:
+          files: |
+            **/*.fzp
+            **/*.svg
+          files_ignore: |
+            **/obsolete/**
+          write_output_files: true
+          json: true
+          safe_output: false
+          sha: develop
+      - name: List changed files
+        run: cat .github/outputs/all_changed_files.json
+      - name: Run fzp checker
+        run: python fzp_checker.py . -f .github/outputs/all_changed_files.json -v
+
+  checker_unit_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install requirements
+        run: |
+          cd scripts/checks
+          pip install --no-cache-dir -r requirements.txt
+      - name: Run pytest
+        run: python -m pytest
+        working-directory: scripts/checks

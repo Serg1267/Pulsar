@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Fritzing (http://www.fritzing.org/) -->
+<svg width=".78234in" height=".81325in" enable-background="new" version="1.2" viewBox="0 0 782.34 813.25" xmlns="http://www.w3.org/2000/svg">
+	<metadata>
+		<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+			<cc:Work rdf:about="" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+				<dc:format xmlns:dc="http://purl.org/dc/elements/1.1/">image/svg+xml</dc:format>
+				<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+				<dc:title xmlns:dc="http://purl.org/dc/elements/1.1/"/>
+			</cc:Work>
+		</rdf:RDF>
+	</metadata>
+	<desc>
+		<referenceFile>generic_ic_dip_8_schem.svg</referenceFile>
+	</desc>
+<g id="schematic">
+	<g fill="none">
+		<rect x="204.62" y="8.0358" width="368.4" height="797.18" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="16.072"/>
+		<g stroke-width="0">
+			<rect x=".069234" y="461.23" width="0" height="9.7222"/>
+			<rect x=".069234" y="561.23" width="0" height="9.7222"/>
+			<rect x=".069234" y="661.23" width="0" height="9.7222"/>
+			<rect x=".069234" y="761.23" width="0" height="9.7222"/>
+			<rect x="600.07" y="461.23" width="0" height="9.7222"/>
+			<rect x="600.07" y="561.23" width="0" height="9.7222"/>
+			<rect x="600.07" y="661.23" width="0" height="9.7222"/>
+			<rect x="600.07" y="761.23" width="0" height="9.7222"/>
+		</g>
+	</g>
+	<g font-family="Droid Sans" font-size="48.611" text-anchor="middle">
+		<text x="388.57001" y="583.69708" font-family="OCRA" font-size="41.667" text-align="center" text-anchor="middle" writing-mode="lr" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">DS2Y-S-DC5V</text>
+	</g>
+	<g fill="none" stroke="#000" stroke-linecap="round">
+		<line x1="371.24" x2="209.3" y1="65.68" y2="65.68" stroke-width="6.6128"/>
+		<line x1="371.94" x2="371.94" y1="265.63" y2="66.336" stroke-width="6.2671"/>
+		<line x1="271.68" x2="212.02" y1="265.71" y2="265.71" marker-start="" stroke-width="5.8882"/>
+		<line x1="342.44" x2="371.94" y1="265.65" y2="265.65" marker-start="" stroke-width="6.25"/>
+		<line x1="331.12" x2="209.3" y1="465.68" y2="465.68" stroke-width="5.7353"/>
+		<path d="m331.12 465.68-50.902-227.3" fill-rule="evenodd" stroke-width="6.25"/>
+		<line x1="407.19" x2="569.13" y1="64.125" y2="64.125" stroke-width="6.6128"/>
+		<line x1="406.49" x2="406.49" y1="264.08" y2="64.781" stroke-width="6.2671"/>
+		<line x1="506.75" x2="566.42" y1="264.16" y2="264.16" marker-start="" stroke-width="5.8882"/>
+		<line x1="435.99" x2="406.49" y1="264.1" y2="264.1" marker-start="" stroke-width="6.25"/>
+		<line x1="447.31" x2="569.13" y1="464.12" y2="464.12" stroke-width="5.7353"/>
+		<path d="m447.31 464.13 50.902-227.3" fill-rule="evenodd" stroke-width="6.25"/>
+	</g>
+	<g transform="translate(.069234 366.09)">
+		<g>
+			<g fill="none" stroke="#000">
+				<g stroke-width="6.9444">
+					<path d="m408.47 340.33c2.6484 34.403 31.542 60.504 65.528 60.168"/>
+					<path d="m468.47 340.33c4.8333-16.569-4.6806-33.917-21.25-38.75-16.569-4.8611-33.917 4.6806-38.75 21.222-1.6667 5.7222-1.6667 11.806 0 17.528"/>
+					<path d="m308.47 340.33c12.431 44.181 58.319 69.917 102.5 57.5 27.875-7.8194 49.653-29.625 57.5-57.5"/>
+					<path d="m368.47 340.33c4.8333-16.569-4.6806-33.917-21.25-38.75-16.556-4.8611-33.917 4.6806-38.764 21.222-1.6667 5.7222-1.6667 11.806 0 17.528"/>
+					<path d="m368.47 340.33c-2.6484 34.403-31.542 60.504-65.528 60.168"/>
+				</g>
+				<line x1="303.21" x2="211.3" y1="400.5" y2="400.5" stroke-linecap="round" stroke-width="6.6575"/>
+				<line x1="566.31" x2="474" y1="400.5" y2="400.5" stroke-linecap="round" stroke-width="6.6719"/>
+			</g>
+		</g>
+		<g>
+			<line x1="4.8611" x2="200" y1="-300.41" y2="-300.41" fill="none" stroke="#787878" stroke-linecap="round" stroke-linejoin="round" stroke-width="9.7222"/>
+			<rect id="connector7pin" x="-2.7105e-17" y="-305.27" width="200" height="9.7222" fill="none" stroke-width="0" connectorName="1"/>
+			<g class="text" fill="#8c8c8c" font-family="Droid Sans" font-size="48.611" stroke-width="0" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+				<text x="100" y="-314.99362" font-family="Droid Sans" font-size="45.833" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">N.O.</text>
+			</g>
+			<line x1="4.8611" x2="200" y1="-100.41" y2="-100.41" fill="none" stroke="#787878" stroke-linecap="round" stroke-linejoin="round" stroke-width="9.7222"/>
+			<rect id="connector6pin" x="-2.7105e-17" y="-105.27" width="200" height="9.7222" fill="none" stroke-width="0" connectorName="2"/>
+			<g class="text" fill="#8c8c8c" font-family="Droid Sans" font-size="48.611" stroke-width="0" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+				<text x="100" y="-114.99333" font-size="45.833px">N.C.</text>
+			</g>
+			<line x1="4.8611" x2="200" y1="99.59" y2="99.59" fill="none" stroke="#787878" stroke-linecap="round" stroke-linejoin="round" stroke-width="9.7222"/>
+			<rect id="connector5pin" y="94.729" width="200" height="9.7222" fill="none" stroke-width="0" connectorName="3"/>
+			<g class="text" fill="#8c8c8c" font-family="Droid Sans" font-size="48.611" stroke-width="0" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+				<text x="100" y="85.006668" font-size="45.833px">COM</text>
+			</g>
+			<g fill="none" transform="translate(0.000, -0.830)">
+				<line x1="4.8611" x2="200" y1="400" y2="400" stroke="#787878" stroke-linecap="round" stroke-linejoin="round" stroke-width="9.7222"/>
+				<rect id="connector4pin" y="395.14" width="200" height="9.7222" stroke-width="0" connectorName="4"/>
+				<line x1="577.34" x2="777.34" y1="-300.41" y2="-300.41" stroke="#787878" stroke-linecap="round" stroke-linejoin="round" stroke-width="9.7222"/>
+				<rect id="connector0pin" x="582.2" y="-305.27" width="200" height="9.7222" stroke-width="0" connectorname="8"/>
+			</g>
+			<g fill="#8c8c8c" font-family="Droid Sans" font-size="48.611" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+				<text x="234.27451" y="-310.81543" font-size="45.833px">9</text>
+			</g>
+			<g class="text" fill="#8c8c8c" font-family="Droid Sans" font-size="48.611" stroke-width="0" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+				<text x="682.20337" y="-314.99362" font-size="45.833px">N.O.</text>
+			</g>
+			<line x1="577.34" x2="777.34" y1="-100.41" y2="-100.41" fill="none" stroke="#787878" stroke-linecap="round" stroke-linejoin="round" stroke-width="9.7222"/>
+			<rect id="connector1pin" x="582.2" y="-105.27" width="200" height="9.7222" fill="none" stroke-width="0" connectorname="7"/>
+			<g fill="#8c8c8c" font-family="Droid Sans" font-size="48.611" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+				<text x="245.44191" y="-110.55063" font-size="45.833px">11</text>
+			</g>
+			<g class="text" fill="#8c8c8c" font-family="Droid Sans" font-size="48.611" stroke-width="0" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+				<text x="682.20337" y="-114.99333" font-size="45.833px">N.C.</text>
+			</g>
+			<line x1="577.34" x2="777.34" y1="99.59" y2="99.59" fill="none" stroke="#787878" stroke-linecap="round" stroke-linejoin="round" stroke-width="9.7222"/>
+			<rect id="connector2pin" x="582.2" y="94.729" width="200" height="9.7222" fill="none" stroke-width="0" connectorname="6"/>
+			<g fill="#8c8c8c" font-family="Droid Sans" font-size="48.611" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+				<text x="243.42775" y="89.18454" font-size="45.833px">13</text>
+			</g>
+			<g class="text" fill="#8c8c8c" font-family="Droid Sans" font-size="48.611" stroke-width="0" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+				<text x="682.20337" y="85.006668" font-size="45.833px">COM</text>
+			</g>
+			<line x1="577.34" x2="777.34" y1="400" y2="400" fill="none" stroke="#787878" stroke-linecap="round" stroke-linejoin="round" stroke-width="9.7222"/>
+			<rect id="connector3pin" x="582.2" y="395.14" width="200" height="9.7222" fill="none" stroke-width="0" connectorname="5"/>
+			<g fill="#8c8c8c" font-family="Droid Sans" text-anchor="middle">
+				<g font-size="48.611" text-align="center" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+					<text x="246.89658" y="389.59488" font-size="45.833px">16</text>
+				</g>
+				<g class="text" font-size="48.611" stroke-width="0" text-align="center" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+					<text x="100" y="385.41699" font-size="45.833px">-</text>
+				</g>
+				<g class="text" font-size="45.833" stroke-width="0" text-align="center" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal;line-height:57.29166794">
+					<text x="682.20337" y="385.41699" font-family="Droid Sans" font-size="47.222" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">+</text>
+				</g>
+				<g font-size="45.833px" text-align="center" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+					<text x="545.86609" y="-310.81543">8</text>
+					<text x="545.64233" y="-110.81546">6</text>
+					<text x="544.45618" y="89.18454">4</text>
+				</g>
+				<g font-size="45.833" text-align="center" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">
+					<text x="552.87091" y="389.59488" font-family="Droid Sans" font-size="45.833" text-align="center" text-anchor="middle" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal">1</text>
+				</g>
+			</g>
+		</g>
+	</g>
+	<g fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-width="6.25">
+		<path d="m271.68 265.71-16.122-17.606"/>
+		<path d="m271.68 265.71-16.122 17.606" enable-background="new"/>
+	</g>
+	<g transform="translate(164.31 -1.6149)">
+		<g enable-background="new" fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-width="6.25">
+			<path d="m271.68 265.71-16.122-17.606"/>
+			<path d="m271.68 265.71-16.122 17.606" enable-background="new"/>
+		</g>
+	</g>
+	<g transform="matrix(-1 0 0 1 614.12 -.060069)">
+		<g enable-background="new" fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-width="6.25">
+			<path d="m271.68 265.71-16.122-17.606"/>
+			<path d="m271.68 265.71-16.122 17.606" enable-background="new"/>
+		</g>
+	</g>
+	<g transform="matrix(-1 0 0 1 778.43 -1.5549)">
+		<g enable-background="new" fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-width="6.25">
+			<path d="m271.68 265.71-16.122-17.606"/>
+			<path d="m271.68 265.71-16.122 17.606" enable-background="new"/>
+		</g>
+	</g>
+</g>
+</svg>

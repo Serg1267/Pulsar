@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" baseProfile="tiny" version="1.2" xmlns="http://www.w3.org/2000/svg">
+ <g id="icon" transform="matrix(.8 0 0 .8 0 2.8)">
+  <g fill="#8c8c8c">
+   <rect x="3.5" y="26.3" width="3" height="6.68"/>
+   <rect x="13.5" y="26.3" width="3" height="6.68"/>
+   <rect x="23.5" y="26.3" width="3" height="6.68"/>
+   <rect x="33.5" y="26.3" width="3" height="6.68"/>
+   <rect x="3.5" width="3" height="6.68"/>
+   <rect x="13.5" width="3" height="6.68"/>
+   <rect x="23.5" width="3" height="6.68"/>
+   <rect x="33.5" width="3" height="6.68"/>
+  </g>
+  <rect y="3" width="40" height="8.5" fill="#3d3d3d"/>
+  <rect y="21.5" width="40" height="8.5"/>
+  <g fill="#8c8c8c">
+   <polygon points="8.5 4.34 8.5 3.26 6.5 2.34 3.5 2.34 3.5 4.34"/>
+   <polygon points="18.5 4.34 18.5 3.26 16.5 2.34 13.5 2.34 11.5 3.26 11.5 4.34"/>
+   <polygon points="36.5 4.34 36.5 2.34 33.5 2.34 31.5 3.26 31.5 4.34"/>
+   <polygon points="28.5 4.34 28.5 3.26 26.5 2.34 23.5 2.34 21.5 3.26 21.5 4.34"/>
+   <polygon points="3.5 28.7 3.5 30.7 6.5 30.7 8.5 29.7 8.5 28.7"/>
+   <polygon points="31.5 28.7 31.5 29.7 33.5 30.7 36.5 30.7 36.5 28.7"/>
+   <polygon points="11.5 28.7 11.5 29.7 13.5 30.7 16.5 30.7 18.5 29.7 18.5 28.7"/>
+   <polygon points="21.5 28.7 21.5 29.7 23.5 30.7 26.5 30.7 28.5 29.7 28.5 28.7"/>
+  </g>
+  <polygon points="40 3 39.2 5.46 39.2 27.5 40 30" fill="#141414"/>
+  <polygon points="0 3 0.75 5.46 0.75 11.5 5 11.5 5 21.5 0.75 21.5 0.75 27.5 0 30" fill="#1f1f1f"/>
+  <linearGradient id="SVGID_1_" x1="2.78" x2="2.78" y1="21.5" y2="11.5" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#424242" offset="0"/>
+   <stop offset="1"/>
+  </linearGradient>
+  <polygon points="0.75 11.5 0.56 13.6 0.56 19.4 0.75 21.6 5 21.6 5 11.5" fill="url(#SVGID_1_)"/>
+  <path d="m0.75 5.46v5.99c2.38 0.45 4.19 2.53 4.19 5.04s-1.8 4.6-4.19 5.05v5.99h38.5v-22.1h-38.5z" fill="#303030"/>
+  <path d="m0.56 13.6v5.83c1.47-0.17 2.62-1.4 2.62-2.92s-1.14-2.74-2.62-2.91z" fill="#262626"/>
+  <linearGradient id="SVGID_2_" x1="6.5" x2="6.5" y1="21.4" y2="25.5" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#121212" offset="0"/>
+   <stop stop-color="#404040" offset="1"/>
+  </linearGradient>
+ <text x="6" y="18" fill="#e3dbdb" font-family="'OCRA'" font-size="9">LM358</text>
+  <circle cx="6.5" cy="23.5" r="2.06" fill="url(#SVGID_2_)"/>
+ </g>
+</svg>

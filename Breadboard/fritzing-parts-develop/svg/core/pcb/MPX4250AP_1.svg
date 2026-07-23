@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="0" width="34.682mm" height="34.321mm" version="1.1" xmlns="http://www.w3.org/2000/svg">
+ <desc id="0.0">
+  <referenceFile id="0.0.0">MPX2010 - pcb.svg</referenceFile>
+ </desc>
+ <metadata id="0.2">
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work rdf:about="" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <dc:format xmlns:dc="http://purl.org/dc/elements/1.1/">image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/"/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g id="layer1">
+  <g id="copper0">
+   <g id="copper1">
+    <g transform="scale(-1,1)">
+     <rect id="connector7pad" x="-87.926" y="110.04" width="5.13" height="5.13" fill="none" stroke="#f7bd13" stroke-width="1.53"/>
+     <circle id="connector1pad" cx="-85.361" cy="112.61" r="2.565" fill="none" stroke="#f7bd13" stroke-width="1.53"/>
+     <circle id="connector2pad" cx="-76.362" cy="112.6" r="2.565" fill="none" stroke="#f7bd13" stroke-width="1.53"/>
+     <circle id="connector3pad" cx="-67.362" cy="112.6" r="2.565" fill="none" stroke="#f7bd13" stroke-width="1.53"/>
+     <circle id="connector4pad" cx="-58.362" cy="112.6" r="2.565" fill="none" stroke="#f7bd13" stroke-width="1.53"/>
+     <circle id="connector5pad" cx="-49.362" cy="112.6" r="2.565" fill="none" stroke="#f7bd13" stroke-width="1.53"/>
+     <circle id="connector6pad" cx="-40.354" cy="112.61" r="2.565" fill="none" stroke="#f7bd13" stroke-width="1.53"/>
+    </g>
+   </g>
+  </g>
+  <g id="silkscreen">
+   <circle id="path4213-1" cx="21.919" cy="70.085" r="7.9301" fill="none" stroke="#000" stroke-dashoffset=".5" stroke-linecap="round" stroke-width=".886"/>
+   <circle id="path4213" cx="103.81" cy="70.085" r="7.9301" fill="none" stroke="#000" stroke-dashoffset=".5" stroke-linecap="round" stroke-width=".886"/>
+   <text x="35" y="73" font-family="OCR-Fritzing-mono" font-size="9">MPX4250AP</text>
+   <g stroke="#000" stroke-linecap="round" stroke-width=".72">
+    <line id="line6797" x1="51.612" x2="47.112" y1="117.1" y2="117.1"/>
+    <line id="line6799" x1="47.112" x2="44.862" y1="117.1" y2="114.85"/>
+    <line id="line6801" x1="44.862" x2="47.112" y1="110.35" y2="108.1"/>
+    <line id="line6803" x1="62.862" x2="60.612" y1="114.85" y2="117.1"/>
+    <line id="line6805" x1="60.612" x2="56.112" y1="117.1" y2="117.1"/>
+    <line id="line6807" x1="56.112" x2="53.862" y1="117.1" y2="114.85"/>
+    <line id="line6809" x1="53.862" x2="56.112" y1="110.35" y2="108.1"/>
+    <line id="line6811" x1="56.112" x2="60.612" y1="108.1" y2="108.1"/>
+    <line id="line6813" x1="60.612" x2="62.862" y1="108.1" y2="110.35"/>
+    <line id="line6815" x1="51.612" x2="53.862" y1="117.1" y2="114.85"/>
+    <line id="line6817" x1="53.862" x2="51.612" y1="110.35" y2="108.1"/>
+    <line id="line6819" x1="47.112" x2="51.612" y1="108.1" y2="108.1"/>
+    <line id="line6821" x1="78.612" x2="74.112" y1="117.1" y2="117.1"/>
+    <line id="line6823" x1="74.112" x2="71.862" y1="117.1" y2="114.85"/>
+    <line id="line6825" x1="71.862" x2="74.112" y1="110.35" y2="108.1"/>
+    <line id="line6827" x1="71.862" x2="69.612" y1="114.85" y2="117.1"/>
+    <line id="line6829" x1="69.612" x2="65.112" y1="117.1" y2="117.1"/>
+    <line id="line6831" x1="65.112" x2="62.862" y1="117.1" y2="114.85"/>
+    <line id="line6833" x1="62.862" x2="65.112" y1="110.35" y2="108.1"/>
+    <line id="line6835" x1="65.112" x2="69.612" y1="108.1" y2="108.1"/>
+    <line id="line6837" x1="69.612" x2="71.862" y1="108.1" y2="110.35"/>
+    <line id="line6841" x1="78.612" x2="80.862" y1="117.1" y2="114.85"/>
+    <line id="line6843" x1="80.862" x2="78.612" y1="110.35" y2="108.1"/>
+    <line id="line6845" x1="74.112" x2="78.612" y1="108.1" y2="108.1"/>
+    <line id="line6821-7" x1="87.637" x2="83.137" y1="117.1" y2="117.1"/>
+    <line id="line6823-7" x1="83.137" x2="80.887" y1="117.1" y2="114.85"/>
+    <line id="line6825-4" x1="80.887" x2="83.137" y1="110.35" y2="108.1"/>
+    <line id="line6839-3" x1="89.887" x2="89.887" y1="114.85" y2="110.35"/>
+    <line id="line6841-5" x1="87.637" x2="89.887" y1="117.1" y2="114.85"/>
+    <line id="line6843-1" x1="89.887" x2="87.637" y1="110.35" y2="108.1"/>
+    <line id="line6845-9" x1="83.137" x2="87.637" y1="108.1" y2="108.1"/>
+    <line id="line6797-5" x1="42.604" x2="38.104" y1="117.09" y2="117.09"/>
+    <line id="line6799-7" x1="38.104" x2="35.854" y1="117.09" y2="114.84"/>
+    <line id="line6801-4" x1="35.854" x2="38.104" y1="110.34" y2="108.09"/>
+    <line id="line6815-5" x1="42.604" x2="44.854" y1="117.09" y2="114.84"/>
+    <line id="line6817-6" x1="44.854" x2="42.604" y1="110.34" y2="108.09"/>
+    <line id="line6819-3" x1="38.104" x2="42.604" y1="108.09" y2="108.09"/>
+    <line id="line6847-9" x1="35.854" x2="35.854" y1="114.84" y2="110.34"/>
+   </g>
+   <g fill="none" stroke="#000" stroke-width="0.72" transform="translate(0.233, 0.000)">
+    <path d="m55.446 38.359-2.3162-3.2476v-11.667h3.3735l-3.3735-16.459v-6.4845h-10.331v6.4845l-2.7887 16.459h2.7887v11.667l-3.0385 3.8172m17.297-0.4311-17.138 0.27643 0.46214 8.6767m-25.317 31.568 31.197 17.931m38.716-50.739 25.143 14.549m-53.062-22.263-41.391 22.222m6.2535 20.626c-6.2191 0-11.261-5.0414-11.261-11.26 0-3.9051 1.988-7.3459 5.0071-9.3656m88.139-1.8946c-3.2372 0-5.7215 1.876-8.2095 3.5529-1.9618 1.0991-2.0184-8.1828-10.619-16.167l0.07252-7.329-27.992-0.3844m-35.138 42.848c3.3421 0 5.3103-3.6538 8.4065-3.7682 1.4988-0.0554 4.0531 6.6071 5.8948 8.8171 6.9107 8.2927 9.6097 13.802 26.642 14.171 17.032 0.36911 27.02-9.8196 40.943-17.562 5.3104-2.9804 11.261-6.6999 11.261-12.919 0-6.2188-5.0416-11.26-11.261-11.26"/>
+   </g>
+  </g>
+ </g>
+</svg>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="36" height="29" version="1.1" xmlns="http://www.w3.org/2000/svg">
+ <desc>
+  <referenceFile>svg.schematics.G5LE-power-relay.svg</referenceFile>
+ </desc>
+ <metadata oldid="metadata4719">
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work rdf:about="" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <dc:format xmlns:dc="http://purl.org/dc/elements/1.1/">image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/"/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g id="schematic">
+  <path d="m3.35 28.9v-28.8" stroke="#000" stroke-linejoin="round" stroke-width=".7"/>
+  <line id="connector4pin" x1="3.35" x2="3.3" y1=".2" y2="5" fill="none" stroke="#555" stroke-linecap="round" stroke-width=".7"/>
+  <rect id="connector4terminal" x="2.99" y=".2" width=".7" height="1.5" fill="none"/>
+  <line id="connector1pin" x1="3.35" x2="3.3" y1="28.7" y2="25" fill="none" stroke="#555" stroke-linecap="round" stroke-width=".7"/>
+  <rect id="connector1terminal" x="2.99" y="27.4" width=".7" height="1.5" fill="none"/>
+  <path d="m6.4 12.7h-6.2v3.1h6.2v-3.1" stroke="#000" stroke-linejoin="round" stroke-width=".5"/>
+  <path d="m36 13.5h-5.6l-6 3" fill="none" stroke="#000" stroke-linejoin="round" stroke-width=".65"/>
+  <line id="connector2pin" x1="35.7" x2="34" y1="13.5" y2="13.5" fill="none" stroke="#555" stroke-linecap="round" stroke-width=".7"/>
+  <rect id="connector2terminal" x="34.5" y="13.15" width="1.5" height=".7" fill="none"/>
+  <path d="m26 10h-0.9375l0.46875 2 0.46875-2" fill-rule="evenodd" stroke="#000" stroke-linejoin="round" stroke-width=".7"/>
+  <path d="m25.6 0.23438v11.7" stroke="#000" stroke-linejoin="round" stroke-width=".7"/>
+  <line id="connector5pin" x1="25.6" x2="25.6" y1=".2" y2="5" fill="none" stroke="#555" stroke-linecap="round" stroke-width=".7"/>
+  <rect id="connector5terminal" x="25.26" y=".2" width=".7" height="1.5" fill="none"/>
+  <path d="m26.1 19h-0.9375l0.46875-2 0.46875 2" fill-rule="evenodd" stroke="#000" stroke-linejoin="round" stroke-width=".7"/>
+  <path d="m25.6 17.2v11.7" stroke="#000" stroke-linejoin="round" stroke-width=".7"/>
+  <line id="connector0pin" x1="25.6" x2="25.6" y1="28.7" y2="25" fill="none" stroke="#555" stroke-linecap="round" stroke-width=".7"/>
+  <rect id="connector0terminal" x="25.26" y="27.4" width=".7" height="1.5" fill="none"/>
+ </g>
+</svg>

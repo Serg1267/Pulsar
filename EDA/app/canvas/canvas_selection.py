@@ -68,6 +68,7 @@ class SelectionMixin:
                     "refdes": item.refdes(),
                     "value": item.value(),
                     "model_line": item.model_line(),
+                    "footprint": item.footprint(),
                     "labels": [],
                 }
                 for child in item.childItems():
@@ -239,6 +240,7 @@ class SelectionMixin:
             ghost = ComponentGraphicsItem(sym_data, refdes=cd.get("refdes", "?"),
                                           value=cd.get("value", ""))
             ghost.set_model_line(cd.get("model_line", ""))
+            ghost.set_footprint(cd.get("footprint", ""))
             ghost.setPos(cd["x"] + dx, cd["y"] + dy)
             ghost.setRotation(cd.get("rotation", 0.0))
             flip_x = cd.get("flip_x", False)
@@ -372,6 +374,7 @@ class SelectionMixin:
             comp = ComponentGraphicsItem(sym_data, refdes=refdes,
                                          value=cd.get("value", ""))
             comp.set_model_line(cd.get("model_line", ""))
+            comp.set_footprint(cd.get("footprint", ""))
             comp.setPos(cd["x"] + dx, cd["y"] + dy)
             comp.setRotation(cd.get("rotation", 0.0))
             flip_x = cd.get("flip_x", False)

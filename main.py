@@ -34,6 +34,7 @@ from ui.settings_dialog import SettingsDialog
 from ui.unified_tabs import UnifiedTabWidget
 from ui.netlist_viewer_dialog import NetlistViewerDialog
 from ui.side_panel import ComponentPanel
+from Breadboard.breadboard_window import BreadboardWindow
 from utils.spice_template import create_cir_template
 from EDA.app.canvas import SchematicCanvas
 from editor.spice_highlighter import SpiceHighlighter, DEFAULT_SCHEME
@@ -325,6 +326,12 @@ class PulsarMainWindow(QMainWindow):
         self._view_netlist_action.setEnabled(True)
         self._sch_menu.addAction(self._view_netlist_action)
 
+        # ─── Макетная плата ───
+        self._breadboard_action = QAction("Макетная плата", self)
+        self._breadboard_action.setEnabled(False)
+        self._breadboard_action.triggered.connect(self._open_breadboard)
+        menubar.addAction(self._breadboard_action)
+
         # ─── Справка (самый правый пункт) ───
         help_menu = menubar.addMenu("Справка")
         quickstart_action = QAction("Быстрый старт", self)
@@ -352,6 +359,15 @@ class PulsarMainWindow(QMainWindow):
                           "QPushButton { background: #e0e0e0; color: black; border: 1px solid #999; padding: 4px 12px; }"
                           "QPushButton:hover { background: #d0d0d0; }")
         box.exec()
+
+    def _open_breadboard(self):
+        if not hasattr(self, '_breadboard_window') or self._breadboard_window is None:
+            self._breadboard_window = BreadboardWindow(self)
+        else:
+            self._breadboard_window.reload()
+        self._breadboard_window.show()
+        self._breadboard_window.raise_()
+        self._breadboard_window.activateWindow()
 
     def _create_toolbar(self):
         from PySide6.QtWidgets import QToolBar
@@ -956,6 +972,7 @@ class PulsarMainWindow(QMainWindow):
         for act in self._comp_actions:
             act.setEnabled(is_sch_now)
 
+        self._breadboard_action.setEnabled(is_sch_now)
         self._comp_panel_action.setVisible(self._tabs.has_sch_tabs())
         if is_sch_now and self._comp_panel_action.isChecked():
             self._ensure_comp_dock()

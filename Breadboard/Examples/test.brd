@@ -1,0 +1,13 @@
+{
+  "placements": [
+    {
+      "file": "sparkfun-discretesemi_to-92-ammo_pcb.svg",
+      "bx": 17.550200000000004,
+      "by": 29.588689999999996,
+      "rotation": 0,
+      "flip_h": false,
+      "flip_v": false
+    }
+  ],
+  "routes": []
+}

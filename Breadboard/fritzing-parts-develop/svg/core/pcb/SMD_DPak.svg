@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width=".29134in" height=".47244in" version="1.1" viewBox="0 0 26.22 42.52" xmlns="http://www.w3.org/2000/svg">
+ <g id="silkscreen">
+  <rect x=".17717" y=".17716" width="25.866" height="31.713" fill="none" stroke="#000" stroke-linecap="square" stroke-linejoin="round" stroke-width=".35433"/>
+ </g>
+ <g id="copper1" fill="#f7bd13">
+  <rect id="connector1pad" x=".70866" y=".70866" width="24.803" height="24.803"/>
+  <rect id="connector2pad" x="19.311" y="32.953" width="5.315" height="9.5669"/>
+  <rect id="connector0pad" x="1.5945" y="32.953" width="5.315" height="9.5669"/>
+ </g>
+</svg>

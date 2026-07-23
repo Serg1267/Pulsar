@@ -973,6 +973,7 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                 ghost = ComponentGraphicsItem(sym_data, refdes=cd.get("refdes", "?"),
                                               value=cd.get("value", ""))
                 ghost.set_model_line(cd.get("model_line", ""))
+                ghost.set_footprint(cd.get("footprint", ""))
                 ghost.setPos(cd["x"] + dx, cd["y"] + dy)
                 ghost.setRotation(cd.get("rotation", 0.0))
                 flip_x = cd.get("flip_x", False)
@@ -1891,22 +1892,25 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                             break
             layout.addWidget(ed_model)
 
-            layout.addWidget(QLabel("footprint:"))
+            layout.addWidget(QLabel("footprint (МП):"))
             ed_fp = QComboBox()
             ed_fp.setEditable(True)
-            _common_fp = [
-                "acy(200)", "acy(300)", "acy(400)", "acy(500)", "acy(600)",
-                "acy(800)", "acy(1000)",
-                "rcy(100)", "rcy(200)",
-                "dip(6)", "dip(8)", "dip(14)",
-                "to92", "to220", "led5",
-                "connector(1,2)", "connector(2,2)",
-                "MLT-0.125", "MLT-0.25", "MLT-0.5", "MLT-1", "MLT-2",
+            _board_fp = [
+                ("(нет)", ""),
+                ("Res_5mm (5.08 мм)", "axial_lay_2_200mil_pcb.svg"),
+                ("Res_8mm (7.62 мм)", "axial_lay_2_300mil_pcb.svg"),
+                ("Res_10mm (10.16 мм)", "axial_lay_2_400mil_pcb.svg"),
+                ("Res_13mm (12.70 мм)", "axial_lay_2_500mil_pcb.svg"),
+                ("Res_15mm (15.24 мм)", "axial_lay_2_600mil_pcb.svg"),
+                ("Res_20mm (20.32 мм)", "axial_lay_2_800mil_pcb.svg"),
             ]
-            ed_fp.addItems(_common_fp)
-            _cur_fp = item._data.attributes.get("footprint", "")
+            for display, svg_name in _board_fp:
+                ed_fp.addItem(display, svg_name)
+            _cur_fp = item.footprint()
             if _cur_fp:
-                ed_fp.setCurrentText(_cur_fp)
+                idx = ed_fp.findData(_cur_fp)
+                if idx >= 0:
+                    ed_fp.setCurrentIndex(idx)
             layout.addWidget(ed_fp)
 
             btn_layout = QHBoxLayout()
@@ -1941,11 +1945,8 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                     value = ed_value.text().strip()
                     item.set_value(value)
                 item.set_model_line(ed_model.toPlainText().strip())
-                fp = ed_fp.currentText().strip()
-                if fp:
-                    item._data.attributes["footprint"] = fp
-                elif "footprint" in item._data.attributes:
-                    del item._data.attributes["footprint"]
+                fp = ed_fp.currentData() or ""
+                item.set_footprint(fp)
                 if refdes_label:
                     refdes_label.setVisible(cb_refdes.isChecked())
                 if value_label:
