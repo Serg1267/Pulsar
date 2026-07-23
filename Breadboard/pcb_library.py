@@ -100,7 +100,7 @@ def _arc_segments(x0, y0, rx, ry, x_rot, large, sweep, x1, y1, n=24):
     n_steps = n
     pts = []
     for i in range(n_steps + 1):
-        t = start_angle + (end_angle - start_angle) * i / n_steps
+        t = start_angle + end_angle * i / n_steps
         x = cx + rx * math.cos(x_rot_rad) * math.cos(t) - ry * math.sin(x_rot_rad) * math.sin(t)
         y = cy + rx * math.sin(x_rot_rad) * math.cos(t) + ry * math.cos(x_rot_rad) * math.sin(t)
         pts.append((x, y))

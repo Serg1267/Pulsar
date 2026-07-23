@@ -39,6 +39,31 @@ from .canvas_export import ExportMixin
 from .canvas_serialization import SerializationMixin
 
 
+DEVICE_FOOTPRINTS: dict[str, list[tuple[str, str]]] = {
+    "RESISTOR": [
+        ("(нет)", ""),
+        ("Res_5mm (5.08 мм)", "axial_lay_2_200mil_pcb.svg"),
+        ("Res_8mm (7.62 мм)", "axial_lay_2_300mil_pcb.svg"),
+        ("Res_10mm (10.16 мм)", "axial_lay_2_400mil_pcb.svg"),
+        ("Res_13mm (12.70 мм)", "axial_lay_2_500mil_pcb.svg"),
+        ("Res_15mm (15.24 мм)", "axial_lay_2_600mil_pcb.svg"),
+        ("Res_20mm (20.32 мм)", "axial_lay_2_800mil_pcb.svg"),
+    ],
+    "NPN_TRANSISTOR": [
+        ("(нет)", ""),
+        ("TO-92 (2.54 mm)", "sparkfun-discretesemi_to-92-ammo_pcb.svg"),
+    ],
+    "PNP_TRANSISTOR": [
+        ("(нет)", ""),
+        ("TO-92 (2.54 mm)", "sparkfun-discretesemi_to-92-ammo_pcb.svg"),
+    ],
+    "AOP-Standard": [
+        ("(нет)", ""),
+        ("DIP-8 (7.62 mm)", "dip_8_300mil.svg"),
+    ],
+}
+
+
 class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, PlacementMixin, WireMixin, QGraphicsView):
     """Холст с системой координат Y-вверх, сеткой 100 mil и привязкой к ней."""
 
@@ -1895,16 +1920,9 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
             layout.addWidget(QLabel("footprint (МП):"))
             ed_fp = QComboBox()
             ed_fp.setEditable(True)
-            _board_fp = [
-                ("(нет)", ""),
-                ("Res_5mm (5.08 мм)", "axial_lay_2_200mil_pcb.svg"),
-                ("Res_8mm (7.62 мм)", "axial_lay_2_300mil_pcb.svg"),
-                ("Res_10mm (10.16 мм)", "axial_lay_2_400mil_pcb.svg"),
-                ("Res_13mm (12.70 мм)", "axial_lay_2_500mil_pcb.svg"),
-                ("Res_15mm (15.24 мм)", "axial_lay_2_600mil_pcb.svg"),
-                ("Res_20mm (20.32 мм)", "axial_lay_2_800mil_pcb.svg"),
-            ]
-            for display, svg_name in _board_fp:
+            _device = item._data.attributes.get("device", "")
+            _fp_list = DEVICE_FOOTPRINTS.get(_device, [("(нет)", "")])
+            for display, svg_name in _fp_list:
                 ed_fp.addItem(display, svg_name)
             _cur_fp = item.footprint()
             if _cur_fp:

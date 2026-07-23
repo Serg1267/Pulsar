@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QMessageBox,
 )
 from PySide6.QtCore import Qt, QPointF, QRectF
-from PySide6.QtGui import QPainter, QPen, QBrush, QColor, QMouseEvent
+from PySide6.QtGui import QPainter, QPen, QBrush, QColor, QMouseEvent, QShortcut, QKeySequence
 
 from Breadboard.board import Board
 from Breadboard.pcb_library import parse_pcb_svg, Package
@@ -61,6 +61,20 @@ class BoardView(QGraphicsView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
+        # Shortcuts — use QShortcut to avoid platform key-code quirks
+        QShortcut(QKeySequence("Ctrl+H"), self, self._flip_selected_h)
+        QShortcut(QKeySequence("Ctrl+V"), self, self._flip_selected_v)
+
+    def _flip_selected_h(self):
+        for item in self.scene().selectedItems():
+            if isinstance(item, PlacedCompItem):
+                item.setFlipH(not item._flip_h)
+
+    def _flip_selected_v(self):
+        for item in self.scene().selectedItems():
+            if isinstance(item, PlacedCompItem):
+                item.setFlipV(not item._flip_v)
+
     def fitBoard(self, margin_mm: float = 10):
         s = self.scene()
         if s is not None and s.sceneRect().isValid():
@@ -103,15 +117,6 @@ class BoardView(QGraphicsView):
             for item in self.scene().selectedItems():
                 if isinstance(item, PlacedCompItem):
                     item.setCompRotation(item._rotation + 90)
-            return
-        if key in (Qt.Key.Key_H, Qt.Key.Key_V) and (event.modifiers() & Qt.KeyboardModifier.ControlModifier):
-            flip_h = key == Qt.Key.Key_H
-            for item in self.scene().selectedItems():
-                if isinstance(item, PlacedCompItem):
-                    if flip_h:
-                        item.setFlipH(not item._flip_h)
-                    else:
-                        item.setFlipV(not item._flip_v)
             return
         super().keyPressEvent(event)
 
