@@ -5,7 +5,7 @@ from __future__ import annotations
 from PySide6.QtWidgets import QGraphicsItem
 from PySide6.QtCore import Qt, QPointF, QRectF
 from PySide6.QtGui import (
-    QPainterPath, QPolygonF, QPen, QBrush, QColor, QTransform,
+    QPainterPath, QPolygonF, QPen, QBrush, QColor, QTransform, QFont,
 )
 
 from Breadboard.pcb_library import Package, DrawCommand
@@ -195,6 +195,23 @@ class PlacedCompItem(QGraphicsItem):
 
     # ── Geometry ────────────────────────────────────────────────
 
+    def _text_bottom(self) -> float:
+        """Bottom Y coordinate (SVG units) of the refdes text area."""
+        br = QRectF()
+        for lst in (self._copper, self._silk, self._other):
+            for path, _, _ in lst:
+                br |= path.boundingRect()
+        if br.isEmpty():
+            return 10
+        fs = self._calc_font_px()
+        gap = 0.4 / self._mmu if ('axial' in self._footprint or 'to-92' in self._footprint) else 2.0 / self._mmu
+        return br.bottom() + gap + fs
+
+    def _calc_font_px(self) -> int:
+        """Font size in SVG pixels (item-local coords), larger for resistors & transistors."""
+        target_mm = 1.8 if ('axial' in self._footprint or 'to-92' in self._footprint) else 0.6
+        return max(1, round(target_mm / self._mmu)) if self._mmu else 10
+
     def boundingRect(self):
         rect = QRectF()
         for lst in (self._copper, self._silk, self._other):
@@ -202,6 +219,8 @@ class PlacedCompItem(QGraphicsItem):
                 rect |= path.boundingRect()
         if rect.isEmpty():
             return QRectF(-5, -5, 10, 10)
+        tb = self._text_bottom()
+        rect.setBottom(max(rect.bottom(), tb))
         pad = 0.3 / self._mmu if self._mmu else 4
         return rect.adjusted(-pad, -pad, pad, pad)
 
@@ -224,6 +243,16 @@ class PlacedCompItem(QGraphicsItem):
                 painter.setPen(pen)
                 painter.setBrush(brush)
                 painter.drawPath(path)
+
+        # Refdes text — use setPixelSize for consistent sizing under any transform
+        br = self.boundingRect()
+        fs = self._calc_font_px()
+        font = QFont("sans-serif")
+        font.setPixelSize(fs)
+        painter.setFont(font)
+        painter.setPen(QPen(QColor("#f0f0f0"), 0))
+        text_y = self._text_bottom()
+        painter.drawText(QPointF(br.center().x(), text_y - fs * 0.3), self._refdes)
 
         if self.isSelected():
             painter.setPen(SELECTED_PEN)
