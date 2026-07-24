@@ -2950,6 +2950,10 @@ class PulsarMainWindow(QMainWindow):
 
 
 def main():
+    # Показывать traceback при любом unhandled исключении в Qt-коллбэках
+    import traceback
+    sys.excepthook = traceback.print_exception
+
     app = QApplication(sys.argv)
     app.setApplicationName("Pulsar")
     app.setApplicationVersion(__version__)

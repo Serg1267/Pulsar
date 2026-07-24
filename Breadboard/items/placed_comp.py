@@ -105,16 +105,22 @@ class PlacedCompItem(QGraphicsItem):
         self._rotation = deg % 360
         self._build_transform()
         self.update()
+        if self._on_moved:
+            self._on_moved()
 
     def setFlipH(self, flip: bool):
         self._flip_h = flip
         self._build_transform()
         self.update()
+        if self._on_moved:
+            self._on_moved()
 
     def setFlipV(self, flip: bool):
         self._flip_v = flip
         self._build_transform()
         self.update()
+        if self._on_moved:
+            self._on_moved()
 
     # ── Geometry builder ────────────────────────────────────────
 
@@ -232,7 +238,8 @@ class PlacedCompItem(QGraphicsItem):
             col, row = self._board.nearest_hole(new_pos.x(), new_pos.y())
             hx, hy = self._board.hole_pos(col, row)
             return QPointF(hx, hy)
-        if change == QGraphicsItem.GraphicsItemChange.ItemPositionHasChanged:
+        if change in (QGraphicsItem.GraphicsItemChange.ItemPositionHasChanged,
+                      QGraphicsItem.GraphicsItemChange.ItemTransformHasChanged):
             if self._on_moved:
                 self._on_moved()
         if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:

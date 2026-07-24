@@ -1,27 +1,110 @@
-"""Rubber-band ratline between component pins."""
+"""Rubber-band ratline between component pins — selectable, deletable, with endpoint drag."""
 
-from PySide6.QtWidgets import QGraphicsPathItem
-from PySide6.QtCore import Qt, QPointF
-from PySide6.QtGui import QPainterPath, QPen, QColor
+from PySide6.QtWidgets import QGraphicsItem
+from PySide6.QtCore import Qt, QPointF, QRectF
+from PySide6.QtGui import (
+    QPainterPath, QPolygonF, QPainter, QPen, QBrush, QColor,
+)
 
+from Breadboard.board import Board
 
 RATLINE_COLOR = QColor("#e87a20")
 RATLINE_PEN = QPen(RATLINE_COLOR, 0.5)
+SELECTED_PEN = QPen(QColor("#ffff00"), 0.8)
+ENDPOINT_RADIUS = 0.5  # mm
+HOVER_TOLERANCE = 1.0  # mm
 
 
-class RatlineItem(QGraphicsPathItem):
-    """Dashed line showing a connection between two pins."""
+class RatlineItem(QGraphicsItem):
+    """Dashed line showing a connection between two pins — interactive."""
 
-    def __init__(self, net_name: str, points: list[QPointF]):
+    def __init__(self, net_name: str, points: list[QPointF],
+                 board: Board | None = None):
         super().__init__()
         self._net_name = net_name
+        self._points = list(points)
+        self._board = board
 
-        path = QPainterPath()
-        if points:
-            path.moveTo(points[0])
-            for p in points[1:]:
-                path.lineTo(p)
+        self.setFlags(
+            QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
+            QGraphicsItem.GraphicsItemFlag.ItemSendsGeometryChanges
+        )
+        self.setZValue(-1)
 
-        self.setPath(path)
-        self.setPen(RATLINE_PEN)
-        self.setZValue(-1)  # behind components
+    # ── Public ────────────────────────────────────────────────
+
+    def net_name(self) -> str:
+        return self._net_name
+
+    def points(self) -> list[QPointF]:
+        return list(self._points)
+
+    # ── Geometry ──────────────────────────────────────────────
+
+    def _rebuild(self):
+        self.prepareGeometryChange()
+        self.update()
+
+    def boundingRect(self) -> QRectF:
+        if not self._points:
+            return QRectF()
+        xs = [p.x() for p in self._points]
+        ys = [p.y() for p in self._points]
+        pad = ENDPOINT_RADIUS + HOVER_TOLERANCE
+        return QRectF(min(xs) - pad, min(ys) - pad,
+                      max(xs) - min(xs) + 2 * pad,
+                      max(ys) - min(ys) + 2 * pad)
+
+    def shape(self) -> QPainterPath:
+        body = QPainterPath()
+        if len(self._points) < 2:
+            return body
+        # Segment hit-boxes: thin rectangles between each pair of points
+        hw = HOVER_TOLERANCE
+        for i in range(len(self._points) - 1):
+            a = self._points[i]
+            b = self._points[i + 1]
+            dx = b.x() - a.x()
+            dy = b.y() - a.y()
+            length = (dx * dx + dy * dy) ** 0.5
+            if length < 1e-6:
+                continue
+            # Unit perpendicular
+            nx = -dy / length * hw
+            ny = dx / length * hw
+            poly = QPolygonF([
+                QPointF(a.x() + nx, a.y() + ny),
+                QPointF(a.x() - nx, a.y() - ny),
+                QPointF(b.x() - nx, b.y() - ny),
+                QPointF(b.x() + nx, b.y() + ny),
+            ])
+            body.addPolygon(poly)
+        # Endpoint circles
+        for pt in self._points:
+            body.addEllipse(pt, hw, hw)
+        return body
+
+    def paint(self, painter: QPainter, option, widget=None):
+        if len(self._points) < 2:
+            return
+
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        # Line
+        if self.isSelected():
+            painter.setPen(SELECTED_PEN)
+        else:
+            painter.setPen(RATLINE_PEN)
+        body = QPainterPath()
+        body.moveTo(self._points[0])
+        for p in self._points[1:]:
+            body.lineTo(p)
+        painter.drawPath(body)
+
+        # Endpoint dots
+        dot_pen = QPen(RATLINE_COLOR, 0.2)
+        dot_brush = QBrush(RATLINE_COLOR)
+        for pt in self._points:
+            painter.setPen(dot_pen)
+            painter.setBrush(dot_brush)
+            painter.drawEllipse(pt, ENDPOINT_RADIUS, ENDPOINT_RADIUS)

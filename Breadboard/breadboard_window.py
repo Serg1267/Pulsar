@@ -17,6 +17,7 @@ from Breadboard.pcb_library import parse_pcb_svg, Package
 from Breadboard.items.placed_comp import PlacedCompItem
 from Breadboard.items.placed_comp import _all_copper_centers
 from Breadboard.items.ratline_item import RatlineItem
+from math import sqrt
 
 # ── Paths ────────────────────────────────────────────────────
 SCRIPT_DIR = Path(__file__).resolve().parent.parent  # Pulsar/
@@ -31,6 +32,16 @@ _LABEL_MAP: dict[str, str] = {
     "axial_lay_2_500mil_pcb.svg": "Res_13mm",
     "axial_lay_2_600mil_pcb.svg": "Res_15mm",
     "axial_lay_2_800mil_pcb.svg": "Res_20mm",
+}
+
+# PIN_MAP: footprint SVG filename → [copper_idx_for_pin_0, pin_1, …]
+# TO-92 ammo: left=emitter(0), middle=base(1), right=collector(2)
+# NPN/PNP .sym: pin 0=C, pin 1=E, pin 2=B
+_PIN_MAP: dict[str, list[int]] = {
+    # SVG has 6 coppers (copper0+copper1 for each of 3 pins)
+    # Unique pins: even index 0/2/4 → left/middle/right
+    # .sym: pin 0=C(collector→right), pin 1=E(emitter→left), pin 2=B(base→middle)
+    "sparkfun-discretesemi_to-92-ammo_pcb.svg": [4, 0, 2],
 }
 
 # ── Colors ────────────────────────────────────────────────────
@@ -60,6 +71,18 @@ class BoardView(QGraphicsView):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+
+        # Routing mode state
+        self._routing_mode = False
+        self._routing_start: QPointF | None = None
+        self._routing_pin: tuple[str, int] | None = None  # (refdes, pin_num) from first click
+        self._routing_hover_pin: tuple[PlacedCompItem, int] | None = None
+        self._routing_hover_wire: tuple[RatlineItem, float, QPointF] | None = None
+        self._cursor_scene = QPointF()
+        self._on_add_connection = None  # callable(ep_list: list[tuple])
+        self._on_add_junction = None  # callable(jrd1, jpin1, jrd2, jpin2, ratio, rd3, pin3)
+        self._on_manual_segment = None  # callable(seg: RatlineItem)
+        self._on_segment_deleted = None  # callable(endpoints: list[tuple])
 
         # Shortcuts — use QShortcut to avoid platform key-code quirks
         QShortcut(QKeySequence("Ctrl+H"), self, self._flip_selected_h)
@@ -104,6 +127,37 @@ class BoardView(QGraphicsView):
                 painter.setBrush(HOLE_FILL)
                 painter.drawEllipse(QPointF(hx, hy), r_out, r_out)
 
+    def drawForeground(self, painter: QPainter, rect: QRectF):
+        if not self._routing_mode:
+            return
+        b = self._board
+        col, row = b.nearest_hole(self._cursor_scene.x(), self._cursor_scene.y())
+        hx, hy = b.hole_pos(col, row)
+        painter.setPen(QPen(QColor(255, 255, 255, 140), 0.08, Qt.PenStyle.DashLine))
+        painter.drawLine(QPointF(hx, 0),
+                         QPointF(hx, b.board_height_mm))
+        painter.drawLine(QPointF(0, hy),
+                         QPointF(b.board_width_mm, hy))
+
+        # Pin highlight
+        if self._routing_hover_pin is not None:
+            comp, idx = self._routing_hover_pin
+            centers = comp.all_pin_centers()
+            if idx < len(centers):
+                cx, cy = centers[idx]
+                painter.setPen(QPen(QColor("#ffffff"), 0.2))
+                painter.setBrush(Qt.BrushStyle.NoBrush)
+                painter.drawEllipse(QPointF(cx, cy), 0.8, 0.8)
+
+        # Preview line during routing (snapped to nearest hole)
+        if self._routing_start is not None:
+            painter.setPen(QPen(QColor("#ffffff"), 0.15, Qt.PenStyle.DashLine))
+            painter.drawLine(self._routing_start, QPointF(hx, hy))
+            # Hole indicator ring
+            painter.setPen(QPen(QColor("#ffffff"), 0.2))
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawEllipse(QPointF(hx, hy), 0.5, 0.5)
+
     def wheelEvent(self, event):
         factor = 1.15 ** (event.angleDelta().y() / 120)
         new_zoom = self.transform().m11() * factor
@@ -113,10 +167,43 @@ class BoardView(QGraphicsView):
 
     def keyPressEvent(self, event):
         key = event.key()
-        if key == Qt.Key.Key_R:
+        if key == Qt.Key.Key_R and not self._routing_mode:
             for item in self.scene().selectedItems():
                 if isinstance(item, PlacedCompItem):
                     item.setCompRotation(item._rotation + 90)
+            return
+        if key in (Qt.Key.Key_Delete, Qt.Key.Key_Backspace) and not self._routing_mode:
+            for item in list(self.scene().selectedItems()):
+                if isinstance(item, RatlineItem):
+                    pts = item.points()
+                    endpoints = []
+                    for pt in pts:
+                        comp, cidx = self._find_pin_at(pt)
+                        if comp is not None and cidx >= 0:
+                            fp = comp.footprint()
+                            pm = _PIN_MAP.get(fp)
+                            if pm:
+                                try:
+                                    pin_num = pm.index(cidx)
+                                except ValueError:
+                                    pin_num = cidx
+                            else:
+                                pin_num = cidx
+                            endpoints.append((comp.refdes(), pin_num, None, None))
+                        else:
+                            endpoints.append((None, None, pt.x(), pt.y()))
+                    self.scene().removeItem(item)
+                    if self._on_segment_deleted:
+                        self._on_segment_deleted(endpoints)
+            return
+        if key == Qt.Key.Key_N and not event.modifiers():
+            self._toggle_routing_mode()
+            return
+        if key == Qt.Key.Key_Escape and self._routing_mode:
+            self._cancel_routing()
+            self._routing_mode = False
+            self.setCursor(Qt.CursorShape.ArrowCursor)
+            self.scene().update()
             return
         super().keyPressEvent(event)
 
@@ -128,9 +215,97 @@ class BoardView(QGraphicsView):
             self.setCursor(Qt.CursorShape.ClosedHandCursor)
             event.accept()
             return
+
+        if self._routing_mode and event.button() == Qt.MouseButton.LeftButton:
+            sp = self.mapToScene(event.pos())
+            snap = self._snap_pos(sp)
+            if self._routing_start is None:
+                self._routing_start = snap
+                rd, pn = self._pin_info_at(snap)
+                self._routing_pin = (rd, pn) if rd is not None else None
+                self.scene().update()
+            else:
+                rd1, p1 = self._routing_pin if self._routing_pin else (None, -1)
+                rd2, p2 = self._pin_info_at(snap)
+                ep1 = (rd1, p1, None, None) if rd1 is not None else (None, None, self._routing_start.x(), self._routing_start.y())
+
+                # Check if second endpoint snaps to wire body (T-junction)
+                wire, w_ratio, w_pt = self._find_wire_body_at(sp)
+                if wire is not None and rd1 is not None:
+                    # Try to find parent segment endpoints as component pins
+                    wpts = wire.points()
+                    ew_rd1, ew_p1 = self._pin_info_at(wpts[0])
+                    ew_rd2, ew_p2 = self._pin_info_at(wpts[1])
+                    if ew_rd1 is not None and ew_rd2 is not None:
+                        # Junction on (ew_rd1, ew_p1)↔(ew_rd2, ew_p2) at w_ratio
+                        if self._on_add_junction:
+                            self._on_add_junction(ew_rd1, ew_p1, ew_rd2, ew_p2, w_ratio, rd1, p1)
+                        self._routing_start = snap
+                        rd, pn = self._pin_info_at(snap)
+                        self._routing_pin = (rd, pn) if rd is not None else None
+                        self.scene().update()
+                        event.accept()
+                        return
+                    # Fall through: wire endpoints aren't both pins → treat as hole
+                    ep2 = (None, None, snap.x(), snap.y())
+                    if self._on_add_connection:
+                        self._on_add_connection([ep1, ep2])
+                elif rd1 is not None or rd2 is not None:
+                    ep2 = (rd2, p2, None, None) if rd2 is not None else (None, None, snap.x(), snap.y())
+                    if self._on_add_connection:
+                        self._on_add_connection([ep1, ep2])
+                else:
+                    seg = RatlineItem(
+                        f"seg_{len(self.scene().items())}",
+                        [self._routing_start, snap],
+                        board=self._board)
+                    self.scene().addItem(seg)
+                    if self._on_manual_segment:
+                        self._on_manual_segment(seg)
+                self._routing_start = snap  # chain from new point
+                rd, pn = self._pin_info_at(snap)
+                self._routing_pin = (rd, pn) if rd is not None else None
+                self.scene().update()
+            event.accept()
+            return
+
+        if event.button() == Qt.MouseButton.LeftButton and not (
+            event.modifiers() & (Qt.KeyboardModifier.ControlModifier |
+                                 Qt.KeyboardModifier.ShiftModifier)):
+            for item in self.scene().items():
+                if isinstance(item, RatlineItem) and item.isSelected():
+                    item.setSelected(False)
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
+        sp = self.mapToScene(event.pos())
+
+        if self._routing_mode:
+            self.setCursor(Qt.CursorShape.CrossCursor)
+            self._cursor_scene = sp
+            # Pin hover detection
+            comp, idx = self._find_pin_at(sp)
+            if (comp, idx) != self._routing_hover_pin:
+                self._routing_hover_pin = (comp, idx) if comp is not None else None
+                self.scene().update()
+            # Wire body hover detection (if not over a pin)
+            if comp is None:
+                wire, wratio, wpt = self._find_wire_body_at(sp)
+                if wire is not None and self._routing_start is not None:
+                    self._routing_hover_wire = (wire, wratio, wpt)
+                    self.scene().update()
+                else:
+                    if self._routing_hover_wire is not None:
+                        self._routing_hover_wire = None
+                        self.scene().update()
+            else:
+                if self._routing_hover_wire is not None:
+                    self._routing_hover_wire = None
+                    self.scene().update()
+            self.viewport().update()
+            event.accept()
+            return
+
         if self._panning:
             delta = QPointF(event.pos()) - self._last_pan_pos
             if delta.manhattanLength() > 2:
@@ -150,6 +325,93 @@ class BoardView(QGraphicsView):
             return
         super().mouseReleaseEvent(event)
 
+    # ── Routing helpers ────────────────────────────────────────
+
+    def _toggle_routing_mode(self):
+        self._routing_mode = not self._routing_mode
+        if self._routing_mode:
+            self.setCursor(Qt.CursorShape.CrossCursor)
+        else:
+            self._cancel_routing()
+            self.setCursor(Qt.CursorShape.ArrowCursor)
+        self.scene().update()
+
+    def _cancel_routing(self):
+        self._routing_start = None
+        self._routing_pin = None
+        self._routing_hover_pin = None
+        self._routing_hover_wire = None
+
+    def _find_pin_at(self, scene_pt: QPointF,
+                     tol: float = 0.6) -> tuple[PlacedCompItem | None, int]:
+        for item in self.scene().items():
+            if isinstance(item, PlacedCompItem):
+                centers = item.all_pin_centers()
+                for i, (cx, cy) in enumerate(centers):
+                    if (QPointF(cx, cy) - scene_pt).manhattanLength() < tol:
+                        return item, i
+        return None, -1
+
+    def _pin_info_at(self, scene_pt: QPointF,
+                     tol: float = 0.6) -> tuple[str | None, int]:
+        """Return (refdes, schematic_pin_number) or (None, -1)."""
+        comp, cidx = self._find_pin_at(scene_pt, tol)
+        if comp is None:
+            return None, -1
+        fp = comp.footprint()
+        pm = _PIN_MAP.get(fp)
+        if pm:
+            try:
+                pin_num = pm.index(cidx)
+            except ValueError:
+                pin_num = cidx
+        else:
+            pin_num = cidx
+        return comp.refdes(), pin_num
+
+    def _find_wire_body_at(self, scene_pt: QPointF, tol: float = 1.0):
+        """Find closest point on any ratline segment near scene_pt.
+        Returns (RatlineItem, param_ratio, closest_point) or (None, None, None)."""
+        best = (None, None, None)
+        best_dist = tol
+        for item in self.scene().items():
+            if not isinstance(item, RatlineItem):
+                continue
+            pts = item.points()
+            for i in range(len(pts) - 1):
+                a = pts[i]
+                b = pts[i + 1]
+                dx = b.x() - a.x()
+                dy = b.y() - a.y()
+                seg_len_sq = dx * dx + dy * dy
+                if seg_len_sq < 1e-6:
+                    continue
+                t = ((scene_pt.x() - a.x()) * dx + (scene_pt.y() - a.y()) * dy) / seg_len_sq
+                t = max(0.0, min(1.0, t))
+                cx = a.x() + t * dx
+                cy = a.y() + t * dy
+                dist = sqrt((scene_pt.x() - cx) ** 2 + (scene_pt.y() - cy) ** 2)
+                if dist < best_dist:
+                    best_dist = dist
+                    best = (item, t, QPointF(cx, cy))
+        return best
+
+    def _snap_pos(self, scene_pt: QPointF) -> QPointF:
+        # 1. Pin
+        comp, idx = self._find_pin_at(scene_pt)
+        if comp is not None and idx >= 0:
+            centers = comp.all_pin_centers()
+            if idx < len(centers):
+                return QPointF(centers[idx][0], centers[idx][1])
+        # 2. Wire body (for T-junction)
+        _wire, _ratio, wpt = self._find_wire_body_at(scene_pt)
+        if _wire is not None:
+            return wpt
+        # 3. Hole
+        col, row = self._board.nearest_hole(scene_pt.x(), scene_pt.y())
+        hx, hy = self._board.hole_pos(col, row)
+        return QPointF(hx, hy)
+
 
 class BreadboardWindow(QMainWindow):
     """Standalone breadboard layout window."""
@@ -162,7 +424,14 @@ class BreadboardWindow(QMainWindow):
         self._view = BoardView(self._board, self._scene)
         self._placements: list[PlacedCompItem] = []
         self._ratlines: list[RatlineItem] = []
-        self._connection_data: list[list[str]] = []
+        self._manual_segments: list[RatlineItem] = []
+        self._connection_data: list[list[tuple[str | None, int | None, float | None, float | None]]] = []
+        self._junctions: list[tuple[str, int, str, int, float, str, int]] = []
+        self._hidden_connections: set[frozenset] = set()
+        self._view._on_add_connection = self._add_connection_entry
+        self._view._on_add_junction = self._add_junction
+        self._view._on_manual_segment = self._manual_segments.append
+        self._view._on_segment_deleted = self._on_segment_deleted
 
         self.setWindowTitle("Макетная плата — Pulsar")
         self.setMinimumSize(600, 450)
@@ -194,17 +463,60 @@ class BreadboardWindow(QMainWindow):
 
     # ── Internal ──────────────────────────────────────────────
 
+    def _on_segment_deleted(self, endpoints):
+        """Handle segment deletion from the view."""
+        # Detect junction segment: exactly one pin endpoint → match _junctions
+        ep_pins = [(ep[0], ep[1]) for ep in endpoints if ep[0] is not None]
+        if len(ep_pins) == 1:
+            rd3, pin3 = ep_pins[0]
+            for j in list(self._junctions):
+                if j[5] == rd3 and j[6] == pin3:
+                    self._junctions.remove(j)
+                    return
+        # Pin→pin → hidden_connections
+        if (endpoints[0][0] is not None and endpoints[1][0] is not None):
+            self._hidden_connections.add(
+                frozenset([(endpoints[0][0], endpoints[0][1]),
+                           (endpoints[1][0], endpoints[1][1])]))
+        else:
+            # Any hole endpoint → remove matching entry from _connection_data
+            for entry in list(self._connection_data):
+                if len(entry) != len(endpoints):
+                    continue
+                match = True
+                for a, b in zip(entry, endpoints):
+                    if a[0] != b[0] or a[1] != b[1]:
+                        match = False
+                        break
+                    # For hole points, also compare coordinates
+                    if a[0] is None and (a[2] != b[2] or a[3] != b[3]):
+                        match = False
+                        break
+                if match:
+                    self._connection_data.remove(entry)
+                    break
+
     def _clear(self):
         for item in self._placements:
             self._scene.removeItem(item)
         self._placements.clear()
         self._clear_ratlines()
+        self._clear_manual_segments()
         self._connection_data.clear()
+        self._junctions.clear()
+        self._hidden_connections.clear()
 
     def _clear_ratlines(self):
-        for item in self._ratlines:
-            self._scene.removeItem(item)
+        for item in list(self._ratlines):
+            if item.scene() is self._scene:
+                self._scene.removeItem(item)
         self._ratlines.clear()
+
+    def _clear_manual_segments(self):
+        for item in list(self._manual_segments):
+            if item.scene() is self._scene:
+                self._scene.removeItem(item)
+        self._manual_segments.clear()
 
     def _load_from_schematic(self):
         canvas = self._app._tabs.current_canvas()
@@ -274,7 +586,9 @@ class BreadboardWindow(QMainWindow):
         self._draw_ratlines(canvas)
 
     def _draw_ratlines(self, canvas):
-        """Build net groups from the canvas wire graph and store connection data."""
+        """Build net groups from the canvas wire graph and store pin‑specific
+        connection data. Each net entry is (refdes, pin_number) so that
+        _update_ratlines can draw ratlines to the correct pin."""
         from EDA.app.items.component_item import ComponentGraphicsItem
 
         cid_to_refdes: dict[int, str] = {}
@@ -286,22 +600,23 @@ class BreadboardWindow(QMainWindow):
         comp_wire_links = canvas._comp_wire_links
 
         processed_wires: set = set()
+        self._connection_data = []
         for (_cid, _pin_idx), (wire, _ep, _px, _py) in comp_wire_links.items():
             if wire in processed_wires:
                 continue
             connected = wire_graph.get_connected(wire)
             processed_wires.update(connected)
 
-            refdes_set: set[str] = set()
+            net_entries: list[tuple[str | None, int | None, float | None, float | None]] = []
             for (cid, pin_idx), (w2, _ep2, _px2, _py2) in comp_wire_links.items():
                 if w2 not in connected:
                     continue
                 rd = cid_to_refdes.get(cid)
                 if rd:
-                    refdes_set.add(rd)
+                    net_entries.append((rd, pin_idx, None, None))
 
-            if len(refdes_set) >= 2:
-                self._connection_data.append(sorted(refdes_set))
+            if len(set(rd for rd, *_ in net_entries)) >= 2:
+                self._connection_data.append(net_entries)
 
         self._update_ratlines()
 
@@ -309,15 +624,76 @@ class BreadboardWindow(QMainWindow):
         """Rebuild ratline paths from current component positions."""
         self._clear_ratlines()
         board_comps = {c.refdes(): c for c in self._placements}
-        for refdes_list in self._connection_data:
+
+        def _pin_pos(rd, pin_number):
+            bc = board_comps.get(rd)
+            if bc is None:
+                return None
+            centers = bc.all_pin_centers()
+            fp_name = bc.footprint()
+            pin_map = _PIN_MAP.get(fp_name)
+            if pin_map and pin_number < len(pin_map):
+                idx = pin_map[pin_number]
+            else:
+                idx = pin_number
+            if idx >= len(centers):
+                idx = 0
+            return QPointF(centers[idx][0], centers[idx][1])
+
+        # 1. Standard connection data
+        for net_entries in self._connection_data:
             points: list[QPointF] = []
-            for rd in refdes_list:
-                bc = board_comps.get(rd)
-                if bc is not None:
-                    centers = bc.all_pin_centers()
-                    if centers:
-                        points.append(QPointF(centers[0][0], centers[0][1]))
+            for rd, pin_number, hx, hy in net_entries:
+                if rd is not None:
+                    pt = _pin_pos(rd, pin_number)
+                    if pt is not None:
+                        points.append(pt)
+                elif hx is not None and hy is not None:
+                    points.append(QPointF(hx, hy))
             if len(points) >= 2:
-                item = RatlineItem(f"net_{len(self._ratlines)}", points)
-                self._scene.addItem(item)
-                self._ratlines.append(item)
+                for i in range(len(points) - 1):
+                    ep_a = net_entries[i]
+                    ep_b = net_entries[i + 1]
+                    if (ep_a[0] is not None and ep_b[0] is not None and
+                        frozenset([(ep_a[0], ep_a[1]), (ep_b[0], ep_b[1])]) in self._hidden_connections):
+                        continue
+                    seg = RatlineItem(
+                        f"seg_{len(self._ratlines)}",
+                        [points[i], points[i + 1]],
+                        board=self._board)
+                    self._scene.addItem(seg)
+                    self._ratlines.append(seg)
+
+        # 2. Junction segments (T-connections on wire bodies)
+        for jrd1, jpin1, jrd2, jpin2, ratio, rd3, pin3 in self._junctions:
+            pt1 = _pin_pos(jrd1, jpin1)
+            pt2 = _pin_pos(jrd2, jpin2)
+            pt3 = _pin_pos(rd3, pin3)
+            if pt1 is None or pt2 is None or pt3 is None:
+                continue
+            # Junction point = ratio along parent segment
+            jx = pt1.x() + ratio * (pt2.x() - pt1.x())
+            jy = pt1.y() + ratio * (pt2.y() - pt1.y())
+            jpt = QPointF(jx, jy)
+            seg = RatlineItem(
+                f"junc_{len(self._ratlines)}",
+                [jpt, pt3],
+                board=self._board)
+            seg._is_junction = True
+            self._scene.addItem(seg)
+            self._ratlines.append(seg)
+
+    def _add_connection_entry(self, endpoints):
+        """Add a connection entry (pin→pin, pin→hole, or hole→pin) to _connection_data."""
+        # If user explicitly re-draws a hidden pin→pin pair, unhide it
+        if (len(endpoints) >= 2 and endpoints[0][0] is not None and endpoints[1][0] is not None):
+            pair = frozenset([(endpoints[0][0], endpoints[0][1]),
+                             (endpoints[1][0], endpoints[1][1])])
+            self._hidden_connections.discard(pair)
+        self._connection_data.append(endpoints)
+        self._update_ratlines()
+
+    def _add_junction(self, jrd1, jpin1, jrd2, jpin2, ratio, rd3, pin3):
+        """Add a T-junction on the body of segment (jrd1,jpin1)↔(jrd2,jpin2)."""
+        self._junctions.append((jrd1, jpin1, jrd2, jpin2, ratio, rd3, pin3))
+        self._update_ratlines()
