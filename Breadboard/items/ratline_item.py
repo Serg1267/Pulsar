@@ -29,7 +29,9 @@ class RatlineItem(QGraphicsItem):
             QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
             QGraphicsItem.GraphicsItemFlag.ItemSendsGeometryChanges
         )
+        self.setAcceptHoverEvents(True)
         self.setZValue(-1)
+        self._hovered = False
 
     # ── Public ────────────────────────────────────────────────
 
@@ -90,11 +92,13 @@ class RatlineItem(QGraphicsItem):
 
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        # Line
         if self.isSelected():
-            painter.setPen(SELECTED_PEN)
+            line_pen = SELECTED_PEN
+        elif self._hovered:
+            line_pen = QPen(QColor("#ffb347"), 0.6)
         else:
-            painter.setPen(RATLINE_PEN)
+            line_pen = RATLINE_PEN
+        painter.setPen(line_pen)
         body = QPainterPath()
         body.moveTo(self._points[0])
         for p in self._points[1:]:
@@ -102,9 +106,20 @@ class RatlineItem(QGraphicsItem):
         painter.drawPath(body)
 
         # Endpoint dots
-        dot_pen = QPen(RATLINE_COLOR, 0.2)
-        dot_brush = QBrush(RATLINE_COLOR)
+        dot_color = QColor("#ffff00") if self.isSelected() else (QColor("#ffb347") if self._hovered else RATLINE_COLOR)
+        dot_pen = QPen(dot_color, 0.2)
+        dot_brush = QBrush(dot_color)
         for pt in self._points:
             painter.setPen(dot_pen)
             painter.setBrush(dot_brush)
             painter.drawEllipse(pt, ENDPOINT_RADIUS, ENDPOINT_RADIUS)
+
+    def hoverEnterEvent(self, event):
+        self._hovered = True
+        self.update()
+        super().hoverEnterEvent(event)
+
+    def hoverLeaveEvent(self, event):
+        self._hovered = False
+        self.update()
+        super().hoverLeaveEvent(event)

@@ -14,7 +14,7 @@ from PySide6.QtGui import QPainter, QPen, QBrush, QColor, QMouseEvent, QShortcut
 
 from Breadboard.board import Board
 from Breadboard.pcb_library import parse_pcb_svg, Package
-from Breadboard.items.placed_comp import PlacedCompItem
+from Breadboard.items.placed_comp import PlacedCompItem, RefdesLabel
 from Breadboard.items.placed_comp import _all_copper_centers
 from Breadboard.items.ratline_item import RatlineItem
 from math import sqrt
@@ -92,11 +92,15 @@ class BoardView(QGraphicsView):
         for item in self.scene().selectedItems():
             if isinstance(item, PlacedCompItem):
                 item.setFlipH(not item._flip_h)
+            elif isinstance(item, RefdesLabel):
+                item.setLabelFlipH(not item._flip_h)
 
     def _flip_selected_v(self):
         for item in self.scene().selectedItems():
             if isinstance(item, PlacedCompItem):
                 item.setFlipV(not item._flip_v)
+            elif isinstance(item, RefdesLabel):
+                item.setLabelFlipV(not item._flip_v)
 
     def fitBoard(self, margin_mm: float = 10):
         s = self.scene()
@@ -171,6 +175,8 @@ class BoardView(QGraphicsView):
             for item in self.scene().selectedItems():
                 if isinstance(item, PlacedCompItem):
                     item.setCompRotation(item._rotation + 90)
+                elif isinstance(item, RefdesLabel):
+                    item.setLabelRotation(item._rotation + 90)
             return
         if key in (Qt.Key.Key_Delete, Qt.Key.Key_Backspace) and not self._routing_mode:
             for item in list(self.scene().selectedItems()):
@@ -331,6 +337,8 @@ class BoardView(QGraphicsView):
         self._routing_mode = not self._routing_mode
         if self._routing_mode:
             self.setCursor(Qt.CursorShape.CrossCursor)
+            self._cursor_scene = self.mapToScene(self.mapFromGlobal(self.cursor().pos()))
+            self.scene().update()
         else:
             self._cancel_routing()
             self.setCursor(Qt.CursorShape.ArrowCursor)

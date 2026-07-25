@@ -70,6 +70,7 @@ class PlacedCompItem(QGraphicsItem):
 
         self._build_geom()
         self._build_transform()
+        self._label_item = RefdesLabel(self)
 
     # ── Properties ──────────────────────────────────────────────
 
@@ -193,71 +194,62 @@ class PlacedCompItem(QGraphicsItem):
 
         return None
 
-    # ── Geometry ────────────────────────────────────────────────
-
-    def _text_bottom(self) -> float:
-        """Bottom Y coordinate (SVG units) of the refdes text area."""
-        br = QRectF()
-        for lst in (self._copper, self._silk, self._other):
-            for path, _, _ in lst:
-                br |= path.boundingRect()
-        if br.isEmpty():
-            return 10
-        fs = self._calc_font_px()
-        gap = 0.4 / self._mmu if ('axial' in self._footprint or 'to-92' in self._footprint) else 2.0 / self._mmu
-        return br.bottom() + gap + fs
+    # ── Geometry helpers (used by RefdesLabel) ───────────────
 
     def _calc_font_px(self) -> int:
         """Font size in SVG pixels (item-local coords), larger for resistors & transistors."""
         target_mm = 1.8 if ('axial' in self._footprint or 'to-92' in self._footprint) else 0.6
         return max(1, round(target_mm / self._mmu)) if self._mmu else 10
 
-    def boundingRect(self):
+    def _label_gap_svg(self) -> float:
+        """Gap below body (SVG units) before refdes text baseline."""
+        return 0.4 / self._mmu if ('axial' in self._footprint or 'to-92' in self._footprint) else 2.0 / self._mmu
+
+    @property
+    def _body_bbox(self) -> QRectF:
         rect = QRectF()
         for lst in (self._copper, self._silk, self._other):
             for path, _, _ in lst:
                 rect |= path.boundingRect()
+        return rect
+
+    # ── Geometry ────────────────────────────────────────────────
+
+    def boundingRect(self):
+        rect = self._body_bbox
+        if self._label_item is not None:
+            lb = self._label_item.boundingRect()
+            lbl_pos = self._label_item.pos()
+            t = self._label_item.transform()
+            if t.isIdentity():
+                rect |= lb.translated(lbl_pos)
+            else:
+                rect |= t.mapRect(lb).translated(lbl_pos)
         if rect.isEmpty():
             return QRectF(-5, -5, 10, 10)
-        tb = self._text_bottom()
-        rect.setBottom(max(rect.bottom(), tb))
         pad = 0.3 / self._mmu if self._mmu else 4
         return rect.adjusted(-pad, -pad, pad, pad)
 
     def shape(self):
-        rect = QRectF()
-        for lst in (self._copper, self._silk, self._other):
-            for path, _, _ in lst:
-                rect |= path.boundingRect()
+        rect = self._body_bbox
         if rect.isEmpty():
             return QPainterPath()
-        tol = 10 / self._mmu if self._mmu else 10
+        tol = 2 / self._mmu if self._mmu else 4
         rect = rect.adjusted(-tol, -tol, tol, tol)
         path = QPainterPath()
         path.addRect(rect)
         return path
 
     def paint(self, painter, option, widget=None):
-        for lst in (self._silk, self._copper, self._other):
+        for lst, is_copper in ((self._silk, False), (self._copper, True), (self._other, False)):
             for path, pen, brush in lst:
-                painter.setPen(pen)
+                if self.isSelected() and not is_copper:
+                    p = QPen(QColor("#ffcc00"), pen.widthF())
+                    painter.setPen(p)
+                else:
+                    painter.setPen(pen)
                 painter.setBrush(brush)
                 painter.drawPath(path)
-
-        # Refdes text — use setPixelSize for consistent sizing under any transform
-        br = self.boundingRect()
-        fs = self._calc_font_px()
-        font = QFont("sans-serif")
-        font.setPixelSize(fs)
-        painter.setFont(font)
-        painter.setPen(QPen(QColor("#f0f0f0"), 0))
-        text_y = self._text_bottom()
-        painter.drawText(QPointF(br.center().x(), text_y - fs * 0.3), self._refdes)
-
-        if self.isSelected():
-            painter.setPen(SELECTED_PEN)
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            painter.drawRect(self.boundingRect())
 
     # ── Snap ────────────────────────────────────────────────────
 
@@ -284,3 +276,115 @@ class PlacedCompItem(QGraphicsItem):
     def hoverLeaveEvent(self, event):
         self.setCursor(Qt.CursorShape.ArrowCursor)
         super().hoverLeaveEvent(event)
+
+
+class RefdesLabel(QGraphicsItem):
+    """Separate, movable/rotatable/flippable refdes label child of PlacedCompItem."""
+
+    _SELECTED_PEN = QPen(QColor("#ffff00"))
+    _SELECTED_PEN.setWidth(0)
+    _SELECTED_PEN.setStyle(Qt.PenStyle.DashLine)
+
+    def __init__(self, comp: PlacedCompItem):
+        super().__init__(comp)
+        self._comp = comp
+        self._offset = QPointF(0, 0)
+        self._rotation = 0
+        self._flip_h = False
+        self._flip_v = False
+
+        self.setFlags(
+            QGraphicsItem.GraphicsItemFlag.ItemIsSelectable |
+            QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+            QGraphicsItem.GraphicsItemFlag.ItemSendsGeometryChanges
+        )
+        self.setAcceptHoverEvents(True)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setZValue(100)
+
+        self._update_pos()
+        self._build_label_transform()
+
+    # ── Public API ───────────────────────────────────────────
+
+    def setLabelRotation(self, deg: int):
+        self._rotation = deg % 360
+        self._build_label_transform()
+        self.update()
+
+    def setLabelFlipH(self, flip: bool):
+        self._flip_h = flip
+        self._build_label_transform()
+        self.update()
+
+    def setLabelFlipV(self, flip: bool):
+        self._flip_v = flip
+        self._build_label_transform()
+        self.update()
+
+    # ── Position ─────────────────────────────────────────────
+
+    def _default_pos(self) -> QPointF:
+        br = self._comp._body_bbox
+        if br.isEmpty():
+            return QPointF(0, 10)
+        fs = self._comp._calc_font_px()
+        gap = self._comp._label_gap_svg()
+        baseline_y = br.bottom() + gap + fs * 0.7
+        return QPointF(br.center().x(), baseline_y)
+
+    def _update_pos(self):
+        self.setPos(self._default_pos() + self._offset)
+
+    def _build_label_transform(self):
+        if self.parentItem():
+            self.parentItem().prepareGeometryChange()
+        t = QTransform()
+        if self._flip_h:
+            t.scale(-1, 1)
+        if self._flip_v:
+            t.scale(1, -1)
+        t.rotate(self._rotation)
+        self.setTransform(t)
+
+    # ── Qt interface ─────────────────────────────────────────
+
+    def boundingRect(self):
+        fs = self._comp._calc_font_px()
+        text = self._comp.refdes()
+        tw = len(text) * fs * 0.65
+        h = fs
+        return QRectF(-1, -h - 1, tw + 2, h + 2)
+
+    def shape(self):
+        fs = self._comp._calc_font_px()
+        text = self._comp.refdes()
+        tw = len(text) * fs * 0.65
+        h = fs
+        path = QPainterPath()
+        path.addRect(-1, -h - 1, tw + 2, h + 2)
+        return path
+
+    def paint(self, painter, option, widget=None):
+        fs = self._comp._calc_font_px()
+        font = QFont("sans-serif")
+        font.setPixelSize(fs)
+        painter.setFont(font)
+        color = QColor("#ffcc00") if self.isSelected() else QColor("#f0f0f0")
+        painter.setPen(QPen(color, 0))
+        painter.drawText(QPointF(0, 0), self._comp.refdes())
+
+    def itemChange(self, change, value):
+        if change == QGraphicsItem.GraphicsItemChange.ItemPositionChange and self.scene():
+            dp = self._default_pos()
+            new_offset = QPointF(value.x() - dp.x(), value.y() - dp.y())
+            self._offset = new_offset
+            self.parentItem().prepareGeometryChange()
+        if change in (QGraphicsItem.GraphicsItemChange.ItemPositionHasChanged,
+                      QGraphicsItem.GraphicsItemChange.ItemTransformHasChanged):
+            if self._comp._on_moved:
+                self._comp._on_moved()
+            if self.scene():
+                r = self.sceneBoundingRect().adjusted(-5, -5, 5, 5)
+                self.scene().update(r)
+        return super().itemChange(change, value)
