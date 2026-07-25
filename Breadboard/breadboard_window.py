@@ -7,7 +7,7 @@ from pathlib import Path
 
 from PySide6.QtWidgets import (
     QMainWindow, QGraphicsView, QGraphicsScene,
-    QWidget, QVBoxLayout, QMessageBox,
+    QWidget, QVBoxLayout, QMessageBox, QMenuBar, QMenu, QFileDialog,
 )
 from PySide6.QtCore import Qt, QPointF, QRectF
 from PySide6.QtGui import QPainter, QPen, QBrush, QColor, QMouseEvent, QShortcut, QKeySequence
@@ -102,6 +102,13 @@ class BoardView(QGraphicsView):
             elif isinstance(item, RefdesLabel):
                 item.setLabelFlipV(not item._flip_v)
 
+    def _rotate_selected(self):
+        for item in self.scene().selectedItems():
+            if isinstance(item, PlacedCompItem):
+                item.setCompRotation(item._rotation + 90)
+            elif isinstance(item, RefdesLabel):
+                item.setLabelRotation(item._rotation + 90)
+
     def fitBoard(self, margin_mm: float = 10):
         s = self.scene()
         if s is not None and s.sceneRect().isValid():
@@ -172,11 +179,7 @@ class BoardView(QGraphicsView):
     def keyPressEvent(self, event):
         key = event.key()
         if key == Qt.Key.Key_R and not self._routing_mode:
-            for item in self.scene().selectedItems():
-                if isinstance(item, PlacedCompItem):
-                    item.setCompRotation(item._rotation + 90)
-                elif isinstance(item, RefdesLabel):
-                    item.setLabelRotation(item._rotation + 90)
+            self._rotate_selected()
             return
         if key in (Qt.Key.Key_Delete, Qt.Key.Key_Backspace) and not self._routing_mode:
             for item in list(self.scene().selectedItems()):
@@ -444,6 +447,7 @@ class BreadboardWindow(QMainWindow):
         self.setWindowTitle("Макетная плата — Pulsar")
         self.setMinimumSize(600, 450)
         self.resize(900, 680)
+        self._create_menu_bar()
         self.setCentralWidget(self._view)
 
         app.destroyed.connect(self.close)
@@ -461,6 +465,38 @@ class BreadboardWindow(QMainWindow):
         self._view.scale(4.0, 4.0)
 
     # ── Public ────────────────────────────────────────────────
+
+    def _create_menu_bar(self):
+        mb = self.menuBar()
+        mb.setStyleSheet("""
+            QMenuBar { background-color: #ddd; color: #000; }
+            QMenuBar::item:selected { background-color: #eee; }
+            QMenu { background-color: #ddd; color: #000; }
+            QMenu::item:selected { background-color: #eee; color: #000; }
+        """)
+
+        # Файл
+        fm = mb.addMenu("Файл")
+        save_act = fm.addAction("Сохранить\tCtrl+S")
+        save_act.triggered.connect(self._save_brd)
+        fm.addSeparator()
+        quit_act = fm.addAction("Выход\tCtrl+Q")
+        quit_act.triggered.connect(self.close)
+
+        # Правка
+        em = mb.addMenu("Правка")
+        rot_act = em.addAction("Повернуть\tR")
+        rot_act.triggered.connect(lambda: self._view._rotate_selected())
+        em.addSeparator()
+        flip_h_act = em.addAction("Отразить по горизонтали\tCtrl+H")
+        flip_h_act.triggered.connect(lambda: self._view._flip_selected_h())
+        flip_v_act = em.addAction("Отразить по вертикали\tCtrl+V")
+        flip_v_act.triggered.connect(lambda: self._view._flip_selected_v())
+
+    def _save_brd(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Сохранить макет", "", "Breadboard (*.brd)")
+        if path:
+            print(f"[breadboard] Save {path} — not implemented yet")
 
     def reload(self):
         """Re-scan the schematic and rebuild the board."""
