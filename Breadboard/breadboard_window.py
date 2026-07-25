@@ -10,7 +10,8 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QMessageBox, QMenuBar, QMenu, QFileDialog,
 )
 from PySide6.QtCore import Qt, QPointF, QRectF
-from PySide6.QtGui import QPainter, QPen, QBrush, QColor, QMouseEvent, QShortcut, QKeySequence
+from PySide6.QtGui import QPainter, QPen, QBrush, QColor, QMouseEvent, QShortcut, QKeySequence, QActionGroup
+import json
 
 from Breadboard.board import Board
 from Breadboard.pcb_library import parse_pcb_svg, Package
@@ -83,12 +84,15 @@ class BoardView(QGraphicsView):
         self._on_add_junction = None  # callable(jrd1, jpin1, jrd2, jpin2, ratio, rd3, pin3)
         self._on_manual_segment = None  # callable(seg: RatlineItem)
         self._on_segment_deleted = None  # callable(endpoints: list[tuple])
+        self._on_before_change = None  # callable() — save snapshot before state change
 
         # Shortcuts — use QShortcut to avoid platform key-code quirks
         QShortcut(QKeySequence("Ctrl+H"), self, self._flip_selected_h)
         QShortcut(QKeySequence("Ctrl+V"), self, self._flip_selected_v)
 
     def _flip_selected_h(self):
+        if self._on_before_change:
+            self._on_before_change()
         for item in self.scene().selectedItems():
             if isinstance(item, PlacedCompItem):
                 item.setFlipH(not item._flip_h)
@@ -96,6 +100,8 @@ class BoardView(QGraphicsView):
                 item.setLabelFlipH(not item._flip_h)
 
     def _flip_selected_v(self):
+        if self._on_before_change:
+            self._on_before_change()
         for item in self.scene().selectedItems():
             if isinstance(item, PlacedCompItem):
                 item.setFlipV(not item._flip_v)
@@ -103,6 +109,8 @@ class BoardView(QGraphicsView):
                 item.setLabelFlipV(not item._flip_v)
 
     def _rotate_selected(self):
+        if self._on_before_change:
+            self._on_before_change()
         for item in self.scene().selectedItems():
             if isinstance(item, PlacedCompItem):
                 item.setCompRotation(item._rotation + 90)
@@ -171,10 +179,13 @@ class BoardView(QGraphicsView):
 
     def wheelEvent(self, event):
         factor = 1.15 ** (event.angleDelta().y() / 120)
-        new_zoom = self.transform().m11() * factor
+        new_zoom = abs(self.transform().m11()) * factor
         if new_zoom < 0.05 or new_zoom > 50.0:
             return
         self.scale(factor, factor)
+        win = self.window()
+        if hasattr(win, '_zoom_factor'):
+            win._zoom_factor *= factor
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -439,10 +450,16 @@ class BreadboardWindow(QMainWindow):
         self._connection_data: list[list[tuple[str | None, int | None, float | None, float | None]]] = []
         self._junctions: list[tuple[str, int, str, int, float, str, int]] = []
         self._hidden_connections: set[frozenset] = set()
+        self._undo_stack: list[dict] = []
+        self._redo_stack: list[dict] = []
+        self._restoring = False
+        self._components_side = True
+        self._zoom_factor = 1.0
         self._view._on_add_connection = self._add_connection_entry
         self._view._on_add_junction = self._add_junction
         self._view._on_manual_segment = self._manual_segments.append
         self._view._on_segment_deleted = self._on_segment_deleted
+        self._view._on_before_change = self._save_snapshot
 
         self.setWindowTitle("Макетная плата — Pulsar")
         self.setMinimumSize(600, 450)
@@ -461,8 +478,7 @@ class BreadboardWindow(QMainWindow):
         self._load_from_schematic()
 
         # Начальный зум: 4 пикселя на мм (плата 70×90 = 280×360 px)
-        self._view.resetTransform()
-        self._view.scale(4.0, 4.0)
+        self._apply_view_scale()
 
     # ── Public ────────────────────────────────────────────────
 
@@ -477,14 +493,29 @@ class BreadboardWindow(QMainWindow):
 
         # Файл
         fm = mb.addMenu("Файл")
+        open_act = fm.addAction("Открыть\tCtrl+O")
+        open_act.triggered.connect(self._open_brd)
+        fm.addSeparator()
         save_act = fm.addAction("Сохранить\tCtrl+S")
         save_act.triggered.connect(self._save_brd)
+        save_as_act = fm.addAction("Сохранить как…\tCtrl+Shift+S")
+        save_as_act.triggered.connect(self._save_brd)
+        fm.addSeparator()
+        export_act = fm.addAction("Экспорт в .JPG")
+        export_act.triggered.connect(self._export_jpg)
+        export_pdf_act = fm.addAction("Экспорт в .PDF")
+        export_pdf_act.triggered.connect(self._export_pdf)
         fm.addSeparator()
         quit_act = fm.addAction("Выход\tCtrl+Q")
         quit_act.triggered.connect(self.close)
 
         # Правка
         em = mb.addMenu("Правка")
+        undo_act = em.addAction("Отменить\tCtrl+Z")
+        undo_act.triggered.connect(self._undo)
+        redo_act = em.addAction("Повторить\tCtrl+Shift+Z")
+        redo_act.triggered.connect(self._redo)
+        em.addSeparator()
         rot_act = em.addAction("Повернуть\tR")
         rot_act.triggered.connect(lambda: self._view._rotate_selected())
         em.addSeparator()
@@ -493,22 +524,274 @@ class BreadboardWindow(QMainWindow):
         flip_v_act = em.addAction("Отразить по вертикали\tCtrl+V")
         flip_v_act.triggered.connect(lambda: self._view._flip_selected_v())
 
+        # Вид
+        vm = mb.addMenu("Вид")
+        self._side_group = QActionGroup(self)
+        comp_side = self._side_group.addAction("Сторона компонентов")
+        comp_side.setCheckable(True)
+        comp_side.setChecked(True)
+        trace_side = self._side_group.addAction("Сторона дорожек")
+        trace_side.setCheckable(True)
+        vm.addActions([comp_side, trace_side])
+        self._side_group.triggered.connect(self._on_side_changed)
+        vm.addSeparator()
+        fit_act = vm.addAction("Вписать в экран")
+        fit_act.triggered.connect(self._fit_in_view)
+
     def _save_brd(self):
-        path, _ = QFileDialog.getSaveFileName(self, "Сохранить макет", "", "Breadboard (*.brd)")
+        path, _ = QFileDialog.getSaveFileName(self, "Сохранить макет", "", "Макетная плата (*.mb)")
         if path:
-            print(f"[breadboard] Save {path} — not implemented yet")
+            if not path.endswith(".mb"):
+                path += ".mb"
+            snap = self._take_snapshot()
+            snap['version'] = 1
+            snap['format'] = 'pulsar-breadboard'
+            try:
+                with open(path, 'w', encoding='utf-8') as f:
+                    json.dump(snap, f, ensure_ascii=False, indent=2)
+            except Exception as e:
+                QMessageBox.warning(self, "Ошибка", f"Не удалось сохранить:\n{e}")
+
+    def _export_jpg(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Экспорт в JPG", "untitled.jpg", "JPEG (*.jpg)")
+        if not path:
+            return
+        base, _ = os.path.splitext(path)
+        path = base + '.jpg'
+        pixmap = self._view.grab()
+        pixmap.save(path, "JPG")
+
+    def _export_pdf(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Экспорт в PDF", "untitled.pdf", "PDF (*.pdf)")
+        if not path:
+            return
+        base, ext = os.path.splitext(path)
+        if ext.lower() != '.pdf':
+            path = base + '.pdf'
+        from PySide6.QtGui import QPdfWriter, QPageSize, QPainter
+        from PySide6.QtCore import QRectF, QPointF
+        b = self._board
+        board_w = b.board_width_mm
+        board_h = b.board_height_mm
+        writer = QPdfWriter(path)
+        writer.setPageSize(QPageSize(QPageSize.A4))
+        dpi = 300
+        writer.setResolution(dpi)
+        margin_px = 50
+        page_w_px = int(210 * dpi / 25.4)
+        page_h_px = int(297 * dpi / 25.4)
+        avail_w = page_w_px - 2 * margin_px
+        avail_h = page_h_px - 2 * margin_px
+        ar = board_w / board_h
+        if ar > avail_w / avail_h:
+            target_w = avail_w
+            target_h = avail_w / ar
+        else:
+            target_h = avail_h
+            target_w = avail_h * ar
+        tx = (page_w_px - target_w) / 2
+        ty = (page_h_px - target_h) / 2
+        p = QPainter(writer)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        scale_x = target_w / board_w
+        scale_y = target_h / board_h
+        p.save()
+        p.translate(tx, ty)
+        p.scale(scale_x, scale_y)
+        p.fillRect(QRectF(0, 0, board_w, board_h), BOARD_FILL)
+        p.setPen(QPen(BOARD_OUTLINE, 0.3))
+        p.drawRect(QRectF(0, 0, board_w, board_h))
+        hole_pen = QPen(HOLE_OUTLINE, 0.15)
+        p.setPen(hole_pen)
+        for col in range(b.cols):
+            for row in range(b.rows):
+                hx, hy = b.hole_pos(col, row)
+                p.setBrush(HOLE_FILL)
+                p.drawEllipse(QPointF(hx, hy), 0.5, 0.5)
+        p.restore()
+        self._scene.render(p, QRectF(tx, ty, target_w, target_h),
+                           QRectF(0, 0, board_w, board_h))
+        p.end()
+
+    def _open_brd(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Открыть макет", "", "Макетная плата (*.mb)")
+        if not path:
+            return
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                snap = json.load(f)
+        except Exception as e:
+            QMessageBox.warning(self, "Ошибка", f"Не удалось открыть:\n{e}")
+            return
+
+        self._restoring = True
+        self._clear()
+
+        # Re-create components from saved data
+        for cd in snap.get('comps', []):
+            fp = cd.get('footprint', '')
+            if not fp:
+                continue
+            svg_path = PCBS_DIR / fp
+            if not svg_path.exists():
+                continue
+            try:
+                pkg = parse_pcb_svg(str(svg_path))
+            except Exception:
+                continue
+
+            comp = PlacedCompItem(
+                pkg, fp, cd['refdes'],
+                board=self._board,
+                on_moved=self._update_ratlines,
+            )
+            comp._on_before_drag = self._save_snapshot
+            comp.setPos(cd['x'], cd['y'])
+            comp._rotation = cd['rot']
+            comp._flip_h = cd['flip_h']
+            comp._flip_v = cd['flip_v']
+            comp._build_transform()
+            comp.setBodyOpacity(cd.get('opacity', 1.0))
+            self._scene.addItem(comp)
+            self._placements.append(comp)
+
+            # Restore label
+            lbl = comp._label_item
+            lbl._offset = QPointF(cd['loffset_x'], cd['loffset_y'])
+            lbl._rotation = cd.get('lrot', 0)
+            lbl._flip_h = cd.get('lflip_h', False)
+            lbl._flip_v = cd.get('lflip_v', False)
+            lbl._build_label_transform()
+            lbl.setPos(cd['lx'], cd['ly'])
+
+        # Restore connections
+        self._connection_data = [
+            [tuple(ep) for ep in entry] for entry in snap.get('conn_data', [])]
+        self._junctions = list(snap.get('junctions', []))
+        self._hidden_connections = {frozenset(tuple(ep) for ep in p) for p in snap.get('hidden', [])}
+        for pts, name in snap.get('manual_pts', []):
+            qpts = [QPointF(x, y) for x, y in pts]
+            seg = RatlineItem(name, qpts, board=self._board)
+            self._scene.addItem(seg)
+            self._manual_segments.append(seg)
+
+        # Rebuild view
+        self._apply_view_scale()
+        self._restoring = False
+        self._update_ratlines()
+        self._undo_stack.clear()
+        self._redo_stack.clear()
+
+    def _fit_in_view(self):
+        self._view.fitInView(QRectF(0, 0, self._board.board_width_mm, self._board.board_height_mm),
+                             Qt.AspectRatioMode.KeepAspectRatio)
+        self._zoom_factor = self._view.transform().m22() / 4.0
+        self._apply_view_scale()
+
+    def _apply_view_scale(self):
+        sx = 4.0 if self._components_side else -4.0
+        sy = 4.0
+        self._view.resetTransform()
+        self._view.scale(sx * self._zoom_factor, sy * self._zoom_factor)
+        cx = self._board.margin_x() + (self._board.cols - 1) * self._board.pitch_mm / 2
+        cy = self._board.margin_y() + (self._board.rows - 1) * self._board.pitch_mm / 2
+        self._view.centerOn(cx, cy)
+
+    def _on_side_changed(self, action):
+        self._components_side = (action.text() == "Сторона компонентов")
+        opacity = 1.0 if self._components_side else 0.25
+        for comp in self._placements:
+            comp.setBodyOpacity(opacity)
+        self._apply_view_scale()
+
+    # ── Snapshot / Undo / Redo ───────────────────────────────
+
+    def _take_snapshot(self) -> dict:
+        comps = []
+        for c in self._placements:
+            lbl = c._label_item
+            comps.append({
+                'refdes': c.refdes(),
+                'footprint': c.footprint(),
+                'x': c.pos().x(), 'y': c.pos().y(),
+                'rot': c._rotation,
+                'flip_h': c._flip_h, 'flip_v': c._flip_v,
+                'opacity': c._body_opacity,
+                'lx': lbl.pos().x(), 'ly': lbl.pos().y(),
+                'lrot': lbl._rotation,
+                'lflip_h': lbl._flip_h, 'lflip_v': lbl._flip_v,
+                'loffset_x': lbl._offset.x(), 'loffset_y': lbl._offset.y(),
+            })
+        return {
+            'comps': comps,
+            'conn_data': [[list(ep) for ep in entry] for entry in self._connection_data],
+            'junctions': list(self._junctions),
+            'hidden': [(a, b) for a, b in self._hidden_connections],
+            'manual_pts': [([(p.x(), p.y()) for p in seg.points()], seg.net_name())
+                           for seg in self._manual_segments],
+        }
+
+    def _restore_snapshot(self, snap: dict):
+        self._restoring = True
+        for cd in snap['comps']:
+            for c in self._placements:
+                if c.refdes() == cd['refdes']:
+                    c.setPos(cd['x'], cd['y'])
+                    c._rotation = cd['rot']
+                    c._flip_h = cd['flip_h']
+                    c._flip_v = cd['flip_v']
+                    c._build_transform()
+                    c.setBodyOpacity(cd['opacity'])
+                    lbl = c._label_item
+                    lbl._offset = QPointF(cd['loffset_x'], cd['loffset_y'])
+                    lbl.setPos(cd['lx'], cd['ly'])
+                    lbl._rotation = cd['lrot']
+                    lbl._flip_h = cd['lflip_h']
+                    lbl._flip_v = cd['lflip_v']
+                    lbl._build_label_transform()
+                    break
+
+        self._clear_ratlines()
+        self._clear_manual_segments()
+        self._connection_data = [
+            [tuple(ep) for ep in entry] for entry in snap['conn_data']]
+        self._junctions = list(snap['junctions'])
+        self._hidden_connections = {frozenset(tuple(ep) for ep in p) for p in snap['hidden']}
+        for pts, name in snap['manual_pts']:
+            qpts = [QPointF(x, y) for x, y in pts]
+            seg = RatlineItem(name, qpts, board=self._board)
+            self._scene.addItem(seg)
+            self._manual_segments.append(seg)
+        self._restoring = False
+        self._update_ratlines()
+
+    def _save_snapshot(self):
+        self._undo_stack.append(self._take_snapshot())
+        self._redo_stack.clear()
+
+    def _undo(self):
+        if not self._undo_stack:
+            return
+        self._redo_stack.append(self._take_snapshot())
+        self._restore_snapshot(self._undo_stack.pop())
+
+    def _redo(self):
+        if not self._redo_stack:
+            return
+        self._undo_stack.append(self._take_snapshot())
+        self._restore_snapshot(self._redo_stack.pop())
 
     def reload(self):
         """Re-scan the schematic and rebuild the board."""
         self._clear()
         self._load_from_schematic()
-        self._view.resetTransform()
-        self._view.scale(4.0, 4.0)
+        self._apply_view_scale()
 
     # ── Internal ──────────────────────────────────────────────
 
     def _on_segment_deleted(self, endpoints):
         """Handle segment deletion from the view."""
+        self._save_snapshot()
         # Detect junction segment: exactly one pin endpoint → match _junctions
         ep_pins = [(ep[0], ep[1]) for ep in endpoints if ep[0] is not None]
         if len(ep_pins) == 1:
@@ -620,6 +903,7 @@ class BreadboardWindow(QMainWindow):
                 board=self._board,
                 on_moved=self._update_ratlines,
             )
+            comp_item._on_before_drag = self._save_snapshot
             comp_item.setPos(hole_x, hole_y)
             self._scene.addItem(comp_item)
             self._placements.append(comp_item)
@@ -666,6 +950,8 @@ class BreadboardWindow(QMainWindow):
 
     def _update_ratlines(self):
         """Rebuild ratline paths from current component positions."""
+        if self._restoring:
+            return
         self._clear_ratlines()
         board_comps = {c.refdes(): c for c in self._placements}
 
@@ -729,7 +1015,7 @@ class BreadboardWindow(QMainWindow):
 
     def _add_connection_entry(self, endpoints):
         """Add a connection entry (pin→pin, pin→hole, or hole→pin) to _connection_data."""
-        # If user explicitly re-draws a hidden pin→pin pair, unhide it
+        self._save_snapshot()
         if (len(endpoints) >= 2 and endpoints[0][0] is not None and endpoints[1][0] is not None):
             pair = frozenset([(endpoints[0][0], endpoints[0][1]),
                              (endpoints[1][0], endpoints[1][1])])
@@ -739,5 +1025,6 @@ class BreadboardWindow(QMainWindow):
 
     def _add_junction(self, jrd1, jpin1, jrd2, jpin2, ratio, rd3, pin3):
         """Add a T-junction on the body of segment (jrd1,jpin1)↔(jrd2,jpin2)."""
+        self._save_snapshot()
         self._junctions.append((jrd1, jpin1, jrd2, jpin2, ratio, rd3, pin3))
         self._update_ratlines()

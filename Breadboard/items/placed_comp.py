@@ -71,6 +71,12 @@ class PlacedCompItem(QGraphicsItem):
         self._build_geom()
         self._build_transform()
         self._label_item = RefdesLabel(self)
+        self._body_opacity = 1.0
+        self._on_before_drag = None
+
+    def setBodyOpacity(self, opacity: float):
+        self._body_opacity = max(0.0, min(1.0, opacity))
+        self.update()
 
     # ── Properties ──────────────────────────────────────────────
 
@@ -242,6 +248,9 @@ class PlacedCompItem(QGraphicsItem):
 
     def paint(self, painter, option, widget=None):
         for lst, is_copper in ((self._silk, False), (self._copper, True), (self._other, False)):
+            if self._body_opacity < 1.0 and not is_copper:
+                painter.save()
+                painter.setOpacity(self._body_opacity)
             for path, pen, brush in lst:
                 if self.isSelected() and not is_copper:
                     p = QPen(QColor("#ffcc00"), pen.widthF())
@@ -250,6 +259,8 @@ class PlacedCompItem(QGraphicsItem):
                     painter.setPen(pen)
                 painter.setBrush(brush)
                 painter.drawPath(path)
+            if self._body_opacity < 1.0 and not is_copper:
+                painter.restore()
 
     # ── Snap ────────────────────────────────────────────────────
 
@@ -268,6 +279,11 @@ class PlacedCompItem(QGraphicsItem):
         return super().itemChange(change, value)
 
     # ── Hover ───────────────────────────────────────────────────
+
+    def mousePressEvent(self, event):
+        if self._on_before_drag:
+            self._on_before_drag()
+        super().mousePressEvent(event)
 
     def hoverEnterEvent(self, event):
         self.setCursor(Qt.CursorShape.OpenHandCursor)
