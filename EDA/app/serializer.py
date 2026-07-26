@@ -285,7 +285,7 @@ def deserialize_into_canvas(canvas, data: dict):
                     _c = _lf.read_text(encoding="utf-8")
                 except Exception:
                     continue
-                _flat = _re.sub(r'\+\s*\n\s*', ' ', _c)
+                _flat = _re.sub(r'\n\s*\+\s*', ' ', _c)
                 # .model
                 for _m in _re.finditer(
                     r'^\s*\.model\s+(\S+)\s+(\S+)\s*(.*)',

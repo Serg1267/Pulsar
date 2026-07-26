@@ -12,8 +12,8 @@ from PySide6.QtWidgets import (QGraphicsView, QGraphicsScene, QGraphicsItem,
                                QGraphicsLineItem, QGraphicsSimpleTextItem,
                                QInputDialog, QDialog, QColorDialog,
                                 QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-                                QPushButton, QCheckBox, QTextEdit, QComboBox,
-                               QApplication)  # View/Scene/Item
+                                 QPushButton, QCheckBox, QTextEdit, QComboBox,
+                                QApplication)  # View/Scene/Item
 from PySide6.QtCore import Qt, QRect, QRectF, QPoint, QPointF, QMimeData, Signal
 from PySide6.QtGui import (QPainter, QMouseEvent, QCursor, QColor, QPen,
                            QBrush, QTransform, QPolygonF, QFont, QFontMetrics,
@@ -60,6 +60,9 @@ DEVICE_FOOTPRINTS: dict[str, list[tuple[str, str]]] = {
     "AOP-Standard": [
         ("(нет)", ""),
         ("DIP-8 (7.62 mm)", "dip_8_300mil.svg"),
+    ],
+    "VARIABLE_RESISTOR": [
+        ("(нет)", ""),
     ],
 }
 
@@ -1841,6 +1844,16 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                 ed_value = QLineEdit(item.value())
                 layout.addWidget(ed_value)
 
+            if _device == "VARIABLE_RESISTOR":
+                from PySide6.QtWidgets import QSpinBox
+                layout.addWidget(QLabel("Положение движка (%):"))
+                ed_pot_pos = QSpinBox()
+                ed_pot_pos.setRange(0, 100)
+                ed_pot_pos.setSingleStep(10)
+                ed_pot_pos.setSuffix("%")
+                ed_pot_pos.setValue(int(item._data.attributes.get("pot_position", "50")))
+                layout.addWidget(ed_pot_pos)
+
             cb_refdes = QCheckBox("Показать имя")
             cb_refdes.setChecked(refdes_label is None or refdes_label.isVisible())
             layout.addWidget(cb_refdes)
@@ -1962,6 +1975,8 @@ class SchematicCanvas(SerializationMixin, ExportMixin, SelectionMixin, Placement
                 elif ed_value is not None:
                     value = ed_value.text().strip()
                     item.set_value(value)
+                if _device == "VARIABLE_RESISTOR":
+                    item._data.attributes["pot_position"] = str(ed_pot_pos.value())
                 item.set_model_line(ed_model.toPlainText().strip())
                 fp = ed_fp.currentData() or ""
                 item.set_footprint(fp)

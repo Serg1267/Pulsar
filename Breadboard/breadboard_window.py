@@ -455,9 +455,11 @@ class BreadboardWindow(QMainWindow):
         self._restoring = False
         self._components_side = True
         self._zoom_factor = 1.0
+        self._dirty = False
+        self._current_path: str | None = None
         self._view._on_add_connection = self._add_connection_entry
         self._view._on_add_junction = self._add_junction
-        self._view._on_manual_segment = self._manual_segments.append
+        self._view._on_manual_segment = lambda seg: self._add_manual_segment(seg)
         self._view._on_segment_deleted = self._on_segment_deleted
         self._view._on_before_change = self._save_snapshot
 
@@ -499,7 +501,7 @@ class BreadboardWindow(QMainWindow):
         save_act = fm.addAction("Сохранить\tCtrl+S")
         save_act.triggered.connect(self._save_brd)
         save_as_act = fm.addAction("Сохранить как…\tCtrl+Shift+S")
-        save_as_act.triggered.connect(self._save_brd)
+        save_as_act.triggered.connect(self._save_brd_as)
         fm.addSeparator()
         export_act = fm.addAction("Экспорт в .JPG")
         export_act.triggered.connect(self._export_jpg)
@@ -539,18 +541,31 @@ class BreadboardWindow(QMainWindow):
         fit_act.triggered.connect(self._fit_in_view)
 
     def _save_brd(self):
-        path, _ = QFileDialog.getSaveFileName(self, "Сохранить макет", "", "Макетная плата (*.mb)")
-        if path:
-            if not path.endswith(".mb"):
-                path += ".mb"
-            snap = self._take_snapshot()
-            snap['version'] = 1
-            snap['format'] = 'pulsar-breadboard'
-            try:
-                with open(path, 'w', encoding='utf-8') as f:
-                    json.dump(snap, f, ensure_ascii=False, indent=2)
-            except Exception as e:
-                QMessageBox.warning(self, "Ошибка", f"Не удалось сохранить:\n{e}")
+        if self._current_path:
+            self._write_brd(self._current_path)
+        else:
+            self._save_brd_as()
+
+    def _save_brd_as(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Сохранить макет как", "", "Макетная плата (*.mb)")
+        if not path:
+            return
+        if not path.endswith(".mb"):
+            path += ".mb"
+        self._write_brd(path)
+        self._current_path = path
+        self._dirty = False
+        self._update_title()
+
+    def _write_brd(self, path: str):
+        snap = self._take_snapshot()
+        snap['version'] = 1
+        snap['format'] = 'pulsar-breadboard'
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(snap, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            QMessageBox.warning(self, "Ошибка", f"Не удалось сохранить:\n{e}")
 
     def _export_jpg(self):
         path, _ = QFileDialog.getSaveFileName(self, "Экспорт в JPG", "untitled.jpg", "JPEG (*.jpg)")
@@ -613,7 +628,29 @@ class BreadboardWindow(QMainWindow):
                            QRectF(0, 0, board_w, board_h))
         p.end()
 
+    def _maybe_save_unsaved(self) -> bool:
+        """If dirty, ask to save. Returns False if cancelled."""
+        if not self._dirty:
+            return True
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Макетная плата")
+        msg.setText("Сохранить изменения?")
+        msg.setIcon(QMessageBox.Icon.Question)
+        save_btn = msg.addButton("Сохранить", QMessageBox.ButtonRole.AcceptRole)
+        discard_btn = msg.addButton("Не сохранять", QMessageBox.ButtonRole.DestructiveRole)
+        cancel_btn = msg.addButton("Отмена", QMessageBox.ButtonRole.RejectRole)
+        msg.setDefaultButton(cancel_btn)
+        msg.exec()
+        if msg.clickedButton() == save_btn:
+            self._save_brd()
+            return True
+        elif msg.clickedButton() == discard_btn:
+            return True
+        return False
+
     def _open_brd(self):
+        if not self._maybe_save_unsaved():
+            return
         path, _ = QFileDialog.getOpenFileName(self, "Открыть макет", "", "Макетная плата (*.mb)")
         if not path:
             return
@@ -626,6 +663,9 @@ class BreadboardWindow(QMainWindow):
 
         self._restoring = True
         self._clear()
+        self._current_path = path
+        self._dirty = False
+        self._update_title()
 
         # Re-create components from saved data
         for cd in snap.get('comps', []):
@@ -704,6 +744,41 @@ class BreadboardWindow(QMainWindow):
             comp.setBodyOpacity(opacity)
         self._apply_view_scale()
 
+    def _update_title(self):
+        name = os.path.basename(self._current_path) if self._current_path else "Макетная плата"
+        mark = "* " if self._dirty else ""
+        self.setWindowTitle(f"{mark}{name} — Pulsar")
+
+    def _mark_dirty(self):
+        if not self._dirty:
+            self._dirty = True
+            self._update_title()
+
+    def _add_manual_segment(self, seg):
+        self._save_snapshot()
+        self._manual_segments.append(seg)
+
+    def closeEvent(self, event):
+        if self._dirty:
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Макетная плата")
+            msg.setText("Сохранить изменения перед закрытием?")
+            msg.setIcon(QMessageBox.Icon.Question)
+            save_btn = msg.addButton("Сохранить", QMessageBox.ButtonRole.AcceptRole)
+            discard_btn = msg.addButton("Не сохранять", QMessageBox.ButtonRole.DestructiveRole)
+            cancel_btn = msg.addButton("Отмена", QMessageBox.ButtonRole.RejectRole)
+            msg.setDefaultButton(cancel_btn)
+            msg.exec()
+            if msg.clickedButton() == save_btn:
+                self._save_brd()
+                event.accept()
+            elif msg.clickedButton() == discard_btn:
+                event.accept()
+            else:
+                event.ignore()
+            return
+        event.accept()
+
     # ── Snapshot / Undo / Redo ───────────────────────────────
 
     def _take_snapshot(self) -> dict:
@@ -766,6 +841,7 @@ class BreadboardWindow(QMainWindow):
         self._update_ratlines()
 
     def _save_snapshot(self):
+        self._mark_dirty()
         self._undo_stack.append(self._take_snapshot())
         self._redo_stack.clear()
 
@@ -783,7 +859,12 @@ class BreadboardWindow(QMainWindow):
 
     def reload(self):
         """Re-scan the schematic and rebuild the board."""
+        if not self._maybe_save_unsaved():
+            return
         self._clear()
+        self._current_path = None
+        self._dirty = False
+        self._update_title()
         self._load_from_schematic()
         self._apply_view_scale()
 

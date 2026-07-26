@@ -287,7 +287,14 @@ class ExportMixin:
                 model_lines.append(swmod_line)
 
         comp_lines.sort()
-        dir_lines.sort(key=lambda t: (1 if t.lstrip().lower().startswith(('.print', '.plot', '.probe')) else 0, t))
+        def _dir_priority(line: str) -> tuple:
+            low = line.lstrip().lower()
+            if low.startswith(('.tran', '.ac', '.dc', '.op', '.ic', '.nodeset', '.step')):
+                return (0, low)
+            if low.startswith(('.print', '.plot', '.probe')):
+                return (2, low)
+            return (1, low)
+        dir_lines.sort(key=_dir_priority)
         lines.extend(comp_lines)
         lines.extend(model_lines)
         lines.extend(dir_lines)
@@ -315,6 +322,16 @@ class ExportMixin:
             if n0 is None or n1 is None:
                 return None
             return f"{refdes} {n0} {n1} {value}" if value else f"{refdes} {n0} {n1}"
+
+        # Потенциометр: 3 пина (1,2 — крайние, 3 — движок)
+        if device == "VARIABLE_RESISTOR":
+            n0, n1, n2 = net(0), net(1), net(2)
+            if n0 is None or n1 is None:
+                return None
+            val = value or "10k"
+            pos = int(attributes.get("pot_position", "50")) if attributes else 50
+            return (f"{refdes}_top {n0} {n2} {{{val}*{pos}/100}}\n"
+                    f"{refdes}_bot {n2} {n1} {{{val}*{100-pos}/100}}")
 
         if device in ("CAPACITOR", "POLARIZED_CAPACITOR"):
             n0, n1 = net(0), net(1)

@@ -1,0 +1,12 @@
+* BD140 — PNP silicon medium-power transistor
+* Vceo=-80V, Ic=-1.5A, Pd=12.5W, Ft=50MHz, hfe=40-250
+* Package: TO-126
+* Complementary to BD135 (NPN)
+* Source: OnSemi/ST datasheet-derived, verified with ngspice-44
+.model BD140 PNP (
++ IS=84.84f  BF=110   NF=1.0   VAF=50   IKF=0.3
++ ISE=14.96f NE=1.5   BR=10    NR=1.0   ISC=1.333p NC=2.0   IKR=0.2
++ RB=8      RE=0.22  RC=0.6
++ CJE=120p  VJE=0.75 MJE=0.5
++ CJC=70p   VJC=0.5  MJC=0.33
++ TF=4n     TR=90n   XTB=1.5  XTI=3    EG=1.11)

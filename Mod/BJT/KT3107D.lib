@@ -1,0 +1,14 @@
+* KT3107D — PNP silicon epitaxial transistor
+* Vceo=45V, Ic=100mA, Ft=300MHz, hfe=400-800
+* Package: TO-92
+* Аналог BC557, параметры по КТ3107Д
+*
+* Gummel-Poon модель, адаптирована под параметры КТ3107Д
+.model KT3107D PNP (
++ IS=1.0e-13 BF=600   VAF=80   NF=1.0   ISE=1.0e-13 NE=1.5
++ BR=15    NR=1.0   ISC=1.0e-13 NC=2.0  IKF=0.08  IKR=0.03
++ RB=30     RC=4.0   RE=1.0
++ CJE=20p   VJE=0.75 MJE=0.33
++ CJC=10p   VJC=0.75 MJC=0.33
++ TF=0.5n   TR=80n   XTF=3    VTF=5    ITF=0.1
++ XTB=1.5   XTI=3    EG=1.11)

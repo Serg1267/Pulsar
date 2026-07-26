@@ -269,12 +269,6 @@ class PulsarMainWindow(QMainWindow):
         self._analysis_ac_action.triggered.connect(self._toggle_ac)
         self._analysis_menu.addAction(self._analysis_ac_action)
 
-        self._analysis_menu.addSeparator()
-
-        self._analysis_four_action = QAction("Коэффициент гармоник", self)
-        self._analysis_four_action.triggered.connect(self._show_fourier_from_menu)
-        self._analysis_menu.addAction(self._analysis_four_action)
-
         # ─── Схема (hidden by default) ───
         self._sch_menu = menubar.addMenu("Схема")
         self._sch_menu.menuAction().setVisible(False)
@@ -1670,6 +1664,7 @@ class PulsarMainWindow(QMainWindow):
         lines = text.split('\n')
 
         self._output_directives = self._detect_output_directives(text)
+        self._log_to_terminal_safe(f"[DEBUG] _apply_sim_fixes: four={self._output_directives.get('has_four')}, print={self._output_directives.get('has_print')}, plot={self._output_directives.get('has_plot')}")
 
         # ── .ic ... + uic → .ic ... + UIC в .tran ──
         uic_needed = False
@@ -1787,10 +1782,19 @@ class PulsarMainWindow(QMainWindow):
         # Читаем оригинал, применяем фиксы в памяти, пишем в temp
         text = path.read_text()
         self._output_directives = self._detect_output_directives(text)
+
+        # Отладка: показать .FOUR в оригинале
+        orig_lines = text.split('\n')
+        four_orig = [l for l in orig_lines if '.FOUR' in l.upper()]
+        self._log_to_terminal_safe(f"[DEBUG] ORIG file: {cir_path}, lines={len(orig_lines)}, .FOUR found={len(four_orig)}")
+        if four_orig:
+            for fl in four_orig:
+                self._log_to_terminal_safe(f"[DEBUG]   .FOUR line: {fl.strip()}")
+
         fixed_text = self._apply_sim_fixes(text)
         sim_path = Path(self._write_temp_sim_file(fixed_text))
 
-        # Отладка: показать первые/последние строки temp-файла
+        # Отладка: показать .FOUR в temp-файле
         sim_lines = fixed_text.split('\n')
         four_lines = [l for l in sim_lines if '.FOUR' in l.upper()]
         self._log_to_terminal_safe(f"[DEBUG] TEMP file: {sim_path}, lines={len(sim_lines)}, .FOUR found={len(four_lines)}")
@@ -1859,12 +1863,19 @@ class PulsarMainWindow(QMainWindow):
         if page:
             page.save()
 
-        # Фиксы в памяти → temp-файл (оригинал не трогаем)
+        # Отладка: показать .FOUR в оригинале (из редактора)
         text = page.editor.toPlainText()
+        orig_lines = text.split('\n')
+        four_orig = [l for l in orig_lines if '.FOUR' in l.upper()]
+        self._log_to_terminal_safe(f"[DEBUG] EDITOR text: lines={len(orig_lines)}, .FOUR found={len(four_orig)}")
+        if four_orig:
+            for fl in four_orig:
+                self._log_to_terminal_safe(f"[DEBUG]   .FOUR line: {fl.strip()}")
+
         fixed_text = self._apply_sim_fixes(text)
         sim_path = Path(self._write_temp_sim_file(fixed_text))
 
-        # Отладка: показать первые/последние строки temp-файла
+        # Отладка: показать .FOUR в temp-файле
         sim_lines = fixed_text.split('\n')
         four_lines = [l for l in sim_lines if '.FOUR' in l.upper()]
         self._log_to_terminal_safe(f"[DEBUG] TEMP file: {sim_path}, lines={len(sim_lines)}, .FOUR found={len(four_lines)}")
@@ -2061,14 +2072,6 @@ class PulsarMainWindow(QMainWindow):
             )
             self._log_to_terminal_safe("[DEBUG] All Fourier regex attempts failed")
         self._show_result_dialog("Результаты .FOUR (коэффициент гармоник)", text)
-
-    def _show_fourier_from_menu(self):
-        """Открыть .FOUR диалог из меню (использует последний буфер вывода)."""
-        text = self._terminal_text()
-        if not text.strip():
-            self._log_to_terminal_safe("[INFO] Нет данных симуляции. Запустите симуляцию с директивой .FOUR")
-            return
-        self._show_fourier_results(text)
 
     def _show_op_table(self, terminal_text: str):
         """Показать .OP результаты в отдельном окне."""
