@@ -43,6 +43,7 @@ _PIN_MAP: dict[str, list[int]] = {
     # Unique pins: even index 0/2/4 → left/middle/right
     # .sym: pin 0=C(collector→right), pin 1=E(emitter→left), pin 2=B(base→middle)
     "sparkfun-discretesemi_to-92-ammo_pcb.svg": [4, 0, 2],
+    "3296W_pcb.svg": [0, 4, 2],
 }
 
 # ── Colors ────────────────────────────────────────────────────
@@ -476,10 +477,7 @@ class BreadboardWindow(QMainWindow):
                                   self._board.board_width_mm,
                                   self._board.board_height_mm)
 
-        # Load components from current schematic
         self._load_from_schematic()
-
-        # Начальный зум: 4 пикселя на мм (плата 70×90 = 280×360 px)
         self._apply_view_scale()
 
     # ── Public ────────────────────────────────────────────────
@@ -543,6 +541,8 @@ class BreadboardWindow(QMainWindow):
     def _save_brd(self):
         if self._current_path:
             self._write_brd(self._current_path)
+            self._dirty = False
+            self._update_title()
         else:
             self._save_brd_as()
 
@@ -645,6 +645,7 @@ class BreadboardWindow(QMainWindow):
             self._save_brd()
             return True
         elif msg.clickedButton() == discard_btn:
+            self._dirty = False
             return True
         return False
 
@@ -773,6 +774,7 @@ class BreadboardWindow(QMainWindow):
                 self._save_brd()
                 event.accept()
             elif msg.clickedButton() == discard_btn:
+                self._dirty = False
                 event.accept()
             else:
                 event.ignore()

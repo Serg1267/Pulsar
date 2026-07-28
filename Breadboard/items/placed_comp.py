@@ -203,9 +203,8 @@ class PlacedCompItem(QGraphicsItem):
     # ── Geometry helpers (used by RefdesLabel) ───────────────
 
     def _calc_font_px(self) -> int:
-        """Font size in SVG pixels (item-local coords), larger for resistors & transistors."""
-        target_mm = 1.8 if ('axial' in self._footprint or 'to-92' in self._footprint) else 0.6
-        return max(1, round(target_mm / self._mmu)) if self._mmu else 10
+        """Font size in SVG pixels (item-local coords), same for all components."""
+        return max(1, round(1.8 / self._mmu)) if self._mmu else 10
 
     def _label_gap_svg(self) -> float:
         """Gap below body (SVG units) before refdes text baseline."""

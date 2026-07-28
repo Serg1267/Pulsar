@@ -357,8 +357,7 @@ class PulsarMainWindow(QMainWindow):
     def _open_breadboard(self):
         if not hasattr(self, '_breadboard_window') or self._breadboard_window is None:
             self._breadboard_window = BreadboardWindow(self)
-        else:
-            self._breadboard_window.reload()
+        self._breadboard_window.reload()
         self._breadboard_window.show()
         self._breadboard_window.raise_()
         self._breadboard_window.activateWindow()

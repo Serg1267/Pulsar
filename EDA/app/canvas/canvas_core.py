@@ -63,6 +63,7 @@ DEVICE_FOOTPRINTS: dict[str, list[tuple[str, str]]] = {
     ],
     "VARIABLE_RESISTOR": [
         ("(нет)", ""),
+        ("3296W (9.5mm, 2.54mm)", "3296W_pcb.svg"),
     ],
 }
 
