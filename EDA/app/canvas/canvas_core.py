@@ -67,13 +67,24 @@ DEVICE_FOOTPRINTS: dict[str, list[tuple[str, str]]] = {
     ],
     "CAPACITOR": [
         ("(нет)", ""),
-        ("Керам. 2.54 мм", "sparkfun-passives_cap-pth-small_pcb.svg"),
-        ("Керам. 5 мм", "sparkfun-passives_cap-pth-5mm_pcb.svg"),
+        ("Керам. 100 mil", "capacitor_ceramic_100mil.svg"),
+        ("Керам. 200 mil", "capacitor_ceramic_200mil.svg"),
+        ("Тантал 100 mil", "capacitor_tantalum_100mil.svg"),
+        ("Тантал 200 mil", "capacitor_tantalum_200mil.svg"),
+        ("PP 5 mm", "capacitor_pp_5mm_pcb.svg"),
+        ("PP 7.5 mm", "capacitor_pp_7.5mm_pcb.svg"),
+        ("PP 10 mm", "capacitor_pp_10mm_pcb.svg"),
+        ("PP 15 mm", "capacitor_pp_15mm_pcb.svg"),
+        ("PP 22.5 mm", "capacitor_pp_22.5mm_pcb.svg"),
+        ("PP 27.5 mm", "capacitor_pp_27.5mm_pcb.svg"),
+        ("PP 37.5 mm", "capacitor_pp_37.5mm_pcb.svg"),
     ],
     "POLARIZED_CAPACITOR": [
         ("(нет)", ""),
-        ("Электролит 2.54 мм", "sparkfun-passives_cpol-radial-10uf-25v_pcb.svg"),
-        ("Электролит 5.08 мм", "sparkfun-passives_cpol-radial-1000uf-25v_pcb.svg"),
+        ("Электролит 100 mil", "capacitor_elko_small_100mil.svg"),
+        ("Электролит 200 mil", "capacitor_elko_medium_200mil.svg"),
+        ("Электролит 300 mil", "capacitor_elko_large_300mil.svg"),
+        ("Goldcap 4.0F", "capacitor_elko_goldcap_4.0F_8647a5c11c9b485c095f1ac7ddec049d_2_pcb.svg"),
     ],
 }
 
