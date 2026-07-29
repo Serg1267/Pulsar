@@ -319,6 +319,22 @@ def _parse_element(el, parent_layer: str = "", tf: tuple = (1, 0, 0, 1, 0, 0)) -
             'stroke': stroke, 'sw': sw,
         }, parent_layer))
 
+    elif tag == 'polyline':
+        pts_str = el.get('points', '')
+        if pts_str:
+            pts = []
+            for pair in pts_str.split():
+                if ',' in pair:
+                    x, y = pair.split(',')
+                    pts.append((float(x), float(y)))
+            if tf != (1, 0, 0, 1, 0, 0):
+                pts = [_apply_transform(px, py, tf) for px, py in pts]
+            if pts:
+                commands.append(DrawCommand('path', {
+                    'points': pts, 'closed': False,
+                    'stroke': stroke, 'fill': fill, 'sw': sw,
+                }, parent_layer))
+
     elif tag == 'path':
         d = el.get('d', '')
         if not d:
