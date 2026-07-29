@@ -65,6 +65,16 @@ DEVICE_FOOTPRINTS: dict[str, list[tuple[str, str]]] = {
         ("(нет)", ""),
         ("3296W (9.5mm, 2.54mm)", "3296W_pcb.svg"),
     ],
+    "CAPACITOR": [
+        ("(нет)", ""),
+        ("Керам. 2.54 мм", "sparkfun-passives_cap-pth-small_pcb.svg"),
+        ("Керам. 5 мм", "sparkfun-passives_cap-pth-5mm_pcb.svg"),
+    ],
+    "POLARIZED_CAPACITOR": [
+        ("(нет)", ""),
+        ("Электролит 2.54 мм", "sparkfun-passives_cpol-radial-10uf-25v_pcb.svg"),
+        ("Электролит 5.08 мм", "sparkfun-passives_cpol-radial-1000uf-25v_pcb.svg"),
+    ],
 }
 
 

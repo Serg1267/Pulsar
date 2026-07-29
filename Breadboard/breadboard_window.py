@@ -33,6 +33,10 @@ _LABEL_MAP: dict[str, str] = {
     "axial_lay_2_500mil_pcb.svg": "Res_13mm",
     "axial_lay_2_600mil_pcb.svg": "Res_15mm",
     "axial_lay_2_800mil_pcb.svg": "Res_20mm",
+    "sparkfun-passives_cap-pth-small_pcb.svg": "Кер_2.54",
+    "sparkfun-passives_cap-pth-5mm_pcb.svg": "Кер_5мм",
+    "sparkfun-passives_cpol-radial-10uf-25v_pcb.svg": "Эл_2.54",
+    "sparkfun-passives_cpol-radial-1000uf-25v_pcb.svg": "Эл_5.08",
 }
 
 # PIN_MAP: footprint SVG filename → [copper_idx_for_pin_0, pin_1, …]
@@ -44,6 +48,10 @@ _PIN_MAP: dict[str, list[int]] = {
     # .sym: pin 0=C(collector→right), pin 1=E(emitter→left), pin 2=B(base→middle)
     "sparkfun-discretesemi_to-92-ammo_pcb.svg": [4, 0, 2],
     "3296W_pcb.svg": [0, 4, 2],
+    # Polarized caps: connector0pad(+) is RIGHT, connector1pad(-) is LEFT
+    # .sym pin 0(+)→copper[1](right), pin 1(-)→copper[0](left)
+    "sparkfun-passives_cpol-radial-10uf-25v_pcb.svg": [1, 0],
+    "sparkfun-passives_cpol-radial-1000uf-25v_pcb.svg": [1, 0],
 }
 
 # ── Colors ────────────────────────────────────────────────────
