@@ -68,6 +68,16 @@ class PlacedCompItem(QGraphicsItem):
         vbw = pkg.vb[2] if pkg.vb[2] else 1
         self._mmu = pkg.width_mm / vbw
 
+        if self._board is not None:
+            cents = _all_copper_centers(pkg)
+            if len(cents) >= 2:
+                svg_spacing = cents[-1][0] - cents[0][0]
+                if svg_spacing > 0:
+                    actual_mm = svg_spacing * self._mmu
+                    target_holes = max(1, round(actual_mm / self._board.pitch_mm))
+                    target_mm = target_holes * self._board.pitch_mm
+                    self._mmu = target_mm / svg_spacing
+
         self._build_geom()
         self._build_transform()
         self._label_item = RefdesLabel(self)
