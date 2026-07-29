@@ -33,7 +33,27 @@ def _parse_inch(s: str) -> float:
         return float(s[:-2]) / 25.4
     if s.endswith("mil"):
         return float(s[:-3]) / 1000.0
-    return float(s)
+    if s.endswith("px"):
+        return float(s[:-2]) / 96.0
+    if s.endswith("pt"):
+        return float(s[:-2]) / 72.0
+    return float(s) / 96.0  # no suffix → px
+
+
+def _parse_px(s: str) -> float:
+    """Return numeric value in CSS pixels (1px = 1/96 in)."""
+    s = s.strip().lower()
+    if s.endswith("in"):
+        return float(s[:-2]) * 96.0
+    if s.endswith("mm"):
+        return float(s[:-2]) / 25.4 * 96.0
+    if s.endswith("mil"):
+        return float(s[:-3]) / 1000.0 * 96.0
+    if s.endswith("px"):
+        return float(s[:-2])
+    if s.endswith("pt"):
+        return float(s[:-2]) * 96.0 / 72.0
+    return float(s)  # no suffix → px
 
 
 def _bezier_segments(x0, y0, x1, y1, x2, y2, x3, y3, n=16):
@@ -324,10 +344,27 @@ def parse_pcb_svg(filepath: str) -> Package:
     root = tree.getroot()
 
     width_str = root.get('width', '0in')
-    viewbox_str = root.get('viewBox', '0 0 1 1')
+    height_str = root.get('height', '0in')
+    viewbox_str = root.get('viewBox', '')
 
-    width_inch = _parse_inch(width_str)
-    vb = list(map(float, viewbox_str.split()))
+    viewbox_str = root.get('viewBox', '')
+    has_viewbox = bool(viewbox_str)
+
+    if viewbox_str:
+        vb = list(map(float, viewbox_str.split()))
+    else:
+        # No viewBox → infer from width/height (in px)
+        w_px = _parse_px(width_str)
+        h_px = _parse_px(height_str)
+        vb = [0.0, 0.0, w_px, h_px]
+
+    # Adobe Illustrator SVGs (enable-background attr) label px but mean pt
+    eb = root.get('enable-background', '')
+    if eb and width_str.strip().lower().endswith('px') and has_viewbox:
+        # Treat px as pt: pt → in = /72, but _parse_inch would /96 → override
+        width_inch = float(width_str.lower().replace('px', '').strip()) / 72.0
+    else:
+        width_inch = _parse_inch(width_str)
     vb_x, vb_y, vb_w, vb_h = vb
 
     mm_per_unit = (width_inch * 25.4) / vb_w if vb_w else 1

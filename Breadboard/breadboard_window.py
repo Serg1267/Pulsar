@@ -33,6 +33,21 @@ _LABEL_MAP: dict[str, str] = {
     "axial_lay_2_500mil_pcb.svg": "Res_13mm",
     "axial_lay_2_600mil_pcb.svg": "Res_15mm",
     "axial_lay_2_800mil_pcb.svg": "Res_20mm",
+    "capacitor_ceramic_100mil.svg": "Кер100",
+    "capacitor_ceramic_200mil.svg": "Кер200",
+    "capacitor_tantalum_100mil.svg": "Тан100",
+    "capacitor_tantalum_200mil.svg": "Тан200",
+    "capacitor_pp_5mm_pcb.svg": "PP5",
+    "capacitor_pp_7.5mm_pcb.svg": "PP7.5",
+    "capacitor_pp_10mm_pcb.svg": "PP10",
+    "capacitor_pp_15mm_pcb.svg": "PP15",
+    "capacitor_pp_22.5mm_pcb.svg": "PP22.5",
+    "capacitor_pp_27.5mm_pcb.svg": "PP27.5",
+    "capacitor_pp_37.5mm_pcb.svg": "PP37.5",
+    "capacitor_elko_small_100mil.svg": "Эл100",
+    "capacitor_elko_medium_200mil.svg": "Эл200",
+    "capacitor_elko_large_300mil.svg": "Эл300",
+    "capacitor_elko_goldcap_4.0F_8647a5c11c9b485c095f1ac7ddec049d_2_pcb.svg": "Goldcap",
 }
 
 # PIN_MAP: footprint SVG filename → [copper_idx_for_pin_0, pin_1, …]
