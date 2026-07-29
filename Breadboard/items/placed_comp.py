@@ -137,6 +137,13 @@ class PlacedCompItem(QGraphicsItem):
         self._other: list[tuple[QPainterPath, QPen, QBrush]] = []
 
         mmu = self._mmu
+
+        copper_rects = []
+        for cmd in self._pkg.commands:
+            if cmd.type == "rect" and cmd.layer.startswith("copper"):
+                copper_rects.append(QRectF(cmd.params["x"], cmd.params["y"],
+                                           cmd.params["w"], cmd.params["h"]))
+
         for cmd in self._pkg.commands:
             path = self._cmd_to_path(cmd)
             if path is None:
@@ -146,6 +153,15 @@ class PlacedCompItem(QGraphicsItem):
             is_silk = cmd.layer == "silkscreen"
 
             if is_copper:
+                cx = cmd.params.get("cx", 0)
+                cy = cmd.params.get("cy", 0)
+                hidden = False
+                for rect in copper_rects:
+                    if rect.contains(QPointF(cx, cy)):
+                        hidden = True
+                        break
+                if hidden:
+                    continue
                 pen = QPen(PAD_COLOR.darker(120), 0.1 / mmu)
                 brush = QBrush(PAD_COLOR)
                 self._copper.append((path, pen, brush))
