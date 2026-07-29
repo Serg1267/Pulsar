@@ -156,7 +156,10 @@ class PlacedCompItem(QGraphicsItem):
             else:
                 fill_s = cmd.params.get("fill", "none")
                 stroke_s = cmd.params.get("stroke", "")
-                pen = QPen(QColor(stroke_s if stroke_s else SILK_COLOR), 0.15 / mmu)
+                if stroke_s and stroke_s != "none":
+                    pen = QPen(QColor(stroke_s), 0.15 / mmu)
+                else:
+                    pen = QPen(Qt.PenStyle.NoPen)
                 brush = QBrush(QColor(fill_s)) if fill_s and fill_s != "none" else QBrush(Qt.BrushStyle.NoBrush)
                 self._other.append((path, pen, brush))
 
@@ -251,7 +254,7 @@ class PlacedCompItem(QGraphicsItem):
                 painter.save()
                 painter.setOpacity(self._body_opacity)
             for path, pen, brush in lst:
-                if self.isSelected() and not is_copper:
+                if self.isSelected() and not is_copper and pen.style() != Qt.PenStyle.NoPen:
                     p = QPen(QColor("#ffcc00"), pen.widthF())
                     painter.setPen(p)
                 else:
